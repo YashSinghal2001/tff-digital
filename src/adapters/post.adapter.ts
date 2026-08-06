@@ -6,13 +6,18 @@ import { adaptAuthor } from "@/adapters/author.adapter";
 import { adaptCategory, adaptTag } from "@/adapters/taxonomy.adapter";
 
 export function adaptPost(wpPost: WPPost): Post {
+  // WPGraphQL returns null (not "") for excerpt/content on posts with no
+  // body text, even though the schema types them as non-null strings.
+  const excerpt = wpPost.excerpt ?? "";
+  const content = wpPost.content ?? "";
+
   return {
     id: wpPost.id,
     databaseId: wpPost.databaseId,
     slug: wpPost.slug,
     title: wpPost.title,
-    excerpt: wpPost.excerpt,
-    content: wpPost.content,
+    excerpt,
+    content,
     publishedAt: wpPost.date,
     updatedAt: wpPost.modified,
     featuredImage: wpPost.featuredImage
@@ -23,7 +28,7 @@ export function adaptPost(wpPost: WPPost): Post {
     tags: wpPost.tags?.nodes.map(adaptTag) ?? [],
     seo: adaptSeo(wpPost.seo, {
       title: wpPost.title,
-      description: wpPost.excerpt,
+      description: excerpt,
     }),
   };
 }

@@ -9,8 +9,8 @@ export interface WPPost {
   databaseId: number;
   slug: string;
   title: string;
-  excerpt: string;
-  content: string;
+  excerpt: string | null;
+  content: string | null;
   date: string;
   modified: string;
   featuredImage: { node: WPMediaItem } | null;

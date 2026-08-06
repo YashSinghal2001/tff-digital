@@ -3,7 +3,9 @@ import { getPosts, getPostsBySearch } from "@/services/post.service";
 import { getCategories, getTags } from "@/services/taxonomy.service";
 import { BlogHero } from "@/sections/blog/BlogHero";
 import { BlogResults } from "@/sections/blog/BlogResults";
+import { BlogSidebar } from "@/components/blog/BlogSidebar";
 import { NewsletterSection } from "@/components/blog/NewsletterSection";
+import { Container } from "@/components/ui/Container";
 import { JsonLd } from "@/components/common/JsonLd";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/json-ld";
 import { getCanonicalUrl } from "@/lib/seo/canonical";
@@ -24,11 +26,15 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const { q, after } = await searchParams;
   const query = q?.trim() || undefined;
 
-  const [result, categories, tags] = await Promise.all([
+  const [result, categories, tags, sidebarPosts] = await Promise.all([
     query ? getPostsBySearch(query, { first: 9, after }) : getPosts({ first: 9, after }),
     getCategories(),
     getTags(),
+    getPosts({ first: 8 }),
   ]);
+
+  const recentPosts = sidebarPosts.items.slice(0, 4);
+  const popularPosts = sidebarPosts.items.slice(4, 8);
 
   return (
     <>
@@ -39,14 +45,27 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         ])}
       />
       <BlogHero defaultQuery={query} />
-      <BlogResults
-        posts={result.items}
-        pageInfo={result.pageInfo}
-        categories={categories}
-        tags={tags}
-        query={query}
-        basePath={ROUTES.blog}
-      />
+      <section className="pb-16 lg:pb-24">
+        <Container size="full" className="max-w-[1280px]">
+          <div className="grid gap-10 lg:grid-cols-[1fr_300px]">
+            <BlogResults
+              posts={result.items}
+              pageInfo={result.pageInfo}
+              query={query}
+              basePath={ROUTES.blog}
+            />
+            <aside className="lg:sticky lg:top-28 lg:h-fit">
+              <BlogSidebar
+                categories={categories}
+                tags={tags}
+                recentPosts={recentPosts}
+                popularPosts={popularPosts}
+                showSearch={false}
+              />
+            </aside>
+          </div>
+        </Container>
+      </section>
       <NewsletterSection />
     </>
   );

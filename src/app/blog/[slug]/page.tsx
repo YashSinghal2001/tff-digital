@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getPostBySlug, getPostsByCategory } from "@/services/post.service";
+import Image from "next/image";
+import { getPostBySlug, getPostsByCategory, getPostsByTag, getPosts } from "@/services/post.service";
+import { getCategories, getTags } from "@/services/taxonomy.service";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { Breadcrumbs } from "@/components/blog/Breadcrumbs";
@@ -10,6 +12,7 @@ import { TableOfContents } from "@/components/blog/TableOfContents";
 import { ShareButtons } from "@/components/blog/ShareButtons";
 import { ReadingTime } from "@/components/blog/ReadingTime";
 import { RelatedPosts } from "@/components/blog/RelatedPosts";
+import { BlogSidebar } from "@/components/blog/BlogSidebar";
 import { JsonLd } from "@/components/common/JsonLd";
 import { buildBlogPostingJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo/json-ld";
 import { buildMetadata } from "@/lib/seo/metadata";
@@ -17,6 +20,7 @@ import { getCanonicalUrl } from "@/lib/seo/canonical";
 import { withHeadingIds } from "@/lib/content/post-content";
 import { formatPostDate } from "@/lib/content/format-date";
 import { ROUTES } from "@/constants/routes";
+import type { Post } from "@/types/domain/post";
 
 interface BlogPostPageProps {
   params: Promise<{ slug: string }>;
@@ -41,17 +45,37 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const canonicalUrl = getCanonicalUrl(ROUTES.blogPost(slug));
 
   const primaryCategory = post.categories[0];
-  const related = primaryCategory
-    ? (await getPostsByCategory(primaryCategory.slug, { first: 4 })).items
-        .filter((item) => item.id !== post.id)
-        .slice(0, 3)
-    : [];
+  const primaryTag = post.tags[0];
+
+  const [categoryMatches, tagMatches, categories, tags, sidebarPosts] = await Promise.all([
+    primaryCategory ? getPostsByCategory(primaryCategory.slug, { first: 4 }) : null,
+    primaryTag ? getPostsByTag(primaryTag.slug, { first: 4 }) : null,
+    getCategories(),
+    getTags(),
+    getPosts({ first: 8 }),
+  ]);
+
+  // Related posts draw from both the post's primary category and primary
+  // tag, deduped by id, so a post with no shared category (or vice versa)
+  // still surfaces relevant reading instead of an empty section.
+  const relatedCandidates = [...(categoryMatches?.items ?? []), ...(tagMatches?.items ?? [])];
+  const seenRelatedIds = new Set<string>();
+  const related: Post[] = [];
+  for (const candidate of relatedCandidates) {
+    if (candidate.id === post.id || seenRelatedIds.has(candidate.id)) continue;
+    seenRelatedIds.add(candidate.id);
+    related.push(candidate);
+    if (related.length === 3) break;
+  }
+
+  const recentPosts = sidebarPosts.items.filter((item) => item.id !== post.id).slice(0, 4);
+  const popularPosts = sidebarPosts.items.filter((item) => item.id !== post.id).slice(4, 8);
 
   return (
     <>
       <JsonLd
         data={[
-          buildBlogPostingJsonLd(post),
+          buildBlogPostingJsonLd(post, canonicalUrl),
           buildBreadcrumbJsonLd([
             { name: "Home", url: getCanonicalUrl(ROUTES.home) },
             { name: "Blog", url: getCanonicalUrl(ROUTES.blog) },
@@ -93,7 +117,20 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             <ShareButtons url={canonicalUrl} title={post.title} />
           </header>
 
-          <div className="mx-auto mt-10 grid max-w-5xl gap-10 lg:grid-cols-[1fr_260px]">
+          {post.featuredImage ? (
+            <div className="relative mx-auto mt-8 aspect-[16/9] w-full max-w-5xl overflow-hidden rounded-[25px] border border-border-strong bg-white/5">
+              <Image
+                src={post.featuredImage.url}
+                alt={post.featuredImage.altText || post.title}
+                fill
+                priority
+                sizes="(max-width: 1024px) 100vw, 1024px"
+                className="object-cover"
+              />
+            </div>
+          ) : null}
+
+          <div className="mx-auto mt-10 grid max-w-5xl gap-10 lg:grid-cols-[1fr_300px]">
             {/* Visually hidden: guarantees h1 -> h2 order even when the post
                 body has no h2 of its own and there are no related posts to
                 supply one (both render their own real h2/h3 when present). */}
@@ -103,6 +140,12 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             <aside className="flex flex-col gap-6 lg:sticky lg:top-28 lg:h-fit">
               <TableOfContents headings={headings} />
               {post.author ? <AuthorCard author={post.author} /> : null}
+              <BlogSidebar
+                categories={categories}
+                tags={tags}
+                recentPosts={recentPosts}
+                popularPosts={popularPosts}
+              />
             </aside>
           </div>
 

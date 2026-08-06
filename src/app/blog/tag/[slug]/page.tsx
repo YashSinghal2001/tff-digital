@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getPostsByTag } from "@/services/post.service";
-import { getTags } from "@/services/taxonomy.service";
+import { getPosts, getPostsByTag } from "@/services/post.service";
+import { getCategories, getTags } from "@/services/taxonomy.service";
 import { PageHero } from "@/components/common/PageHero";
 import { Container } from "@/components/ui/Container";
 import { Breadcrumbs } from "@/components/blog/Breadcrumbs";
 import { PostCard } from "@/components/blog/PostCard";
 import { Pagination } from "@/components/blog/Pagination";
 import { BlogEmptyState } from "@/components/blog/BlogEmptyState";
+import { BlogSidebar } from "@/components/blog/BlogSidebar";
 import { JsonLd } from "@/components/common/JsonLd";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/json-ld";
 import { getCanonicalUrl } from "@/lib/seo/canonical";
@@ -34,10 +35,17 @@ export default async function BlogTagPage({ params, searchParams }: TagPageProps
   const { slug } = await params;
   const { after } = await searchParams;
 
-  const tag = (await getTags()).find((item) => item.slug === slug);
+  const [categories, tags, sidebarPosts] = await Promise.all([
+    getCategories(),
+    getTags(),
+    getPosts({ first: 8 }),
+  ]);
+  const tag = tags.find((item) => item.slug === slug);
   if (!tag) notFound();
 
   const result = await getPostsByTag(slug, { first: 9, after });
+  const recentPosts = sidebarPosts.items.slice(0, 4);
+  const popularPosts = sidebarPosts.items.slice(4, 8);
 
   return (
     <>
@@ -60,23 +68,35 @@ export default async function BlogTagPage({ params, searchParams }: TagPageProps
             className="mb-8"
           />
 
-          {result.items.length === 0 ? (
-            <BlogEmptyState
-              title="No articles with this tag yet"
-              description="Check back soon — we're publishing new content regularly."
-            />
-          ) : (
-            <>
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {result.items.map((post, index) => (
-                  <PostCard key={post.id} post={post} priority={index === 0} />
-                ))}
-              </div>
-              <div className="mt-12">
-                <Pagination pageInfo={result.pageInfo} basePath={ROUTES.blogTag(slug)} />
-              </div>
-            </>
-          )}
+          <div className="grid gap-10 lg:grid-cols-[1fr_300px]">
+            <div>
+              {result.items.length === 0 ? (
+                <BlogEmptyState
+                  title="No articles with this tag yet"
+                  description="Check back soon — we're publishing new content regularly."
+                />
+              ) : (
+                <>
+                  <div className="grid gap-6 sm:grid-cols-2">
+                    {result.items.map((post, index) => (
+                      <PostCard key={post.id} post={post} priority={index === 0} />
+                    ))}
+                  </div>
+                  <div className="mt-12">
+                    <Pagination pageInfo={result.pageInfo} basePath={ROUTES.blogTag(slug)} />
+                  </div>
+                </>
+              )}
+            </div>
+            <aside className="lg:sticky lg:top-28 lg:h-fit">
+              <BlogSidebar
+                categories={categories}
+                tags={tags}
+                recentPosts={recentPosts}
+                popularPosts={popularPosts}
+              />
+            </aside>
+          </div>
         </Container>
       </section>
     </>

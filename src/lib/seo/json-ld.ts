@@ -19,17 +19,26 @@ export function buildWebsiteJsonLd(): Record<string, unknown> {
   };
 }
 
-export function buildBlogPostingJsonLd(post: Post): Record<string, unknown> {
+export function buildBlogPostingJsonLd(
+  post: Post,
+  canonicalUrl: string,
+): Record<string, unknown> {
   return {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
+    "@id": canonicalUrl,
+    mainEntityOfPage: { "@type": "WebPage", "@id": canonicalUrl },
     headline: post.title,
+    description: post.excerpt || undefined,
     datePublished: post.publishedAt,
     dateModified: post.updatedAt,
-    image: post.featuredImage?.url,
+    image: post.featuredImage?.url
+      ? { "@type": "ImageObject", url: post.featuredImage.url }
+      : undefined,
     author: post.author
       ? { "@type": "Person", name: post.author.name }
       : undefined,
+    publisher: buildOrganizationJsonLd(),
   };
 }
 
