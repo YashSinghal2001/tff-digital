@@ -1,0 +1,15 @@
+export const ROUTES = {
+  home: "/",
+  about: "/about",
+  services: "/services",
+  service: (slug: string) => `/services/${slug}`,
+  portfolio: "/portfolio",
+  portfolioItem: (slug: string) => `/portfolio/${slug}`,
+  caseStudies: "/case-studies",
+  caseStudy: (slug: string) => `/case-studies/${slug}`,
+  blog: "/blog",
+  blogPost: (slug: string) => `/blog/${slug}`,
+  blogCategory: (slug: string) => `/blog/category/${slug}`,
+  blogTag: (slug: string) => `/blog/tag/${slug}`,
+  contact: "/contact",
+} as const;

@@ -1,0 +1,47 @@
+:root {
+  /* Colors */
+  --color-background: #0c1025;
+  --color-primary: #3882f6;
+  --color-secondary: #8b5cf6;
+  --color-foreground: #ffffff;
+  --color-muted: #d8d8d8;
+  --color-glass-background: rgba(17, 16, 31, 0.2);
+  --color-border-strong: #545768;
+  --color-border-subtle: #252838;
+  --color-inner-shadow: #212e49;
+
+  --gradient-brand: linear-gradient(90deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+
+  /* Typography */
+  --font-heading: var(--font-poppins);
+  --font-body: var(--font-open-sans);
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 25px;
+  --radius-full: 9999px;
+
+  /* Spacing */
+  --page-gutter-desktop: 80px;
+  --page-gutter-tablet: 40px;
+  --page-gutter-mobile: 20px;
+  --section-spacing-desktop: 96px;
+  --section-spacing-tablet: 64px;
+  --section-spacing-mobile: 48px;
+  --container-content: 1280px;
+
+  /* Shadows */
+  --shadow-inner-glass: inset 0px 4px 4px 0px rgba(33, 46, 73, 1);
+  --shadow-card: 0px 8px 24px 0px rgba(0, 0, 0, 0.25);
+  --shadow-glow: 0px 0px 40px 0px rgba(56, 130, 246, 0.35);
+
+  /* Motion */
+  --duration-fast: 0.15s;
+  --duration-base: 0.25s;
+  --duration-slow: 0.4s;
+  --duration-slower: 0.6s;
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+}
