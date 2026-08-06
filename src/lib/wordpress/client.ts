@@ -28,14 +28,24 @@ export async function fetchGraphQL<TData>(
     );
   }
 
+  // No caller currently passes `cache` or `next`, so this default applies
+  // globally: uncached WordPress fetches become ISR (revalidate every 60s)
+  // instead of Next.js's implicit permanent static cache. An explicit
+  // `cache` always wins and is never combined with `next.revalidate`,
+  // since fetch() rejects requests that set both.
+  const cacheOption = options?.cache;
+  const nextOption = cacheOption
+    ? undefined
+    : (options?.next ?? { revalidate: 60 });
+
   let response: Response;
   try {
     response = await fetch(wordpressConfig.graphqlEndpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ query, variables }),
-      cache: options?.cache,
-      next: options?.next,
+      cache: cacheOption,
+      next: nextOption,
     });
   } catch (cause) {
     throw new WordPressError(
