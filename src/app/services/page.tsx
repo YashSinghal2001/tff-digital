@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getCanonicalUrl } from "@/lib/seo/canonical";
 import { ROUTES } from "@/constants/routes";
+import { getServiceOfferings } from "@/services/service-offering.service";
 import { ServicesHero } from "@/sections/services/ServicesHero";
 import { ServicesGrid } from "@/sections/services/ServicesGrid";
 import { WhySeniorLed } from "@/sections/services/WhySeniorLed";
@@ -14,11 +15,13 @@ export const metadata: Metadata = {
   alternates: { canonical: getCanonicalUrl(ROUTES.services) },
 };
 
-export default function ServicesPage() {
+export default async function ServicesPage() {
+  const services = await getServiceOfferings();
+
   return (
     <>
       <ServicesHero />
-      <ServicesGrid />
+      <ServicesGrid services={services.items} />
       <WhySeniorLed />
       <FAQ />
       <CTABookForm />

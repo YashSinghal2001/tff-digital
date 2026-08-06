@@ -6,20 +6,24 @@ import { adaptSeo } from "@/adapters/seo.adapter";
 export function adaptServiceOffering(
   wpService: WPServiceOffering,
 ): ServiceOffering {
+  const summary = wpService.serviceFields?.shortDescription ?? "";
+
   return {
     id: wpService.id,
     slug: wpService.slug,
     title: wpService.title,
-    summary: wpService.summary ?? "",
-    content: wpService.content,
-    icon: wpService.icon ? adaptMedia(wpService.icon) : null,
+    summary,
+    content: wpService.content || wpService.serviceFields?.description || "",
+    icon: wpService.serviceFields?.icon
+      ? adaptMedia(wpService.serviceFields.icon.node)
+      : null,
     featuredImage: wpService.featuredImage
       ? adaptMedia(wpService.featuredImage.node)
       : null,
-    order: wpService.menuOrder,
+    order: wpService.serviceFields?.displayOrder ?? null,
     seo: adaptSeo(wpService.seo, {
       title: wpService.title,
-      description: wpService.summary ?? "",
+      description: summary,
     }),
   };
 }

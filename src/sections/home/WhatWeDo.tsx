@@ -1,44 +1,28 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { TrendingUp, Megaphone, Search, Palette, CodeXml } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Heading } from "@/components/ui/Heading";
 import { GradientText } from "@/components/ui/GradientText";
 import { SectionEyebrow } from "@/components/common/SectionEyebrow";
-import { FeatureGrid } from "@/components/common/FeatureGrid";
+import { FeatureGrid, type FeatureGridItem } from "@/components/common/FeatureGrid";
 import { ROUTES } from "@/constants/routes";
 import { fadeInUp } from "@/styles/animations";
+import { getServiceIcon } from "@/lib/content/service-icons";
+import type { ServiceOffering } from "@/types/domain/service-offering";
 
-const services = [
-  { icon: TrendingUp, title: "CRO", description: "Turn traffic into revenue.", href: ROUTES.services },
-  {
-    icon: Megaphone,
-    title: "Google & Meta Ads",
-    description: "Profitable paid acquisition at scale.",
-    href: ROUTES.services,
-  },
-  {
-    icon: Search,
-    title: "SEO",
-    description: "Rank for what your buyers actually search.",
-    href: ROUTES.service("seo"),
-  },
-  {
-    icon: Palette,
-    title: "Branding",
-    description: "Distinct, ownable visual identity systems.",
-    href: ROUTES.services,
-  },
-  {
-    icon: CodeXml,
-    title: "Website Design & Development",
-    description: "Fast, conversion-focused builds.",
-    href: ROUTES.services,
-  },
-];
+interface WhatWeDoProps {
+  services: ServiceOffering[];
+}
 
-export function WhatWeDo() {
+export function WhatWeDo({ services }: WhatWeDoProps) {
+  const items: FeatureGridItem[] = services.map((service) => ({
+    icon: getServiceIcon(service.slug),
+    title: service.title,
+    description: service.summary,
+    href: ROUTES.service(service.slug),
+  }));
+
   return (
     <section id="services" className="py-16 lg:py-24">
       <Container size="full" className="max-w-[1280px]">
@@ -58,7 +42,7 @@ export function WhatWeDo() {
           </p>
         </motion.div>
 
-        <FeatureGrid items={services} titleClassName="text-lg" />
+        <FeatureGrid items={items} titleClassName="text-lg" />
       </Container>
     </section>
   );

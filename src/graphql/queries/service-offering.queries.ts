@@ -8,16 +8,21 @@ const SERVICE_FIELDS = gql`
     slug
     title
     content
-    summary
-    icon {
-      ...MediaFields
-    }
     featuredImage {
       node {
         ...MediaFields
       }
     }
-    menuOrder
+    serviceFields {
+      shortDescription
+      description
+      displayOrder
+      icon {
+        node {
+          ...MediaFields
+        }
+      }
+    }
     seo {
       ...SeoFields
     }

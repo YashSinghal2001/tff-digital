@@ -2,15 +2,20 @@ import type { WPMediaItem } from "@/types/api/wp-media";
 import type { WPSeo } from "@/types/api/wp-seo";
 import type { WPConnection } from "@/types/api/wp-connection";
 
+export interface WPServiceFields {
+  shortDescription: string | null;
+  description: string | null;
+  displayOrder: number | null;
+  icon: { node: WPMediaItem } | null;
+}
+
 export interface WPServiceOffering {
   id: string;
   slug: string;
   title: string;
-  content: string;
-  summary: string | null;
-  icon: WPMediaItem | null;
+  content: string | null;
   featuredImage: { node: WPMediaItem } | null;
-  menuOrder: number | null;
+  serviceFields: WPServiceFields | null;
   seo: WPSeo | null;
 }
 
