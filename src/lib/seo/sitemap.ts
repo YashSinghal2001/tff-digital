@@ -24,16 +24,26 @@ const STATIC_ROUTES = [
 ];
 
 export async function getAllSitemapEntries(): Promise<SitemapEntry[]> {
-  const posts = await getPosts({ first: 1000 });
-
   const staticEntries: SitemapEntry[] = STATIC_ROUTES.map((route) => ({
     url: getCanonicalUrl(route),
   }));
 
-  const postEntries: SitemapEntry[] = posts.items.map((post) => ({
-    url: getCanonicalUrl(ROUTES.blogPost(post.slug)),
-    lastModified: post.updatedAt,
-  }));
+  try {
+    const posts = await getPosts({ first: 1000 });
+    const postEntries: SitemapEntry[] = posts.items.map((post) => ({
+      url: getCanonicalUrl(ROUTES.blogPost(post.slug)),
+      lastModified: post.updatedAt,
+    }));
 
-  return [...staticEntries, ...postEntries];
+    return [...staticEntries, ...postEntries];
+  } catch (error) {
+    // sitemap.xml is statically generated at build time; a WPGraphQL outage
+    // here would otherwise fail the whole Vercel build. Ship the static
+    // routes alone and pick up post entries again on the next successful build.
+    console.error(
+      "[getAllSitemapEntries] WPGraphQL request failed; sitemap will omit blog posts for this build.",
+      error,
+    );
+    return staticEntries;
+  }
 }
