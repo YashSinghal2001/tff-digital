@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { Container } from "@/components/ui/Container";
@@ -21,8 +21,24 @@ const navLinks = [
 export function Navbar() {
   const [open, setOpen] = useState(false);
 
+  useEffect(() => {
+    if (!open) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [open]);
+
   return (
     <header className="fixed inset-x-0 top-6 z-50">
+      {open && (
+        <div
+          className="fixed inset-0 -z-10 bg-background/80 backdrop-blur-sm lg:hidden"
+          onClick={() => setOpen(false)}
+          aria-hidden="true"
+        />
+      )}
       <Container size="full" className="max-w-[1280px]">
         <div className="flex h-[69px] items-center justify-between rounded-[25px] border border-border-strong bg-glass px-6 backdrop-blur-md">
           <Link href={ROUTES.home} className="flex items-center gap-2">

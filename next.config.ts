@@ -43,6 +43,11 @@ const nextConfig: NextConfig = {
         : []),
       // Mock media host used by src/lib/mock while WORDPRESS_USE_MOCK_DATA=true.
       { protocol: "https" as const, hostname: "placehold.co" },
+      // WordPress's own get_avatar_url() falls back to Gravatar (secure.gravatar.com)
+      // for any user without a custom-uploaded avatar — confirmed live on the
+      // "admin" author. Without this, next/image's optimizer 400s on every such
+      // avatar (see src/components/blog/AuthorCard.tsx).
+      { protocol: "https" as const, hostname: "secure.gravatar.com" },
     ],
   },
   experimental: {

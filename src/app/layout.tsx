@@ -48,9 +48,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${poppins.variable} ${openSans.variable} antialiased`}>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-background focus:px-5 focus:py-3 focus:text-sm focus:font-semibold focus:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+        >
+          Skip to main content
+        </a>
         <JsonLd data={[buildOrganizationJsonLd(), buildWebsiteJsonLd()]} />
         <Navbar />
-        <main className="pt-28">{children}</main>
+        <main id="main-content" tabIndex={-1} className="pt-28 outline-none">
+          {children}
+        </main>
         <Footer />
       </body>
     </html>

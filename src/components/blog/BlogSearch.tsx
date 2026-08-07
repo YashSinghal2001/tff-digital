@@ -41,7 +41,7 @@ export function BlogSearch({ defaultValue = "", className }: BlogSearchProps) {
         value={value}
         onChange={(event) => setValue(event.target.value)}
         placeholder="Search articles..."
-        className="w-full bg-transparent font-body text-sm text-white placeholder:text-muted focus:outline-none"
+        className="w-full bg-transparent font-body text-sm text-white placeholder:text-muted outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
       />
     </form>
   );

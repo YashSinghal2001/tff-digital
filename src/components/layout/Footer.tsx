@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { Link2, Globe, Send, Mail, Phone, MapPin } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Input } from "@/components/ui/Input";
@@ -35,6 +35,14 @@ const socialLinks = [
 
 export function Footer() {
   const [email, setEmail] = useState("");
+  const [subscribed, setSubscribed] = useState(false);
+
+  const onSubscribe = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!email.trim()) return;
+    setSubscribed(true);
+    setEmail("");
+  };
 
   return (
     <footer className="border-t border-border-subtle">
@@ -52,21 +60,25 @@ export function Footer() {
             <p className="mt-6 font-heading text-sm font-semibold text-white">
               Get growth insights, monthly.
             </p>
-            <form
-              onSubmit={(event) => event.preventDefault()}
-              className="mt-3 flex max-w-xs gap-2"
-            >
-              <Input
-                type="email"
-                placeholder="you@company.com"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                className="h-11"
-              />
-              <button type="submit" className={buttonVariants({ size: "sm", className: "h-11 shrink-0" })}>
-                Subscribe
-              </button>
-            </form>
+            {subscribed ? (
+              <p role="status" className="mt-3 font-body text-sm font-semibold text-primary">
+                You&apos;re subscribed — thanks for joining.
+              </p>
+            ) : (
+              <form onSubmit={onSubscribe} className="mt-3 flex max-w-xs gap-2">
+                <Input
+                  type="email"
+                  placeholder="you@company.com"
+                  required
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  className="h-11"
+                />
+                <button type="submit" className={buttonVariants({ size: "sm", className: "h-11 shrink-0" })}>
+                  Subscribe
+                </button>
+              </form>
+            )}
 
             <div className="mt-6 flex gap-3">
               {socialLinks.map(({ label, href, icon: Icon }) => (

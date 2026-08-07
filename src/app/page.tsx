@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getCanonicalUrl } from "@/lib/seo/canonical";
+import { seoConfig } from "@/config/seo.config";
 import { ROUTES } from "@/constants/routes";
 import { getServiceOfferings } from "@/services/service-offering.service";
 import { getCaseStudies } from "@/services/case-study.service";
@@ -16,7 +17,11 @@ import { FAQ } from "@/sections/shared/FAQ";
 import { CTABookForm } from "@/sections/shared/CTABookForm";
 
 export const metadata: Metadata = {
-  title: "Home",
+  // Next's title.template (root layout) never applies to app/page.tsx, since
+  // it's the same route segment as app/layout.tsx that defines the template
+  // — so this must spell out the site name explicitly, or the homepage
+  // <title> renders as the bare string below with no brand name at all.
+  title: seoConfig.defaultTitle,
   description:
     "Target Find & Finish Digital — strategy, branding, and performance marketing built to compound.",
   alternates: { canonical: getCanonicalUrl(ROUTES.home) },

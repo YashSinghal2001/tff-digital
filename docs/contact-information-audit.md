@@ -1,84 +1,59 @@
 # Contact Information Audit
 
-Every email address, phone number, physical address, and social link found
-in the source tree, with exact locations. No values are changed here — per
-Phase 4E's explicit instructions, none of these can be safely corrected
-without the real production values being supplied.
+Every email address, phone number, address, and social link found in
+`src/`, with exact locations, cross-checked for conflicts. No values were
+changed in this pass — see "Recommended action" per row for why.
 
-## Email addresses
+## Emails
 
-| Value | File:Line | Type |
-|---|---|---|
-| `hello@targetfindfinish.com` | `src/sections/contact/ContactFormSection.tsx:12` | **Displayed contact info** |
-| `hello@tffdigital.com` | `src/components/layout/Footer.tsx:108` | **Displayed contact info** |
-| `you@company.com` | `src/features/contact/ContactForm.tsx:82` | Input placeholder text (not a real address) |
-| `you@company.com` | `src/components/layout/Footer.tsx:61` | Newsletter input placeholder text (not a real address) |
-| `you@company.com` | `src/components/blog/NewsletterSection.tsx:60` | Newsletter input placeholder text (not a real address) |
+| File | Exact value | Where it appears | Conflicts with | Real / placeholder / unknown | Recommended action |
+|---|---|---|---|---|---|
+| `src/sections/contact/ContactFormSection.tsx:12` | `hello@targetfindfinish.com` | Contact page, "Business info" card | `Footer.tsx:108` (different domain) | Unknown | **BLOCKED — needs owner value** |
+| `src/components/layout/Footer.tsx:108` | `hello@tffdigital.com` | Sitewide footer, every page | `ContactFormSection.tsx:12` | Unknown | **BLOCKED — needs owner value** |
+| `src/features/contact/ContactForm.tsx:82` | `jane@company.com` | Input `placeholder` attribute, empty-state hint only | — | Intentional placeholder (not a real address, never rendered as a claim) | No action needed |
+| `src/components/layout/Footer.tsx:61` | `you@company.com` | Newsletter input `placeholder` | — | Intentional placeholder | No action needed |
+| `src/components/blog/NewsletterSection.tsx:60` | `you@company.com` | Newsletter input `placeholder` | — | Intentional placeholder | No action needed |
 
-**Inconsistency**: `ContactFormSection.tsx` and `Footer.tsx` display two
-*different* domains for the same business — `targetfindfinish.com` vs
-`tffdigital.com`. Both pages are live simultaneously (`/contact` and every
-page's footer), so a visitor sees a different email depending on which one
-they read. This needs the owner to confirm the single correct address.
-
-The `you@company.com` placeholders are not a bug — they're standard
-`placeholder="..."` attribute text shown in an empty input before a user
-types, never displayed as actual contact information.
+**On the domain-matching observation, and why I did not act on it**: `hello@tffdigital.com` shares its domain with `NEXT_PUBLIC_SITE_URL` (`https://tffdigital.com`), the value used everywhere else in the app as the canonical domain (sitemap, canonical URLs, Open Graph, JSON-LD). That's a real, code-derivable data point — but domain-matching alone isn't proof of intent; a business can legitimately use a different domain for email than for its website (common during a rebrand — `targetfindfinish.com` reads like it could be the pre-rebrand name, "Target Find Finish" appearing throughout the site's own copy, e.g. `HeroSection.tsx`'s "Target Right. Find Strategy. Finish Strong."). Given the explicit instruction not to guess contact info and the real cost of misdirecting business inquiries, I left both values untouched rather than treat a plausible pattern as authoritative.
 
 ## Phone numbers
 
-| Value | File:Line | Type |
-|---|---|---|
-| `+1 (512) 555-0128` | `src/sections/contact/ContactFormSection.tsx:13` | **Displayed contact info** — fake ("555" prefix) |
-| `+1 (415) 555-0132` | `src/components/layout/Footer.tsx:111` | **Displayed contact info** — fake ("555" prefix) |
-| `(555) 000-0000` | `src/features/contact/ContactForm.tsx:89` | Input placeholder text (not a real number) |
+| File | Exact value | Where it appears | Conflicts with | Real / placeholder / unknown | Recommended action |
+|---|---|---|---|---|---|
+| `src/sections/contact/ContactFormSection.tsx:13` | `+1 (512) 555-0128` | Contact page, "Business info" card | `Footer.tsx:111` (different number) | **Placeholder** — `555` is the reserved fictional-number exchange, never assigned to a real subscriber | **BLOCKED — needs owner value** |
+| `src/components/layout/Footer.tsx:111` | `+1 (415) 555-0132` | Sitewide footer | `ContactFormSection.tsx:13` | **Placeholder** — same reason | **BLOCKED — needs owner value** |
+| `src/features/contact/ContactForm.tsx:89` | `(555) 000-0000` | Input `placeholder` attribute | — | Intentional placeholder | No action needed |
 
-Both displayed numbers use the `555` exchange — the standard
-fiction/placeholder convention (US phone numbers `XXX-555-01XX` are
-reserved and never assigned to real subscribers). Neither is a working
-number. They are also **different numbers** in the two files (different
-area codes: 512 vs 415), so even setting aside that both are fake, they
-already contradict each other.
+Unlike the emails, there's no candidate value here that could be "normalized to" — both displayed numbers are independently fake, so there is no authoritative one to prefer.
 
-## Physical address
+## Address
 
-| Value | File:Line |
-|---|---|
-| `Zirakpur, Punjab, India` | `src/sections/contact/ContactFormSection.tsx:14` |
-| `Zirakpur, Punjab, India` | `src/components/layout/Footer.tsx:114` |
+| File | Exact value | Where it appears | Conflicts with | Real / placeholder / unknown | Recommended action |
+|---|---|---|---|---|---|
+| `src/sections/contact/ContactFormSection.tsx:14` | `Zirakpur, Punjab, India` | Contact page | — (matches Footer) | Unknown | Confirm with owner (lower urgency — no conflict to resolve, just unverified) |
+| `src/components/layout/Footer.tsx:114` | `Zirakpur, Punjab, India` | Sitewide footer | — (matches Contact page) | Unknown | Confirm with owner |
 
-This one **is** consistent between the two files — same city/state/country
-in both places. It's a city-level location only (no street address, no
-postal code), and there's no way to confirm from the repository alone
-whether this is the real business location or a placeholder — flagging for
-owner confirmation rather than assuming either way.
+Already consistent between the two files — no fix needed, just unverified.
 
-## Social links (`href="#"`)
+## Social links
 
-All six are dead placeholder links — clicking any of them does nothing
-(reloads the current page via a bare `#` fragment).
+| Platform | File | URL | Conflicts with | Status |
+|---|---|---|---|---|
+| LinkedIn | `ContactFormSection.tsx:18` | `#` | — | Placeholder, consistent |
+| Instagram | `ContactFormSection.tsx:19` | `#` | — | Placeholder, consistent |
+| YouTube | `ContactFormSection.tsx:20` | `#` | `Footer.tsx:33` lists Twitter here instead | Placeholder + **platform mismatch** |
+| LinkedIn | `Footer.tsx:31` | `#` | — | Placeholder, consistent |
+| Instagram | `Footer.tsx:32` | `#` | — | Placeholder, consistent |
+| Twitter | `Footer.tsx:33` | `#` | `ContactFormSection.tsx:20` lists YouTube here instead | Placeholder + **platform mismatch** |
 
-| Platform | File:Line | Section |
-|---|---|---|
-| LinkedIn | `src/sections/contact/ContactFormSection.tsx:18` | Contact page |
-| Instagram | `src/sections/contact/ContactFormSection.tsx:19` | Contact page |
-| YouTube | `src/sections/contact/ContactFormSection.tsx:20` | Contact page |
-| LinkedIn | `src/components/layout/Footer.tsx:31` | Sitewide footer |
-| Instagram | `src/components/layout/Footer.tsx:32` | Sitewide footer |
-| Twitter | `src/components/layout/Footer.tsx:33` | Sitewide footer |
+All six are the literal string `"#"` — no real URL exists to normalize toward for any of them. The YouTube-vs-Twitter mismatch is a genuine inconsistency, but *which* platform the business actually uses is a business fact, not a technical bug — I did not pick one to standardize on. WhatsApp, Calendly, and Facebook: no references found anywhere in `src/`.
 
-**Note**: the Contact page lists YouTube as the third platform; the footer
-lists Twitter instead — a third inconsistency (which platforms the business
-is actually present on), independent of the fact that none of the six URLs
-are real yet.
+## No `mailto:` / `tel:` links exist anywhere
 
-## What's needed from the owner to resolve this
+Both the email and phone number are rendered as plain, non-interactive text — not just inconsistent between the two files, but not even clickable/functional as contact affordances in either one. Worth the owner knowing this independent of which values are correct.
 
-1. **One** confirmed business email address (currently two conflicting candidates: `hello@targetfindfinish.com`, `hello@tffdigital.com`).
-2. **One** confirmed business phone number (currently two conflicting fake placeholders).
-3. Confirmation of whether `Zirakpur, Punjab, India` is the real, publishable business location.
-4. The real URLs for whichever social platforms the business actually maintains — and confirmation of which platforms those are (LinkedIn/Instagram appear on both; YouTube vs Twitter differs between the two files).
+## Summary: what's actually blocked vs. what's already fine
 
-No values were changed in this phase — this document exists so those four
-answers can be applied in one pass across both files once available,
-without further searching.
+**Genuinely blocked (no safe fix possible without real values):** email, phone, social platform/URLs, address confirmation.
+
+**Not blocked, no action needed:** the five `you@company.com`/`jane@company.com`/`(555) 000-0000` occurrences are input placeholder attributes — standard UI pattern, not contact-info claims, already correct as-is.

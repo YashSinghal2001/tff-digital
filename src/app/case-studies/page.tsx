@@ -46,6 +46,8 @@ export default async function CaseStudiesPage({ searchParams }: CaseStudiesPageP
             />
           ) : (
             <>
+              {/* Visually hidden: keeps h1 -> h3 card titles in valid heading order, matching the same pattern used in ServicesGrid.tsx. */}
+              <h2 className="sr-only">Case studies</h2>
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {result.items.map((caseStudy, index) => (
                   <CaseStudyCard key={caseStudy.id} caseStudy={caseStudy} priority={index === 0} />
