@@ -31,9 +31,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
   const post = await getPostBySlug(slug);
   if (!post) return {};
 
-  return buildMetadata(post.seo, {
-    alternates: { canonical: getCanonicalUrl(ROUTES.blogPost(slug)) },
-  });
+  return buildMetadata(post.seo, getCanonicalUrl(ROUTES.blogPost(slug)));
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {

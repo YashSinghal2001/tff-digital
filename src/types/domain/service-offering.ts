@@ -7,6 +7,8 @@ export interface ServiceOffering {
   title: string;
   summary: string;
   content: string;
+  publishedAt: string;
+  updatedAt: string;
   icon: Media | null;
   featuredImage: Media | null;
   order: number | null;

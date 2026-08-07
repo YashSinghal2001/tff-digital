@@ -1,6 +1,7 @@
 import type { WPSeo } from "@/types/api/wp-seo";
 import type { Seo } from "@/types/domain/seo";
 import { adaptMedia } from "@/adapters/media.adapter";
+import { stripHtml } from "@/lib/content/post-content";
 
 function isIndexable(metaRobotsNoindex: string | null | undefined): boolean {
   return metaRobotsNoindex !== "noindex";
@@ -29,7 +30,11 @@ export interface SeoFallback {
 
 export function adaptSeo(wpSeo: WPSeo | null, fallback: SeoFallback): Seo {
   const title = wpSeo?.title || fallback.title;
-  const description = wpSeo?.metaDesc || fallback.description;
+  // fallback.description often comes from a WP excerpt/summary field, which
+  // can carry raw HTML (e.g. "<p>...</p>") — strip it so a <meta
+  // description> never renders literal markup when Yoast's metaDesc is unset.
+  const fallbackDescription = stripHtml(fallback.description).replace(/\s+/g, " ").trim();
+  const description = wpSeo?.metaDesc || fallbackDescription;
   const ogImage = wpSeo?.opengraphImage
     ? adaptMedia(wpSeo.opengraphImage)
     : null;

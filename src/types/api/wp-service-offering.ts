@@ -14,6 +14,8 @@ export interface WPServiceOffering {
   slug: string;
   title: string;
   content: string | null;
+  date: string;
+  modified: string;
   featuredImage: { node: WPMediaItem } | null;
   serviceFields: WPServiceFields | null;
   seo: WPSeo | null;

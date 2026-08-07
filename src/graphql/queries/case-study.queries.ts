@@ -1,41 +1,44 @@
 import { gql } from "@/graphql/gql";
 import { MEDIA_FRAGMENT } from "@/graphql/fragments/media.fragment";
 import { SEO_FRAGMENT } from "@/graphql/fragments/seo.fragment";
+import { SERVICE_FIELDS } from "@/graphql/queries/service-offering.queries";
 
 const CASE_STUDY_FIELDS = gql`
   fragment CaseStudyFields on CaseStudy {
     id
     slug
     title
+    excerpt
     content
-    summary
-    client
-    industry
+    date
+    modified
     featuredImage {
       node {
         ...MediaFields
       }
     }
-    metrics {
-      label
-      value
-    }
-    relatedServices {
-      id
-      slug
-      title
-      summary
-      menuOrder
-      icon {
-        ...MediaFields
-      }
-      featuredImage {
-        node {
-          ...MediaFields
+    caseStudyFields {
+      clientName
+      industry
+      projectUrl
+      shortSummary
+      challenge
+      solution
+      result1Label
+      result1Value
+      result2Label
+      result2Value
+      result3Label
+      result3Value
+      result4Label
+      result4Value
+      featuredOnHomepage
+      relatedServices {
+        nodes {
+          ... on Service {
+            ...ServiceFields
+          }
         }
-      }
-      seo {
-        ...SeoFields
       }
     }
     seo {
@@ -44,6 +47,7 @@ const CASE_STUDY_FIELDS = gql`
   }
   ${MEDIA_FRAGMENT}
   ${SEO_FRAGMENT}
+  ${SERVICE_FIELDS}
 `;
 
 export const GET_CASE_STUDIES = gql`

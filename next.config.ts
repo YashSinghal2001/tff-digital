@@ -3,6 +3,35 @@ import type { NextConfig } from "next";
 
 const wordpressMediaHostname = process.env.WORDPRESS_MEDIA_HOSTNAME;
 
+// Next.js injects its own inline hydration/RSC-streaming <script> tags with
+// no nonce by default; locking script-src down to 'self' without
+// 'unsafe-inline' would break hydration on every page. A nonce-based CSP
+// would remove this need but requires middleware.ts plus wiring next/headers
+// through every layout — a bigger architecture change than this pass calls
+// for. next/image's `fill` mode also sets inline style="..." on the
+// underlying <img>, so style-src needs the same allowance.
+const scriptSrc = ["'self'", "'unsafe-inline'"];
+if (process.env.NODE_ENV !== "production") {
+  // Turbopack/webpack HMR in `next dev` requires eval; production builds do not.
+  scriptSrc.push("'unsafe-eval'");
+}
+
+const cspDirectives = [
+  `default-src 'self'`,
+  `script-src ${scriptSrc.join(" ")}`,
+  `style-src 'self' 'unsafe-inline'`,
+  // next/font self-hosts Google Fonts at build time (no fonts.gstatic.com request at runtime).
+  `font-src 'self'`,
+  // WordPress media host + the placehold.co mock fallback (see images.remotePatterns below), plus data: for any inline/blur placeholders.
+  `img-src 'self' data:${wordpressMediaHostname ? ` https://${wordpressMediaHostname}` : ""} https://placehold.co`,
+  // WP oEmbed YouTube embeds rendered inside ArticleContent (see src/components/blog/ArticleContent.tsx).
+  `frame-src 'self' https://www.youtube.com https://youtube.com https://www.youtube-nocookie.com`,
+  `frame-ancestors 'self'`,
+  `connect-src 'self'`,
+  `object-src 'none'`,
+  `base-uri 'self'`,
+].join("; ");
+
 const nextConfig: NextConfig = {
   turbopack: {
     root: path.join(__dirname),
@@ -18,6 +47,23 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     optimizePackageImports: ["lucide-react", "framer-motion"],
+  },
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=(), interest-cohort=()",
+          },
+          { key: "Content-Security-Policy", value: cspDirectives },
+        ],
+      },
+    ];
   },
 };
 

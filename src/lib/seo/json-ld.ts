@@ -1,5 +1,6 @@
 import { siteConfig } from "@/config/site.config";
 import type { Post } from "@/types/domain/post";
+import type { CaseStudy } from "@/types/domain/case-study";
 
 export function buildOrganizationJsonLd(): Record<string, unknown> {
   return {
@@ -38,6 +39,38 @@ export function buildBlogPostingJsonLd(
     author: post.author
       ? { "@type": "Person", name: post.author.name }
       : undefined,
+    publisher: buildOrganizationJsonLd(),
+  };
+}
+
+export function buildCaseStudyJsonLd(
+  caseStudy: CaseStudy,
+  canonicalUrl: string,
+): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    "@id": canonicalUrl,
+    mainEntityOfPage: { "@type": "WebPage", "@id": canonicalUrl },
+    name: caseStudy.title,
+    description: caseStudy.summary || caseStudy.excerpt || undefined,
+    url: canonicalUrl,
+    datePublished: caseStudy.publishedAt,
+    dateModified: caseStudy.updatedAt,
+    image: caseStudy.featuredImage?.url
+      ? { "@type": "ImageObject", url: caseStudy.featuredImage.url }
+      : undefined,
+    about: caseStudy.clientName
+      ? { "@type": "Organization", name: caseStudy.clientName }
+      : undefined,
+    additionalProperty:
+      caseStudy.results.length > 0
+        ? caseStudy.results.map((result) => ({
+            "@type": "PropertyValue",
+            name: result.label,
+            value: result.value,
+          }))
+        : undefined,
     publisher: buildOrganizationJsonLd(),
   };
 }

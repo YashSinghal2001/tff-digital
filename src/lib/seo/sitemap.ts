@@ -3,14 +3,18 @@ import { getCanonicalUrl } from "@/lib/seo/canonical";
 import { ROUTES } from "@/constants/routes";
 import { getPosts } from "@/services/post.service";
 import { getCaseStudies } from "@/services/case-study.service";
+import { getServiceOfferings } from "@/services/service-offering.service";
 
 export interface SitemapEntry {
   url: string;
   lastModified?: string;
 }
 
-// Portfolio and per-slug Service pages still have no route under src/app —
-// Case Studies do (src/app/case-studies), so they're included below.
+// Portfolio still has no route under src/app. Case Studies (src/app/case-studies)
+// and generic per-slug Service pages (src/app/services/[slug]) do — both included
+// below. /services/seo and /services/smm are bespoke pages with no matching
+// WordPress service slug (confirmed live), so they stay listed here as statics
+// rather than being derivable from the service repository.
 const STATIC_ROUTES = [
   ROUTES.home,
   ROUTES.about,
@@ -47,10 +51,27 @@ async function getCaseStudyEntries(): Promise<SitemapEntry[]> {
     const caseStudies = await getCaseStudies({ first: 1000 });
     return caseStudies.items.map((caseStudy) => ({
       url: getCanonicalUrl(ROUTES.caseStudy(caseStudy.slug)),
+      lastModified: caseStudy.updatedAt,
     }));
   } catch (error) {
     console.error(
       "[getAllSitemapEntries] WPGraphQL request failed; sitemap will omit case studies for this build.",
+      error,
+    );
+    return [];
+  }
+}
+
+async function getServiceOfferingEntries(): Promise<SitemapEntry[]> {
+  try {
+    const services = await getServiceOfferings({ first: 1000 });
+    return services.items.map((service) => ({
+      url: getCanonicalUrl(ROUTES.service(service.slug)),
+      lastModified: service.updatedAt,
+    }));
+  } catch (error) {
+    console.error(
+      "[getAllSitemapEntries] WPGraphQL request failed; sitemap will omit services for this build.",
       error,
     );
     return [];
@@ -62,10 +83,11 @@ export async function getAllSitemapEntries(): Promise<SitemapEntry[]> {
     url: getCanonicalUrl(route),
   }));
 
-  const [postEntries, caseStudyEntries] = await Promise.all([
+  const [postEntries, caseStudyEntries, serviceEntries] = await Promise.all([
     getBlogPostEntries(),
     getCaseStudyEntries(),
+    getServiceOfferingEntries(),
   ]);
 
-  return [...staticEntries, ...postEntries, ...caseStudyEntries];
+  return [...staticEntries, ...postEntries, ...caseStudyEntries, ...serviceEntries];
 }

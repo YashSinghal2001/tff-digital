@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getCanonicalUrl } from "@/lib/seo/canonical";
 import { ROUTES } from "@/constants/routes";
 import { getServiceOfferings } from "@/services/service-offering.service";
+import { getCaseStudies } from "@/services/case-study.service";
 import { HeroSection } from "@/sections/home/HeroSection";
 import { TrustedBrands } from "@/sections/home/TrustedBrands";
 import { WhatWeDo } from "@/sections/home/WhatWeDo";
@@ -22,7 +23,14 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  const services = await getServiceOfferings({ first: 5 });
+  const [services, caseStudies] = await Promise.all([
+    getServiceOfferings({ first: 5 }),
+    getCaseStudies({ first: 20 }),
+  ]);
+
+  const featuredCaseStudies = caseStudies.items
+    .filter((caseStudy) => caseStudy.featuredOnHomepage)
+    .slice(0, 4);
 
   return (
     <>
@@ -32,7 +40,7 @@ export default async function Home() {
       <WhyTFF />
       <HowWeWork />
       <AboutJourney />
-      <SelectedWork />
+      <SelectedWork caseStudies={featuredCaseStudies} />
       <Testimonials />
       <Industries />
       <FAQ />

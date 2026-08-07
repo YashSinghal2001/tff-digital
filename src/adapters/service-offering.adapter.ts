@@ -14,6 +14,8 @@ export function adaptServiceOffering(
     title: wpService.title,
     summary,
     content: wpService.content || wpService.serviceFields?.description || "",
+    publishedAt: wpService.date,
+    updatedAt: wpService.modified,
     icon: wpService.serviceFields?.icon
       ? adaptMedia(wpService.serviceFields.icon.node)
       : null,

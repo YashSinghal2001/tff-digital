@@ -1,6 +1,6 @@
 const WORDS_PER_MINUTE = 200;
 
-function stripHtml(html: string): string {
+export function stripHtml(html: string): string {
   return html.replace(/<[^>]*>/g, " ");
 }
 

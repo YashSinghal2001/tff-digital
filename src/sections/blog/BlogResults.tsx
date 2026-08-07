@@ -38,7 +38,7 @@ export function BlogResults({ posts, pageInfo, query, basePath }: BlogResultsPro
       {gridPosts.length > 0 ? (
         <div className="grid gap-6 sm:grid-cols-2">
           {gridPosts.map((post, index) => (
-            <PostCard key={post.id} post={post} priority={index === 0} />
+            <PostCard key={post.id} post={post} priority={!showFeatured && index === 0} />
           ))}
         </div>
       ) : null}

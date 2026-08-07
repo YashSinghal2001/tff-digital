@@ -1,5 +1,5 @@
 export type { Author } from "@/types/domain/author";
-export type { CaseStudy, CaseStudyMetric } from "@/types/domain/case-study";
+export type { CaseStudy, CaseStudyResult } from "@/types/domain/case-study";
 export type { ContentPage } from "@/types/domain/content-page";
 export type { Lead, LeadSubmissionResult } from "@/types/domain/lead";
 export type { Media } from "@/types/domain/media";

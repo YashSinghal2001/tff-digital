@@ -2,12 +2,14 @@ import { gql } from "@/graphql/gql";
 import { MEDIA_FRAGMENT } from "@/graphql/fragments/media.fragment";
 import { SEO_FRAGMENT } from "@/graphql/fragments/seo.fragment";
 
-const SERVICE_FIELDS = gql`
+export const SERVICE_FIELDS = gql`
   fragment ServiceFields on Service {
     id
     slug
     title
     content
+    date
+    modified
     featuredImage {
       node {
         ...MediaFields
