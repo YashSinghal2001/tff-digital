@@ -129,9 +129,23 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-16 flex flex-col gap-4 border-t border-border-subtle pt-8 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} Target Find &amp; Finish Digital. All rights reserved.</p>
-          <p>Find Strategy · Target Right · Finish Strong</p>
+        <div className="mt-16 border-t border-border-subtle pt-8 text-sm text-muted">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <p>© {new Date().getFullYear()} Target Find &amp; Finish Digital. All rights reserved.</p>
+            <p>Find Strategy · Target Right · Finish Strong</p>
+          </div>
+
+          <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs">
+            <Link href={ROUTES.privacyPolicy} className="transition-colors hover:text-white">
+              Privacy Policy
+            </Link>
+            <span aria-hidden="true" className="text-border-strong">
+              |
+            </span>
+            <Link href={ROUTES.termsAndConditions} className="transition-colors hover:text-white">
+              Terms &amp; Conditions
+            </Link>
+          </div>
         </div>
       </Container>
     </footer>

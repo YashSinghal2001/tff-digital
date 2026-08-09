@@ -12,4 +12,6 @@ export const ROUTES = {
   blogCategory: (slug: string) => `/blog/category/${slug}`,
   blogTag: (slug: string) => `/blog/tag/${slug}`,
   contact: "/contact",
+  privacyPolicy: "/privacy-policy",
+  termsAndConditions: "/terms-and-conditions",
 } as const;

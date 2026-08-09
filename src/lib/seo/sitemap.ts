@@ -24,6 +24,8 @@ const STATIC_ROUTES = [
   ROUTES.blog,
   ROUTES.caseStudies,
   ROUTES.contact,
+  ROUTES.privacyPolicy,
+  ROUTES.termsAndConditions,
 ];
 
 // sitemap.xml is statically generated at build time; a WPGraphQL outage here
