@@ -5,6 +5,7 @@ import { siteConfig } from "@/config/site.config";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { JsonLd } from "@/components/common/JsonLd";
+import { HashScrollHandler } from "@/components/common/HashScrollHandler";
 import { buildOrganizationJsonLd, buildWebsiteJsonLd } from "@/lib/seo/json-ld";
 
 const poppins = Poppins({
@@ -55,6 +56,7 @@ export default function RootLayout({
           Skip to main content
         </a>
         <JsonLd data={[buildOrganizationJsonLd(), buildWebsiteJsonLd()]} />
+        <HashScrollHandler />
         <Navbar />
         <main id="main-content" tabIndex={-1} className="pt-28 outline-none">
           {children}

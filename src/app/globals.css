@@ -18,6 +18,10 @@
   --radius-full: var(--radius-full);
 }
 
+html {
+  scroll-padding-top: 112px;
+}
+
 body {
   background: var(--color-background);
   color: var(--color-foreground);

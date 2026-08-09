@@ -12,6 +12,17 @@ import {
 import type { Paginated } from "@/types/domain/pagination";
 import type { CaseStudy } from "@/types/domain/case-study";
 
+const EMPTY_CASE_STUDIES: Paginated<CaseStudy> = {
+  items: [],
+  pageInfo: {
+    hasNextPage: false,
+    hasPreviousPage: false,
+    startCursor: null,
+    endCursor: null,
+  },
+  totalCount: 0,
+};
+
 export async function getCaseStudies(params?: {
   first?: number;
   after?: string;
@@ -20,12 +31,23 @@ export async function getCaseStudies(params?: {
     return getMockCaseStudies();
   }
 
-  const { caseStudies } = await findAllCaseStudies(params);
-  return {
-    items: caseStudies.nodes.map(adaptCaseStudy),
-    pageInfo: caseStudies.pageInfo,
-    totalCount: caseStudies.nodes.length,
-  };
+  try {
+    const { caseStudies } = await findAllCaseStudies(params);
+    return {
+      items: caseStudies.nodes.map(adaptCaseStudy),
+      pageInfo: caseStudies.pageInfo,
+      totalCount: caseStudies.nodes.length,
+    };
+  } catch (error) {
+    // A live WPGraphQL outage would otherwise throw here and take down the
+    // entire homepage. Degrade to an empty (still-live-sourced, not mock)
+    // result, matching getServiceOfferings' resilience pattern.
+    console.error(
+      "[getCaseStudies] WPGraphQL request failed; rendering without live case studies for this build.",
+      error,
+    );
+    return EMPTY_CASE_STUDIES;
+  }
 }
 
 export async function getCaseStudyBySlug(

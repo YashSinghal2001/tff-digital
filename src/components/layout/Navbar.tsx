@@ -34,7 +34,7 @@ export function Navbar() {
     <header className="fixed inset-x-0 top-6 z-50">
       {open && (
         <div
-          className="fixed inset-0 -z-10 bg-background/80 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 -z-10 bg-background/80 backdrop-blur-sm xl:hidden"
           onClick={() => setOpen(false)}
           aria-hidden="true"
         />
@@ -53,7 +53,7 @@ export function Navbar() {
             </span>
           </Link>
 
-          <nav className="hidden items-center gap-8 lg:flex">
+          <nav className="hidden items-center gap-8 xl:flex">
             {navLinks.map((link) => (
               <Link
                 key={link.label}
@@ -67,7 +67,7 @@ export function Navbar() {
 
           <Link
             href={ROUTES.contact}
-            className={cn(buttonVariants({ size: "sm" }), "hidden h-11 px-5 text-sm lg:inline-flex")}
+            className={cn(buttonVariants({ size: "sm" }), "hidden h-11 px-5 text-sm xl:inline-flex")}
           >
             Book Free Consultation
           </Link>
@@ -75,7 +75,7 @@ export function Navbar() {
           <button
             type="button"
             aria-label={open ? "Close menu" : "Open menu"}
-            className="flex h-10 w-10 items-center justify-center rounded-full text-white lg:hidden"
+            className="flex h-10 w-10 items-center justify-center rounded-full text-white xl:hidden"
             onClick={() => setOpen((prev) => !prev)}
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -84,7 +84,7 @@ export function Navbar() {
 
         <div
           className={cn(
-            "mt-2 flex flex-col gap-1 rounded-[25px] border border-border-strong bg-glass p-4 backdrop-blur-md lg:hidden",
+            "mt-2 flex flex-col gap-1 rounded-[25px] border border-border-strong bg-glass p-4 backdrop-blur-md xl:hidden",
             open ? "flex" : "hidden",
           )}
         >

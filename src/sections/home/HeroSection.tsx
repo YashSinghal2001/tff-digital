@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { User } from "lucide-react";
+import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { GradientText } from "@/components/ui/GradientText";
@@ -56,7 +56,15 @@ export function HeroSection() {
           </div>
 
           <div className="relative mx-auto flex h-[320px] w-[320px] items-center justify-center rounded-full bg-white/5 sm:h-[400px] sm:w-[400px]">
-            <User className="h-32 w-32 text-white/20" strokeWidth={1} />
+            <div className="absolute inset-0 overflow-hidden rounded-full">
+              <Image
+                src="https://cms.tffdigital.com/wp-content/uploads/2026/08/hero.jpg"
+                alt="Target Find Finish Digital team driving strategy, branding, and performance growth"
+                fill
+                sizes="(min-width: 640px) 400px, 320px"
+                className="object-cover"
+              />
+            </div>
 
             <Badge className="absolute left-2 top-6" tone="info">
               SEO

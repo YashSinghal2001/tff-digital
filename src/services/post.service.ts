@@ -28,6 +28,17 @@ function adaptPaginatedPosts(posts: WPConnection<WPPost>): Paginated<Post> {
   };
 }
 
+const EMPTY_POSTS: Paginated<Post> = {
+  items: [],
+  pageInfo: {
+    hasNextPage: false,
+    hasPreviousPage: false,
+    startCursor: null,
+    endCursor: null,
+  },
+  totalCount: 0,
+};
+
 export async function getPosts(params?: {
   first?: number;
   after?: string;
@@ -36,8 +47,19 @@ export async function getPosts(params?: {
     return getMockPosts(params);
   }
 
-  const { posts } = await findAllPosts(params);
-  return adaptPaginatedPosts(posts);
+  try {
+    const { posts } = await findAllPosts(params);
+    return adaptPaginatedPosts(posts);
+  } catch (error) {
+    // A live WPGraphQL outage would otherwise throw here and take down the
+    // entire blog listing page, matching getServiceOfferings' resilience
+    // pattern.
+    console.error(
+      "[getPosts] WPGraphQL request failed; rendering without live posts for this build.",
+      error,
+    );
+    return EMPTY_POSTS;
+  }
 }
 
 export async function getPostBySlug(slug: string): Promise<Post | null> {
@@ -57,8 +79,16 @@ export async function getPostsByCategory(
     return getMockPostsByCategory(categorySlug, params);
   }
 
-  const { posts } = await findPostsByCategory(categorySlug, params);
-  return adaptPaginatedPosts(posts);
+  try {
+    const { posts } = await findPostsByCategory(categorySlug, params);
+    return adaptPaginatedPosts(posts);
+  } catch (error) {
+    console.error(
+      "[getPostsByCategory] WPGraphQL request failed; rendering without live posts for this build.",
+      error,
+    );
+    return EMPTY_POSTS;
+  }
 }
 
 export async function getPostsByTag(
@@ -69,8 +99,16 @@ export async function getPostsByTag(
     return getMockPostsByTag(tagSlug, params);
   }
 
-  const { posts } = await findPostsByTag(tagSlug, params);
-  return adaptPaginatedPosts(posts);
+  try {
+    const { posts } = await findPostsByTag(tagSlug, params);
+    return adaptPaginatedPosts(posts);
+  } catch (error) {
+    console.error(
+      "[getPostsByTag] WPGraphQL request failed; rendering without live posts for this build.",
+      error,
+    );
+    return EMPTY_POSTS;
+  }
 }
 
 export async function getPostsBySearch(
@@ -81,6 +119,14 @@ export async function getPostsBySearch(
     return getMockPostsBySearch(search, params);
   }
 
-  const { posts } = await findPostsBySearch(search, params);
-  return adaptPaginatedPosts(posts);
+  try {
+    const { posts } = await findPostsBySearch(search, params);
+    return adaptPaginatedPosts(posts);
+  } catch (error) {
+    console.error(
+      "[getPostsBySearch] WPGraphQL request failed; rendering without live posts for this build.",
+      error,
+    );
+    return EMPTY_POSTS;
+  }
 }

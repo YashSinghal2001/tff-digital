@@ -2,13 +2,21 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Card } from "@/components/ui/Card";
-import { IconCircle } from "@/components/ui/IconCircle";
+import { IconCircle, sizeClass } from "@/components/ui/IconCircle";
 import type { Size } from "@/types/ui/common";
 import { fadeInUp } from "@/styles/animations";
 import { cn } from "@/lib/utils";
+
+const iconPixelSize: Record<Size, string> = {
+  sm: "32px",
+  md: "44px",
+  lg: "56px",
+  xl: "64px",
+};
 
 export interface FeatureGridItem {
   icon: LucideIcon;
@@ -16,6 +24,8 @@ export interface FeatureGridItem {
   description?: string;
   href?: string;
   linkLabel?: string;
+  /** Replaces the icon glyph with a photo in the same circular slot. */
+  image?: { src: string; alt: string };
 }
 
 export interface FeatureGridProps {
@@ -52,12 +62,36 @@ export function FeatureGrid({
         >
           {variant === "compact" ? (
             <Card className="flex flex-col items-center gap-3 py-8 text-center">
-              <IconCircle icon={item.icon} size={iconSize} />
+              {item.image ? (
+                <span className={cn("relative shrink-0 overflow-hidden rounded-full", sizeClass[iconSize])}>
+                  <Image
+                    src={item.image.src}
+                    alt={item.image.alt}
+                    fill
+                    sizes={iconPixelSize[iconSize]}
+                    className="object-cover"
+                  />
+                </span>
+              ) : (
+                <IconCircle icon={item.icon} size={iconSize} />
+              )}
               <p className="font-heading text-sm font-semibold text-white">{item.title}</p>
             </Card>
           ) : (
             <Card className={cn("flex h-full flex-col", cardGap)}>
-              <IconCircle icon={item.icon} size={iconSize} />
+              {item.image ? (
+                <span className={cn("relative shrink-0 overflow-hidden rounded-full", sizeClass[iconSize])}>
+                  <Image
+                    src={item.image.src}
+                    alt={item.image.alt}
+                    fill
+                    sizes={iconPixelSize[iconSize]}
+                    className="object-cover"
+                  />
+                </span>
+              ) : (
+                <IconCircle icon={item.icon} size={iconSize} />
+              )}
               <h3 className={cn("font-heading font-bold text-white", titleClassName)}>
                 {item.title}
               </h3>

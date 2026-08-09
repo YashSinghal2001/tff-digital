@@ -10,8 +10,19 @@ export async function getCategories(): Promise<Category[]> {
     return getMockCategories();
   }
 
-  const { categories } = await findAllCategories();
-  return categories.nodes.map(adaptCategory);
+  try {
+    const { categories } = await findAllCategories();
+    return categories.nodes.map(adaptCategory);
+  } catch (error) {
+    // A live WPGraphQL outage would otherwise throw here and take down any
+    // page that renders a category filter/sidebar, matching
+    // getServiceOfferings' resilience pattern.
+    console.error(
+      "[getCategories] WPGraphQL request failed; rendering without live categories for this build.",
+      error,
+    );
+    return [];
+  }
 }
 
 export async function getTags(): Promise<Tag[]> {
@@ -19,6 +30,14 @@ export async function getTags(): Promise<Tag[]> {
     return getMockTags();
   }
 
-  const { tags } = await findAllTags();
-  return tags.nodes.map(adaptTag);
+  try {
+    const { tags } = await findAllTags();
+    return tags.nodes.map(adaptTag);
+  } catch (error) {
+    console.error(
+      "[getTags] WPGraphQL request failed; rendering without live tags for this build.",
+      error,
+    );
+    return [];
+  }
 }

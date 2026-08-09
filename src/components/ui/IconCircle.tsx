@@ -8,7 +8,7 @@ export interface IconCircleProps extends HTMLAttributes<HTMLSpanElement> {
   size?: Size;
 }
 
-const sizeClass: Record<Size, string> = {
+export const sizeClass: Record<Size, string> = {
   sm: "h-8 w-8",
   md: "h-11 w-11",
   lg: "h-14 w-14",

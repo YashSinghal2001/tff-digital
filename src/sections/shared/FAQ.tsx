@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ChevronDown, User } from "lucide-react";
+import Image from "next/image";
+import { ChevronDown } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { GradientText } from "@/components/ui/GradientText";
 import { Heading } from "@/components/ui/Heading";
@@ -53,9 +54,15 @@ export function FAQ() {
         <div className="grid items-center gap-10 lg:grid-cols-2">
           <motion.div
             {...fadeInUp}
-            className="mx-auto flex h-64 w-64 items-center justify-center rounded-full bg-white/5"
+            className="relative mx-auto flex h-64 w-64 items-center justify-center overflow-hidden rounded-full bg-white/5"
           >
-            <User className="h-24 w-24 text-white/20" strokeWidth={1} />
+            <Image
+              src="https://cms.tffdigital.com/wp-content/uploads/2026/08/faq-1.jpg"
+              alt="Our team ready to answer your questions about working with Target Find Finish Digital"
+              fill
+              sizes="256px"
+              className="object-cover"
+            />
           </motion.div>
 
           <div className="flex flex-col gap-3">

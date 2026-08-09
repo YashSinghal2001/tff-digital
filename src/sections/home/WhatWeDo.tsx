@@ -15,12 +15,24 @@ interface WhatWeDoProps {
   services: ServiceOffering[];
 }
 
+const FEATURE_IMAGES: Record<number, { src: string; alt: string }> = {
+  0: {
+    src: "https://cms.tffdigital.com/wp-content/uploads/2026/08/f1-1.jpg",
+    alt: "Team collaborating on a client growth strategy",
+  },
+  1: {
+    src: "https://cms.tffdigital.com/wp-content/uploads/2026/08/f2.jpg",
+    alt: "Performance dashboard showing campaign growth results",
+  },
+};
+
 export function WhatWeDo({ services }: WhatWeDoProps) {
-  const items: FeatureGridItem[] = services.map((service) => ({
+  const items: FeatureGridItem[] = services.map((service, index) => ({
     icon: getServiceIcon(service.slug),
     title: service.title,
     description: service.summary,
     href: ROUTES.service(service.slug),
+    image: FEATURE_IMAGES[index],
   }));
 
   return (

@@ -4,11 +4,14 @@ import { adaptMedia } from "@/adapters/media.adapter";
 import { adaptSeo } from "@/adapters/seo.adapter";
 import { adaptAuthor } from "@/adapters/author.adapter";
 import { adaptCategory, adaptTag } from "@/adapters/taxonomy.adapter";
+import { stripHtml } from "@/lib/content/post-content";
 
 export function adaptPost(wpPost: WPPost): Post {
   // WPGraphQL returns null (not "") for excerpt/content on posts with no
   // body text, even though the schema types them as non-null strings.
-  const excerpt = wpPost.excerpt ?? "";
+  // The raw excerpt also carries markup (e.g. "<p>...</p>") — strip it so
+  // post cards render plain text instead of literal tags.
+  const excerpt = stripHtml(wpPost.excerpt ?? "").replace(/\s+/g, " ").trim();
   const content = wpPost.content ?? "";
 
   return {

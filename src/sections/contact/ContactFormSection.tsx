@@ -9,8 +9,8 @@ import { ContactForm } from "@/features/contact/ContactForm";
 import { fadeInUp } from "@/styles/animations";
 
 const businessInfo = [
-  { icon: Mail, label: "hello@targetfindfinish.com" },
-  { icon: Phone, label: "+1 (512) 555-0128" },
+  { icon: Mail, label: "hello@tffdigital.com" },
+  { icon: Phone, label: "+1 (415) 555-0132" },
   { icon: MapPin, label: "Zirakpur, Punjab, India" },
 ];
 
