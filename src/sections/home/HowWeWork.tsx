@@ -39,10 +39,10 @@ export function HowWeWork() {
                 transition={{ ...fadeInUp.transition, delay: index * 0.05 }}
                 className="relative flex items-center gap-4 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:items-center lg:gap-8"
               >
-                <div className="flex w-4 shrink-0 justify-center lg:col-start-2 lg:w-10">
+                <div className="flex w-4 shrink-0 justify-center lg:col-start-2 lg:row-start-1 lg:w-10">
                   <span className="relative z-10 h-3.5 w-3.5 shrink-0 rounded-full bg-[linear-gradient(90deg,var(--color-primary)_0%,var(--color-secondary)_100%)] shadow-[var(--shadow-glow)] ring-4 ring-background" />
                 </div>
-                <Card className={cn("flex-1", index % 2 === 1 ? "lg:col-start-3" : "lg:col-start-1")}>
+                <Card className={cn("flex-1 lg:row-start-1", index % 2 === 1 ? "lg:col-start-3" : "lg:col-start-1")}>
                   <p className="font-body text-xs font-semibold tracking-wide text-primary">
                     Step {item.step}
                   </p>

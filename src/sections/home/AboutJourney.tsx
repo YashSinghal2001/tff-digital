@@ -13,7 +13,6 @@ const founders = [
   {
     name: "Raju Gorai",
     role: "Performance Marketing",
-    bio: "Former growth lead at two IPO'd SaaS companies.",
     image: {
       src: "https://cms.tffdigital.com/wp-content/uploads/2026/08/f1-1.jpg",
       alt: "Raju Gorai",
@@ -22,7 +21,6 @@ const founders = [
   {
     name: "Kanchan Rana",
     role: "Search Engine Optimization",
-    bio: "Former growth lead at two IPO'd SaaS companies.",
     image: {
       src: "https://cms.tffdigital.com/wp-content/uploads/2026/08/f2.jpg",
       alt: "Kanchan Rana",
@@ -64,9 +62,6 @@ export function AboutJourney() {
                 <div className="flex flex-1 flex-col items-center gap-2 px-2 pb-2 pt-6 text-center">
                   <h3 className="font-heading text-xl font-bold text-white">{founder.name}</h3>
                   <p className="font-body text-sm font-semibold text-primary">{founder.role}</p>
-                  <p className="max-w-[280px] font-body text-sm leading-relaxed text-muted">
-                    {founder.bio}
-                  </p>
                 </div>
               </div>
             </motion.div>

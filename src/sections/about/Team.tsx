@@ -12,7 +12,6 @@ import { fadeInUp } from "@/styles/animations";
 const team = Array.from({ length: 4 }, () => ({
   name: "Name",
   position: "Position",
-  bio: "Former growth lead at two IPO'd SaaS companies.",
 }));
 
 export function Team() {
@@ -39,7 +38,6 @@ export function Team() {
                 </span>
                 <h3 className="font-heading text-base font-bold text-white">{member.name}</h3>
                 <p className="font-body text-xs font-semibold text-primary">{member.position}</p>
-                <p className="font-body text-sm text-muted">{member.bio}</p>
               </Card>
             </motion.div>
           ))}
