@@ -1,9 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { User } from "lucide-react";
+import Image from "next/image";
 import { Container } from "@/components/ui/Container";
-import { Card } from "@/components/ui/Card";
 import { Heading } from "@/components/ui/Heading";
 import { GradientText } from "@/components/ui/GradientText";
 import { ThreePartJourney } from "@/sections/shared/ThreePartJourney";
@@ -11,8 +10,24 @@ import { SectionEyebrow } from "@/components/common/SectionEyebrow";
 import { fadeInUp } from "@/styles/animations";
 
 const founders = [
-  { name: "Rahul Sharma", role: "Co-Founder & CEO" },
-  { name: "Sneha Kapoor", role: "Co-Founder & CSO" },
+  {
+    name: "Raju Gorai",
+    role: "Position",
+    bio: "Former growth lead at two IPO'd SaaS companies.",
+    image: {
+      src: "https://cms.tffdigital.com/wp-content/uploads/2026/08/hero.jpg",
+      alt: "Raju Gorai",
+    },
+  },
+  {
+    name: "Kanchan Rana",
+    role: "Position",
+    bio: "Former growth lead at two IPO'd SaaS companies.",
+    image: {
+      src: "https://cms.tffdigital.com/wp-content/uploads/2026/08/f1-1.jpg",
+      alt: "Kanchan Rana",
+    },
+  },
 ];
 
 export function AboutJourney() {
@@ -30,13 +45,22 @@ export function AboutJourney() {
         <div className="mb-16 grid gap-6 sm:grid-cols-2">
           {founders.map((founder) => (
             <motion.div key={founder.name} {...fadeInUp}>
-              <Card className="flex flex-col items-center gap-3 text-center">
-                <span className="flex h-20 w-20 items-center justify-center rounded-full bg-white/5">
-                  <User className="h-8 w-8 text-white/30" strokeWidth={1} />
-                </span>
-                <h3 className="font-heading text-base font-bold text-white">{founder.name}</h3>
-                <p className="font-body text-sm text-muted">{founder.role}</p>
-              </Card>
+              <div className="flex h-full flex-col overflow-hidden rounded-[25px] border border-border-strong bg-glass">
+                <div className="relative aspect-[4/5] w-full overflow-hidden bg-white/5">
+                  <Image
+                    src={founder.image.src}
+                    alt={founder.image.alt}
+                    fill
+                    sizes="(max-width: 640px) 100vw, 50vw"
+                    className="object-cover"
+                  />
+                </div>
+                <div className="flex flex-col items-center gap-2 p-6 text-center">
+                  <h3 className="font-heading text-lg font-bold text-white">{founder.name}</h3>
+                  <p className="font-body text-sm font-medium text-primary">{founder.role}</p>
+                  <p className="font-body text-sm text-muted">{founder.bio}</p>
+                </div>
+              </div>
             </motion.div>
           ))}
         </div>
