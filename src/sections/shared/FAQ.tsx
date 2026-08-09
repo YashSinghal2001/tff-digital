@@ -61,7 +61,7 @@ export function FAQ() {
               alt="Our team ready to answer your questions about working with TFF Digital"
               fill
               sizes="256px"
-              className="object-cover"
+              className="object-cover object-[center_10%]"
             />
           </motion.div>
 
