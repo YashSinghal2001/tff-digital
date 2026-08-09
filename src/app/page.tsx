@@ -5,7 +5,8 @@ import { ROUTES } from "@/constants/routes";
 import { getServiceOfferings } from "@/services/service-offering.service";
 import { getCaseStudies } from "@/services/case-study.service";
 import { HeroSection } from "@/sections/home/HeroSection";
-import { TrustedBrands } from "@/sections/home/TrustedBrands";
+// Temporarily hidden — restore by uncommenting this import and <TrustedBrands /> below.
+// import { TrustedBrands } from "@/sections/home/TrustedBrands";
 import { WhatWeDo } from "@/sections/home/WhatWeDo";
 import { WhyTFF } from "@/sections/shared/WhyTFF";
 import { HowWeWork } from "@/sections/home/HowWeWork";
@@ -40,7 +41,7 @@ export default async function Home() {
   return (
     <>
       <HeroSection />
-      <TrustedBrands />
+      {/* <TrustedBrands /> */}
       <WhatWeDo services={services.items} />
       <WhyTFF />
       <HowWeWork />
