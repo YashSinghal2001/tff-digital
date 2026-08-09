@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { buttonVariants } from "@/components/ui/button-variants";
+import { Logo } from "@/components/layout/Logo";
 import { ROUTES } from "@/constants/routes";
 import { cn } from "@/lib/utils";
 
@@ -41,17 +42,7 @@ export function Navbar() {
       )}
       <Container size="full" className="max-w-[1280px]">
         <div className="flex h-[69px] items-center justify-between rounded-[25px] border border-border-strong bg-glass px-6 backdrop-blur-md">
-          <Link href={ROUTES.home} className="flex items-center gap-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--color-primary)_0%,var(--color-secondary)_100%)] font-heading text-sm font-bold text-white">
-              TFF
-            </span>
-            <span className="hidden flex-col leading-none sm:flex">
-              <span className="font-heading text-sm font-bold tracking-wide text-white">
-                TARGET FIND &amp; FINISH
-              </span>
-              <span className="text-[10px] tracking-[0.2em] text-muted">DIGITAL</span>
-            </span>
-          </Link>
+          <Logo priority className="h-8 sm:h-9" />
 
           <nav className="hidden items-center gap-8 xl:flex">
             {navLinks.map((link) => (

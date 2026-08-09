@@ -42,11 +42,17 @@ export function AboutJourney() {
           </Heading>
         </motion.div>
 
-        <div className="mb-16 grid gap-6 sm:grid-cols-2">
+        <div className="mb-16 grid gap-6 sm:grid-cols-2 lg:gap-8">
           {founders.map((founder) => (
-            <motion.div key={founder.name} {...fadeInUp}>
-              <div className="flex h-full flex-col overflow-hidden rounded-[25px] border border-border-strong bg-glass">
-                <div className="relative aspect-[4/5] w-full overflow-hidden bg-white/5">
+            <motion.div key={founder.name} {...fadeInUp} className="h-full">
+              <div
+                className="flex h-full flex-col rounded-[25px] border border-border-subtle p-4"
+                style={{
+                  background:
+                    "linear-gradient(160deg, rgba(56, 130, 246, 0.16) 0%, rgba(139, 92, 246, 0.1) 45%, var(--color-glass-background) 100%)",
+                }}
+              >
+                <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-white/5">
                   <Image
                     src={founder.image.src}
                     alt={founder.image.alt}
@@ -55,10 +61,12 @@ export function AboutJourney() {
                     className="object-cover"
                   />
                 </div>
-                <div className="flex flex-col items-center gap-2 p-6 text-center">
-                  <h3 className="font-heading text-lg font-bold text-white">{founder.name}</h3>
-                  <p className="font-body text-sm font-medium text-primary">{founder.role}</p>
-                  <p className="font-body text-sm text-muted">{founder.bio}</p>
+                <div className="flex flex-1 flex-col items-center gap-2 px-2 pb-2 pt-6 text-center">
+                  <h3 className="font-heading text-xl font-bold text-white">{founder.name}</h3>
+                  <p className="font-body text-sm font-semibold text-primary">{founder.role}</p>
+                  <p className="max-w-[280px] font-body text-sm leading-relaxed text-muted">
+                    {founder.bio}
+                  </p>
                 </div>
               </div>
             </motion.div>

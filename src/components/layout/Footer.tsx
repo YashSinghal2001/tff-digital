@@ -6,6 +6,7 @@ import { Link2, Globe, Send, Mail, Phone, MapPin } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Input } from "@/components/ui/Input";
 import { buttonVariants } from "@/components/ui/button-variants";
+import { Logo } from "@/components/layout/Logo";
 import { ROUTES } from "@/constants/routes";
 
 const footerLinks = {
@@ -49,10 +50,8 @@ export function Footer() {
       <Container size="full" className="max-w-[1280px] py-16">
         <div className="grid gap-12 lg:grid-cols-[1.2fr_2fr]">
           <div>
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--color-primary)_0%,var(--color-secondary)_100%)] font-heading text-sm font-bold text-white">
-              TFF
-            </span>
-            <p className="mt-4 max-w-xs font-body text-sm text-muted">
+            <Logo asLink={false} className="h-10" />
+            <p className="mt-5 max-w-xs font-body text-sm text-muted">
               Find Strategy. Target Right. Finish Strong. We build digital growth systems
               for brands that want measurable results.
             </p>
