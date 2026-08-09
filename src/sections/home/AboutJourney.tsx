@@ -15,7 +15,7 @@ const founders = [
     role: "Position",
     bio: "Former growth lead at two IPO'd SaaS companies.",
     image: {
-      src: "https://cms.tffdigital.com/wp-content/uploads/2026/08/hero.jpg",
+      src: "https://cms.tffdigital.com/wp-content/uploads/2026/08/f1-1.jpg",
       alt: "Raju Gorai",
     },
   },
@@ -24,7 +24,7 @@ const founders = [
     role: "Position",
     bio: "Former growth lead at two IPO'd SaaS companies.",
     image: {
-      src: "https://cms.tffdigital.com/wp-content/uploads/2026/08/f1-1.jpg",
+      src: "https://cms.tffdigital.com/wp-content/uploads/2026/08/f2.jpg",
       alt: "Kanchan Rana",
     },
   },
