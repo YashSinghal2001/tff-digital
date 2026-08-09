@@ -20,7 +20,7 @@ export function HeroSection() {
       <Container size="full" className="max-w-[1280px] py-10 lg:py-16">
         <div className="grid items-center gap-12 lg:grid-cols-2">
           <div className="flex flex-col gap-6">
-            <Badge>
+            <Badge className="self-start">
               <span className="h-1.5 w-1.5 rounded-full bg-primary" />
               Premium Digital Growth Agency
             </Badge>
