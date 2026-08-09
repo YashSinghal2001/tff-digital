@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 
 const faqs = [
   {
-    question: "How is Target Find Finish different from other agencies?",
+    question: "How is TFF different from other agencies?",
     answer:
       "We integrate strategy, brand, and performance marketing into one accountable team instead of handing you off between disconnected vendors.",
   },
@@ -58,7 +58,7 @@ export function FAQ() {
           >
             <Image
               src="https://cms.tffdigital.com/wp-content/uploads/2026/08/faq-1.jpg"
-              alt="Our team ready to answer your questions about working with Target Find Finish Digital"
+              alt="Our team ready to answer your questions about working with TFF Digital"
               fill
               sizes="256px"
               className="object-cover"

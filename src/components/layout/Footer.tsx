@@ -131,7 +131,7 @@ export function Footer() {
 
         <div className="mt-16 border-t border-border-subtle pt-8 text-sm text-muted">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <p>© {new Date().getFullYear()} Target Find &amp; Finish Digital. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} TFF Digital. All rights reserved.</p>
             <p>Find Strategy · Target Right · Finish Strong</p>
           </div>
 

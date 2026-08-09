@@ -30,7 +30,7 @@ export function WhyTFF() {
     <section className="py-16 lg:py-24">
       <Container size="full" className="max-w-[1280px]">
         <motion.div {...fadeInUp} className="mb-12 text-center">
-          <SectionEyebrow>WHY TARGET FIND FINISH</SectionEyebrow>
+          <SectionEyebrow>WHY TFF</SectionEyebrow>
           <Heading as="h2">
             The difference is <GradientText>strategy.</GradientText>
           </Heading>
@@ -56,7 +56,7 @@ export function WhyTFF() {
           <motion.div {...fadeInUp} transition={{ ...fadeInUp.transition, delay: 0.1 }}>
             <Card className="border-primary/40">
               <h3 className="font-heading text-sm font-bold tracking-wide text-white">
-                TARGET FIND FINISH DIGITAL
+                TFF DIGITAL
               </h3>
               <ul className="mt-5 flex flex-col gap-4">
                 {tff.map((item) => (

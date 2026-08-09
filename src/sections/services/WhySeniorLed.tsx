@@ -38,7 +38,7 @@ export function WhySeniorLed() {
       <Container size="full" className="max-w-[1280px]">
         <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
           <motion.div {...fadeInUp}>
-            <SectionEyebrow>WHY TARGET FIND FINISH</SectionEyebrow>
+            <SectionEyebrow>WHY TFF</SectionEyebrow>
             <Heading as="h2">
               <GradientText>Senior-led.</GradientText> Outcome-obsessed. Zero fluff.
             </Heading>

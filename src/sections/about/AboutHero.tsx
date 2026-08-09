@@ -12,7 +12,7 @@ export function AboutHero() {
         </>
       }
       description={[
-        "Target Find Finish exists because ambitious brands deserve a growth partner that thinks like them, ships like them, and wins with them.",
+        "TFF exists because ambitious brands deserve a growth partner that thinks like them, ships like them, and wins with them.",
       ]}
       buttons={[
         { label: "Book Free Consultation", href: ROUTES.contact },

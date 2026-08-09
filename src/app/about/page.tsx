@@ -13,7 +13,7 @@ import { FAQ } from "@/sections/shared/FAQ";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "We're operators disguised as an agency — meet the team building Target Find & Finish Digital.",
+    "We're operators disguised as an agency — meet the team building TFF Digital.",
   alternates: { canonical: getCanonicalUrl(ROUTES.about) },
 };
 

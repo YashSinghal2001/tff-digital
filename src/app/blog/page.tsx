@@ -14,7 +14,7 @@ import { ROUTES } from "@/constants/routes";
 export const metadata: Metadata = {
   title: "Blog",
   description:
-    "Strategy, SEO, and performance marketing insights from the team building Target Find & Finish Digital.",
+    "Strategy, SEO, and performance marketing insights from the team building TFF Digital.",
   alternates: { canonical: getCanonicalUrl(ROUTES.blog) },
 };
 

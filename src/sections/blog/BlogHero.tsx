@@ -18,7 +18,7 @@ export function BlogHero({ defaultQuery }: BlogHeroProps) {
           </>
         }
         description={[
-          "Strategy, SEO, and performance marketing lessons from the team building Target Find & Finish Digital.",
+          "Strategy, SEO, and performance marketing lessons from the team building TFF Digital.",
         ]}
       />
       <div className="pb-10">

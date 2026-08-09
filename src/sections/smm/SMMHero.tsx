@@ -15,7 +15,7 @@ export function SMMHero() {
         </>
       }
       description={[
-        "At Target Find Finish Digital, we don't just manage social media — we build growth systems that connect your brand with the right audience, create meaningful engagement, and turn “follows” into measurable business results.",
+        "At TFF Digital, we don't just manage social media — we build growth systems that connect your brand with the right audience, create meaningful engagement, and turn “follows” into measurable business results.",
         "Whether you're looking to increase brand awareness, generate qualified leads, or build a loyal community, our data-driven social media strategies are designed to help your business grow with purpose.",
       ]}
       buttons={[

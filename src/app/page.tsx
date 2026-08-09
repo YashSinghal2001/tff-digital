@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   // <title> renders as the bare string below with no brand name at all.
   title: seoConfig.defaultTitle,
   description:
-    "Target Find & Finish Digital — strategy, branding, and performance marketing built to compound.",
+    "TFF Digital — strategy, branding, and performance marketing built to compound.",
   alternates: { canonical: getCanonicalUrl(ROUTES.home) },
 };
 
