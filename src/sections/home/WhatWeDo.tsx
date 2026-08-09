@@ -17,11 +17,11 @@ interface WhatWeDoProps {
 
 const FEATURE_IMAGES: Record<number, { src: string; alt: string }> = {
   0: {
-    src: "https://cms.tffdigital.com/wp-content/uploads/2026/08/f1-1.jpg",
+    src: "",
     alt: "Team collaborating on a client growth strategy",
   },
   1: {
-    src: "https://cms.tffdigital.com/wp-content/uploads/2026/08/f2.jpg",
+    src: "",
     alt: "Performance dashboard showing campaign growth results",
   },
 };
