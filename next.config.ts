@@ -49,6 +49,11 @@ const nextConfig: NextConfig = {
       // avatar (see src/components/blog/AuthorCard.tsx).
       { protocol: "https" as const, hostname: "secure.gravatar.com" },
     ],
+    // The WordPress media host sends no Cache-Control header, so optimized
+    // images fall back to the 60s default TTL — and the host is slow enough
+    // (5-7s per image) that every re-fetch hits the optimizer's 7s upstream
+    // timeout and 504s. Keep successfully optimized variants for 31 days.
+    minimumCacheTTL: 2678400,
   },
   experimental: {
     optimizePackageImports: ["lucide-react", "framer-motion"],
