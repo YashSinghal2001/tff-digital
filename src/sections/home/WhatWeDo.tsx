@@ -7,12 +7,11 @@ import { Container } from "@/components/ui/Container";
 import { Card } from "@/components/ui/Card";
 import { Heading } from "@/components/ui/Heading";
 import { GradientText } from "@/components/ui/GradientText";
-import { IconCircle } from "@/components/ui/IconCircle";
 import { SectionEyebrow } from "@/components/common/SectionEyebrow";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { ROUTES } from "@/constants/routes";
 import { fadeInUp } from "@/styles/animations";
-import { getServiceIcon } from "@/lib/content/service-icons";
+import { getServiceCardIcon } from "@/components/icons/service-icons";
 import type { ServiceOffering } from "@/types/domain/service-offering";
 
 // TEMPORARY: WordPress What We Do content disabled for UI development.
@@ -97,7 +96,7 @@ export function WhatWeDo() {
             className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:grid sm:grid-cols-2 sm:overflow-visible sm:pb-0 lg:grid-cols-3 xl:grid-cols-5"
           >
             {services.map((service) => {
-              const Icon = getServiceIcon(service.slug);
+              const Icon = getServiceCardIcon(service.slug);
               return (
                 <div
                   key={service.id}
@@ -105,7 +104,7 @@ export function WhatWeDo() {
                 >
                   <div className="group h-full rounded-[25px] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--color-primary)_40%,transparent),color-mix(in_srgb,var(--color-secondary)_40%,transparent))] p-px transition-transform duration-200 hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:translate-y-0">
                     <Card className="flex h-full flex-col gap-4 border-0 bg-[color-mix(in_srgb,var(--color-background)_94%,#ffffff)] p-5 transition-shadow duration-200 group-hover:shadow-[0_0_32px_0_rgba(56,130,246,0.18)]">
-                      <IconCircle icon={Icon} size="md" />
+                      <Icon className="h-20 w-20 shrink-0" />
                       <h3 className="font-heading text-lg font-bold text-white xl:text-base">
                         {service.title}
                       </h3>
