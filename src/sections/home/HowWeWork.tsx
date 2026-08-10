@@ -93,7 +93,7 @@ function StepContent({ step }: { step: Step }) {
     <div className="relative">
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute -top-3 left-8 select-none font-heading text-[56px] font-bold leading-none text-white/5 lg:text-[64px]"
+        className="pointer-events-none absolute -top-3 left-14 select-none font-heading text-[56px] font-bold leading-none text-white/5 lg:text-[64px]"
       >
         {step.step}
       </span>
