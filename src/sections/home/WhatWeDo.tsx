@@ -1,80 +1,91 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import Image from "next/image";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Card } from "@/components/ui/Card";
 import { Heading } from "@/components/ui/Heading";
 import { GradientText } from "@/components/ui/GradientText";
-import { IconCircle, sizeClass } from "@/components/ui/IconCircle";
+import { IconCircle } from "@/components/ui/IconCircle";
 import { SectionEyebrow } from "@/components/common/SectionEyebrow";
+import { buttonVariants } from "@/components/ui/button-variants";
 import { ROUTES } from "@/constants/routes";
 import { fadeInUp } from "@/styles/animations";
 import { getServiceIcon } from "@/lib/content/service-icons";
 import type { ServiceOffering } from "@/types/domain/service-offering";
 
-interface WhatWeDoProps {
-  services: ServiceOffering[];
-}
+// TEMPORARY: WordPress What We Do content disabled for UI development.
+// Mock cards reuse the real ServiceOffering fields the UI needs, plus the
+// `features` list the new design calls for (not yet modeled in WordPress).
+type TemporaryWhatWeDoService = Pick<
+  ServiceOffering,
+  "id" | "slug" | "title" | "summary"
+> & { features: string[] };
 
-const FEATURE_IMAGES: Record<number, { src: string; alt: string }> = {
-  0: {
-    src: "",
-    alt: "Team collaborating on a client growth strategy",
+const temporaryWhatWeDoServices: TemporaryWhatWeDoService[] = [
+  {
+    id: "temp-aeo-seo",
+    slug: "seo",
+    title: "AEO & SEO Services",
+    summary: "Get found. Build authority. Drive organic growth.",
+    features: ["Answer Engine Optimization", "Technical SEO", "Organic Growth"],
   },
-  1: {
-    src: "",
-    alt: "Performance dashboard showing campaign growth results",
+  {
+    id: "temp-smm",
+    slug: "smm",
+    title: "SMM Services",
+    summary: "Build brand love. Grow your community.",
+    features: ["Content Strategy", "Engagement Growth", "Social Visibility"],
   },
-};
+  {
+    id: "temp-meta-ads",
+    slug: "google-meta-ads",
+    title: "Meta Ads",
+    summary: "Reach the right people. Turn clicks into customers.",
+    features: ["Targeted Campaigns", "Lower CPA", "Higher ROI"],
+  },
+  {
+    id: "temp-web-dev",
+    slug: "web-development",
+    title: "Web Development",
+    summary: "Fast. Modern. Conversion focused websites.",
+    features: ["SEO-Friendly Structure", "Mobile Responsive", "Better User Experience"],
+  },
+  {
+    id: "temp-video-editing",
+    slug: "video-editing",
+    title: "Video Editing",
+    summary: "Create scroll-stopping content that converts.",
+    features: ["Engaging Visuals", "Social Ready Videos", "Brand Storytelling"],
+  },
+];
 
-const navButtonClass =
-  "flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(90deg,var(--color-primary)_0%,var(--color-secondary)_100%)] text-white transition-[filter,opacity] duration-150 hover:brightness-110 disabled:pointer-events-none disabled:opacity-40 outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background";
-
-export function WhatWeDo({ services }: WhatWeDoProps) {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const [canScrollPrev, setCanScrollPrev] = useState(false);
-  const [canScrollNext, setCanScrollNext] = useState(false);
-
-  const updateNavState = useCallback(() => {
-    const track = trackRef.current;
-    if (!track) return;
-    setCanScrollPrev(track.scrollLeft > 1);
-    setCanScrollNext(track.scrollLeft < track.scrollWidth - track.clientWidth - 1);
-  }, []);
-
-  useEffect(() => {
-    updateNavState();
-    window.addEventListener("resize", updateNavState);
-    return () => window.removeEventListener("resize", updateNavState);
-  }, [updateNavState, services.length]);
-
-  const scrollByCard = (direction: -1 | 1) => {
-    const track = trackRef.current;
-    if (!track) return;
-    const card = track.firstElementChild as HTMLElement | null;
-    if (!card) return;
-    const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
-    track.scrollBy({ left: direction * (card.offsetWidth + gap) });
-  };
+// TEMPORARY: WordPress What We Do content disabled for UI development.
+// Original WordPress-driven signature — restore this and delete the mock above:
+// interface WhatWeDoProps {
+//   services: ServiceOffering[];
+// }
+// export function WhatWeDo({ services }: WhatWeDoProps) {
+//
+// TODO: RESTORE WORDPRESS DATA
+// Remove temporaryWhatWeDoServices usage and restore the existing WordPress
+// service data source (the `services` prop passed from src/app/page.tsx).
+// WordPress integration has intentionally NOT been deleted.
+export function WhatWeDo() {
+  const services = temporaryWhatWeDoServices;
 
   return (
     <section id="services" className="py-16 lg:py-24">
       <Container size="full" className="max-w-[1280px]">
-        <motion.div
-          {...fadeInUp}
-          className="mb-12 flex flex-col justify-between gap-4 lg:flex-row lg:items-end"
-        >
-          <div>
-            <SectionEyebrow>WHAT WE DO</SectionEyebrow>
-            <Heading as="h2">
-              A full growth stack, <GradientText>under one roof.</GradientText>
-            </Heading>
-          </div>
-          <p className="max-w-xs font-body text-sm text-muted">
+        <motion.div {...fadeInUp} className="mx-auto mb-12 max-w-2xl text-center">
+          <SectionEyebrow>WHAT WE DO</SectionEyebrow>
+          <Heading as="h2">
+            A full growth stack,
+            <br />
+            <GradientText>under one roof.</GradientText>
+          </Heading>
+          <p className="mx-auto mt-4 max-w-md font-body text-sm text-muted">
             Sixteen disciplines, one integrated system — engineered to move a single
             metric: your growth.
           </p>
@@ -82,72 +93,60 @@ export function WhatWeDo({ services }: WhatWeDoProps) {
 
         <motion.div {...fadeInUp}>
           <div
-            ref={trackRef}
-            onScroll={updateNavState}
             aria-label="Our services"
-            className="flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] motion-reduce:scroll-auto [&::-webkit-scrollbar]:hidden"
+            className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:grid sm:grid-cols-2 sm:overflow-visible sm:pb-0 lg:grid-cols-3 xl:grid-cols-5"
           >
-            {services.map((service, index) => {
+            {services.map((service) => {
               const Icon = getServiceIcon(service.slug);
-              const image = FEATURE_IMAGES[index];
               return (
                 <div
                   key={service.id}
-                  className="w-[85%] shrink-0 snap-start sm:w-[calc((100%-1.5rem)/2)] lg:w-[calc((100%-3rem)/3)]"
+                  className="w-[85%] shrink-0 snap-start sm:w-auto"
                 >
-                  <Card className="flex h-full flex-col gap-4 transition-colors duration-150 hover:bg-white/5">
-                    {image?.src ? (
-                      <span
-                        className={`relative shrink-0 overflow-hidden rounded-full ${sizeClass.md}`}
-                      >
-                        <Image
-                          src={image.src}
-                          alt={image.alt}
-                          fill
-                          sizes="44px"
-                          className="object-cover"
-                        />
-                      </span>
-                    ) : (
+                  <div className="group h-full rounded-[25px] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--color-primary)_40%,transparent),color-mix(in_srgb,var(--color-secondary)_40%,transparent))] p-px transition-transform duration-200 hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:translate-y-0">
+                    <Card className="flex h-full flex-col gap-4 border-0 bg-[color-mix(in_srgb,var(--color-background)_94%,#ffffff)] p-5 transition-shadow duration-200 group-hover:shadow-[0_0_32px_0_rgba(56,130,246,0.18)]">
                       <IconCircle icon={Icon} size="md" />
-                    )}
-                    <h3 className="font-heading text-lg font-bold text-white">
-                      {service.title}
-                    </h3>
-                    <p className="font-body text-sm text-muted">{service.summary}</p>
-                    <Link
-                      href={ROUTES.service(service.slug)}
-                      className="relative mt-auto flex items-center gap-1 font-body text-sm font-semibold text-primary"
-                    >
-                      Learn more
-                      <span className="sr-only"> about {service.title}</span>{" "}
-                      <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                    </Link>
-                  </Card>
+                      <h3 className="font-heading text-lg font-bold text-white xl:text-base">
+                        {service.title}
+                      </h3>
+                      <p className="font-body text-sm text-muted">{service.summary}</p>
+                      <ul className="flex flex-col gap-2">
+                        {service.features.map((feature) => (
+                          <li
+                            key={feature}
+                            className="flex items-start gap-2 font-body text-sm text-muted"
+                          >
+                            <Check
+                              className="mt-0.5 h-4 w-4 shrink-0 text-primary"
+                              aria-hidden="true"
+                            />
+                            {feature}
+                          </li>
+                        ))}
+                      </ul>
+                      <Link
+                        href={ROUTES.service(service.slug)}
+                        className="relative mt-auto flex items-center gap-1 pt-2 font-body text-sm font-semibold text-primary transition-colors hover:text-white"
+                      >
+                        Learn more
+                        <span className="sr-only"> about {service.title}</span>{" "}
+                        <ArrowRight
+                          className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-0.5 motion-reduce:transition-none"
+                          aria-hidden="true"
+                        />
+                      </Link>
+                    </Card>
+                  </div>
                 </div>
               );
             })}
           </div>
 
-          <div className="mt-8 flex justify-center gap-3">
-            <button
-              type="button"
-              onClick={() => scrollByCard(-1)}
-              disabled={!canScrollPrev}
-              aria-label="Previous services"
-              className={navButtonClass}
-            >
-              <ArrowLeft className="h-5 w-5" aria-hidden="true" />
-            </button>
-            <button
-              type="button"
-              onClick={() => scrollByCard(1)}
-              disabled={!canScrollNext}
-              aria-label="Next services"
-              className={navButtonClass}
-            >
+          <div className="mt-12 flex justify-center">
+            <Link href={ROUTES.contact} className={buttonVariants({ size: "lg" })}>
+              Let&apos;s Grow Together
               <ArrowRight className="h-5 w-5" aria-hidden="true" />
-            </button>
+            </Link>
           </div>
         </motion.div>
       </Container>

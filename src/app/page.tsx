@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { getCanonicalUrl } from "@/lib/seo/canonical";
 import { seoConfig } from "@/config/seo.config";
 import { ROUTES } from "@/constants/routes";
-import { getServiceOfferings } from "@/services/service-offering.service";
+// TEMPORARY: WordPress What We Do content disabled for UI development.
+// import { getServiceOfferings } from "@/services/service-offering.service";
 import { getCaseStudies } from "@/services/case-study.service";
 // TEMPORARY demo fallback — remove once real case studies exist in WordPress.
 import { withCaseStudyFallback } from "@/lib/fallback/case-studies.fallback";
@@ -31,10 +32,17 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  const [services, caseStudies] = await Promise.all([
-    getServiceOfferings({ first: 5 }),
-    getCaseStudies({ first: 20 }),
-  ]);
+  // TEMPORARY: WordPress What We Do content disabled for UI development.
+  // TODO: RESTORE WORDPRESS DATA
+  // Remove temporaryWhatWeDoServices usage (in src/sections/home/WhatWeDo.tsx) and
+  // restore the existing WordPress service data source by uncommenting the fetch
+  // below, the getServiceOfferings import above, and <WhatWeDo services={...} />.
+  // WordPress integration has intentionally NOT been deleted.
+  // const [services, caseStudies] = await Promise.all([
+  //   getServiceOfferings({ first: 5 }),
+  //   getCaseStudies({ first: 20 }),
+  // ]);
+  const caseStudies = await getCaseStudies({ first: 20 });
 
   const featuredCaseStudies = withCaseStudyFallback(caseStudies.items)
     .filter((caseStudy) => caseStudy.featuredOnHomepage)
@@ -44,7 +52,9 @@ export default async function Home() {
     <>
       <HeroSection />
       {/* <TrustedBrands /> */}
-      <WhatWeDo services={services.items} />
+      {/* TEMPORARY: WordPress What We Do content disabled for UI development. */}
+      {/* <WhatWeDo services={services.items} /> */}
+      <WhatWeDo />
       <WhyTFF />
       <HowWeWork />
       <AboutJourney />
