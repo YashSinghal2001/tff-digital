@@ -23,7 +23,7 @@ interface SlideCard {
 }
 
 interface Slide {
-  image: { src: string; alt: string };
+  image: { src: string; alt: string; positionClassName?: string };
   /** Order: top-left, top-right, bottom-left, bottom-right. */
   cards: [SlideCard, SlideCard, SlideCard, SlideCard];
 }
@@ -62,6 +62,7 @@ const slides: Slide[] = [
     image: {
       src: "https://cms.tffdigital.com/wp-content/uploads/2026/08/f1-1.jpg",
       alt: "Raju Gorai, TFF Digital co-founder and performance marketing expert",
+      positionClassName: "object-top",
     },
     cards: [
       {
@@ -93,10 +94,10 @@ const slides: Slide[] = [
 ];
 
 const cornerClasses = [
-  "left-0 top-2 sm:-left-12 sm:top-4",
-  "right-0 top-2 sm:-right-12 sm:top-4",
-  "bottom-2 left-0 sm:-left-12 sm:bottom-4",
-  "bottom-2 right-0 sm:-right-12 sm:bottom-4",
+  "left-0 top-2 sm:-left-24 sm:-top-2",
+  "right-0 top-2 sm:-right-24 sm:-top-2",
+  "bottom-2 left-0 sm:-left-24 sm:-bottom-2",
+  "bottom-2 right-0 sm:-right-24 sm:-bottom-2",
 ];
 
 /**
@@ -130,6 +131,7 @@ export function HeroShowcase() {
             aria-hidden={index !== activeIndex}
             className={cn(
               "object-cover transition-opacity duration-700 ease-out",
+              slide.image.positionClassName,
               index === activeIndex ? "opacity-100" : "opacity-0",
             )}
           />
