@@ -4,6 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import { getCaseStudyBySlug } from "@/services/case-study.service";
+// TEMPORARY demo fallback — remove once real case studies exist in WordPress.
+import { getFallbackCaseStudyBySlug } from "@/lib/fallback/case-studies.fallback";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { Heading } from "@/components/ui/Heading";
@@ -24,7 +26,8 @@ interface CaseStudyPageProps {
 
 export async function generateMetadata({ params }: CaseStudyPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const caseStudy = await getCaseStudyBySlug(slug);
+  const caseStudy =
+    (await getCaseStudyBySlug(slug)) ?? getFallbackCaseStudyBySlug(slug);
   if (!caseStudy) return {};
 
   return buildMetadata(caseStudy.seo, getCanonicalUrl(ROUTES.caseStudy(slug)));
@@ -32,7 +35,8 @@ export async function generateMetadata({ params }: CaseStudyPageProps): Promise<
 
 export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
   const { slug } = await params;
-  const caseStudy = await getCaseStudyBySlug(slug);
+  const caseStudy =
+    (await getCaseStudyBySlug(slug)) ?? getFallbackCaseStudyBySlug(slug);
   if (!caseStudy) notFound();
 
   const canonicalUrl = getCanonicalUrl(ROUTES.caseStudy(slug));

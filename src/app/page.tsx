@@ -4,6 +4,8 @@ import { seoConfig } from "@/config/seo.config";
 import { ROUTES } from "@/constants/routes";
 import { getServiceOfferings } from "@/services/service-offering.service";
 import { getCaseStudies } from "@/services/case-study.service";
+// TEMPORARY demo fallback — remove once real case studies exist in WordPress.
+import { withCaseStudyFallback } from "@/lib/fallback/case-studies.fallback";
 import { HeroSection } from "@/sections/home/HeroSection";
 // Temporarily hidden — restore by uncommenting this import and <TrustedBrands /> below.
 // import { TrustedBrands } from "@/sections/home/TrustedBrands";
@@ -34,7 +36,7 @@ export default async function Home() {
     getCaseStudies({ first: 20 }),
   ]);
 
-  const featuredCaseStudies = caseStudies.items
+  const featuredCaseStudies = withCaseStudyFallback(caseStudies.items)
     .filter((caseStudy) => caseStudy.featuredOnHomepage)
     .slice(0, 4);
 

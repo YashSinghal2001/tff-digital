@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { getCaseStudies } from "@/services/case-study.service";
+// TEMPORARY demo fallback — remove once real case studies exist in WordPress.
+import { withCaseStudyFallback } from "@/lib/fallback/case-studies.fallback";
 import { PageHero } from "@/components/common/PageHero";
 import { Container } from "@/components/ui/Container";
 import { Pagination } from "@/components/blog/Pagination";
@@ -23,6 +25,7 @@ interface CaseStudiesPageProps {
 export default async function CaseStudiesPage({ searchParams }: CaseStudiesPageProps) {
   const { after } = await searchParams;
   const result = await getCaseStudies({ first: 9, after });
+  const caseStudyItems = withCaseStudyFallback(result.items);
 
   return (
     <>
@@ -39,7 +42,7 @@ export default async function CaseStudiesPage({ searchParams }: CaseStudiesPageP
       />
       <section className="pb-16 lg:pb-24">
         <Container size="full" className="max-w-[1280px]">
-          {result.items.length === 0 ? (
+          {caseStudyItems.length === 0 ? (
             <EmptyState
               title="No case studies yet"
               description="Check back soon — we're publishing new client results regularly."
@@ -49,7 +52,7 @@ export default async function CaseStudiesPage({ searchParams }: CaseStudiesPageP
               {/* Visually hidden: keeps h1 -> h3 card titles in valid heading order, matching the same pattern used in ServicesGrid.tsx. */}
               <h2 className="sr-only">Case studies</h2>
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {result.items.map((caseStudy, index) => (
+                {caseStudyItems.map((caseStudy, index) => (
                   <CaseStudyCard key={caseStudy.id} caseStudy={caseStudy} priority={index === 0} />
                 ))}
               </div>
