@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/Badge";
 import { GradientText } from "@/components/ui/GradientText";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { Glow } from "@/components/ui/Glow";
-import { AutoRotatingImage } from "@/components/common/AutoRotatingImage";
+import { HeroShowcase } from "@/sections/home/HeroShowcase";
 import { ROUTES } from "@/constants/routes";
 
 const stats = [
@@ -55,33 +55,7 @@ export function HeroSection() {
             </div>
           </div>
 
-          <div className="relative mx-auto flex h-[320px] w-[320px] items-center justify-center rounded-full bg-white/5 sm:h-[400px] sm:w-[400px]">
-            <div className="absolute inset-0 overflow-hidden rounded-full">
-              <AutoRotatingImage
-                images={[
-                  {
-                    src: "https://cms.tffdigital.com/wp-content/uploads/2026/08/hero.jpg",
-                    alt: "Target Find Finish Digital team driving strategy, branding, and performance growth",
-                  },
-                  {
-                    src: "https://cms.tffdigital.com/wp-content/uploads/2026/08/f2.jpg",
-                    alt: "Kanchan Rana, TFF Digital co-founder",
-                  },
-                ]}
-                sizes="(min-width: 640px) 400px, 320px"
-              />
-            </div>
-
-            <Badge className="absolute left-2 top-6" tone="info">
-              SEO
-            </Badge>
-            <Badge className="absolute right-0 top-4" tone="info">
-              CRO +64%
-            </Badge>
-            <Badge className="absolute bottom-8 right-2" tone="info">
-              Leads 1,932
-            </Badge>
-          </div>
+          <HeroShowcase />
         </div>
       </Container>
     </section>
