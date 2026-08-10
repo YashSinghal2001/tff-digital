@@ -33,6 +33,7 @@ const slides: Slide[] = [
     image: {
       src: "https://cms.tffdigital.com/wp-content/uploads/2026/08/f2.jpg",
       alt: "Kanchan Rana, TFF Digital co-founder and SEO expert",
+      positionClassName: "object-top",
     },
     cards: [
       {
