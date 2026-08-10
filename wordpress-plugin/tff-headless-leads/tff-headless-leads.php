@@ -242,6 +242,72 @@ add_action( 'init', function () {
 	// false, so this CPT never registers custom permalink rewrite rules.
 } );
 
+/**
+ * Admin-only display of the submitted lead data. The CPT only supports
+ * 'title' (see register_post_type() above), so without this metabox the
+ * edit screen shows nothing but "Name — Email". Read-only: this plugin's
+ * job is to record submissions accurately, not let admins edit them.
+ */
+add_action( 'add_meta_boxes', function () {
+	add_meta_box(
+		'tff_lead_details',
+		'Lead Details',
+		'tff_headless_leads_render_details_metabox',
+		TFF_HEADLESS_LEADS_CPT,
+		'normal',
+		'high'
+	);
+} );
+
+function tff_headless_leads_render_details_metabox( WP_Post $post ) {
+	// The title is stored as "{name} — {email}" by
+	// tff_headless_leads_persist_as_cpt(); split it back out here rather
+	// than storing name separately, to avoid duplicating data.
+	$title_parts = explode( ' — ', $post->post_title, 2 );
+	$name        = $title_parts[0] !== '' ? $title_parts[0] : $post->post_title;
+
+	$email   = get_post_meta( $post->ID, 'lead_email', true );
+	$phone   = get_post_meta( $post->ID, 'lead_phone', true );
+	$company = get_post_meta( $post->ID, 'lead_company', true );
+	$service = get_post_meta( $post->ID, 'lead_service', true );
+	$budget  = get_post_meta( $post->ID, 'lead_budget', true );
+	$message = get_post_meta( $post->ID, 'lead_message', true );
+	$source  = get_post_meta( $post->ID, 'lead_source', true );
+
+	$rows = array(
+		'Name'             => $name,
+		'Email'            => $email,
+		'Phone'            => $phone,
+		'Company'          => $company,
+		'Service Interest' => $service,
+		'Budget'           => $budget,
+		'Source'           => $source,
+		'Submitted'        => get_the_date( 'F j, Y g:i a', $post ),
+	);
+	?>
+	<table class="widefat striped" style="border:none;">
+		<tbody>
+			<?php foreach ( $rows as $label => $value ) : ?>
+				<tr>
+					<th style="width:160px; text-align:left; vertical-align:top;"><?php echo esc_html( $label ); ?></th>
+					<td>
+						<?php if ( $label === 'Email' && $value ) : ?>
+							<a href="<?php echo esc_url( 'mailto:' . $value ); ?>"><?php echo esc_html( $value ); ?></a>
+						<?php else : ?>
+							<?php echo $value !== '' ? esc_html( $value ) : '<em>Not provided</em>'; ?>
+						<?php endif; ?>
+					</td>
+				</tr>
+			<?php endforeach; ?>
+			<tr>
+				<th style="width:160px; text-align:left; vertical-align:top;">Message</th>
+				<td><?php echo $message !== '' ? nl2br( esc_html( $message ) ) : '<em>Not provided</em>'; ?></td>
+			</tr>
+		</tbody>
+	</table>
+	<?php
+}
+
 function tff_headless_leads_persist_as_cpt( array $lead ) {
 	$post_id = wp_insert_post(
 		array(
