@@ -20,6 +20,12 @@ export function buildLeadNotificationEmail(lead: Lead): LeadNotificationEmail {
   const serviceLabel = labelFor(serviceOptions, lead.serviceInterest);
   const budgetLabel = labelFor(budgetOptions, lead.budget);
   const safeName = sanitizeHeaderValue(lead.name);
+  const safeEmail = sanitizeHeaderValue(lead.email);
+  const submittedAtLabel = `${new Date(lead.submittedAt).toLocaleString("en-US", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "UTC",
+  })} UTC`;
 
   const rows: [string, string][] = [
     ["Name", lead.name],
@@ -28,6 +34,8 @@ export function buildLeadNotificationEmail(lead: Lead): LeadNotificationEmail {
     ["Company", lead.company ?? "Not provided"],
     ["Service", serviceLabel],
     ["Budget", budgetLabel],
+    ["Source", lead.source ?? "Not specified"],
+    ["Submitted", submittedAtLabel],
   ];
 
   const html = `
@@ -61,6 +69,8 @@ export function buildLeadNotificationEmail(lead: Lead): LeadNotificationEmail {
     `Company: ${lead.company ?? "Not provided"}`,
     `Service: ${serviceLabel}`,
     `Budget: ${budgetLabel}`,
+    `Source: ${lead.source ?? "Not specified"}`,
+    `Submitted: ${submittedAtLabel}`,
     "",
     "Message:",
     lead.message,
@@ -70,6 +80,8 @@ export function buildLeadNotificationEmail(lead: Lead): LeadNotificationEmail {
     subject: `New Lead — ${safeName} — ${serviceLabel}`,
     html,
     text,
-    replyTo: `${safeName} <${lead.email}>`,
+    // safeEmail guards against header injection defense-in-depth, even
+    // though Zod's email() format already rejects embedded CR/LF.
+    replyTo: `${safeName} <${safeEmail}>`,
   };
 }
