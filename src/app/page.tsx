@@ -8,8 +8,7 @@ import { getCaseStudies } from "@/services/case-study.service";
 // TEMPORARY demo fallback — remove once real case studies exist in WordPress.
 import { withCaseStudyFallback } from "@/lib/fallback/case-studies.fallback";
 import { HeroSection } from "@/sections/home/HeroSection";
-// Temporarily hidden — restore by uncommenting this import and <TrustedBrands /> below.
-// import { TrustedBrands } from "@/sections/home/TrustedBrands";
+import { TrustedBrands } from "@/sections/home/TrustedBrands";
 import { WhatWeDo } from "@/sections/home/WhatWeDo";
 import { WhyTFF } from "@/sections/shared/WhyTFF";
 import { HowWeWork } from "@/sections/home/HowWeWork";
@@ -51,7 +50,7 @@ export default async function Home() {
   return (
     <>
       <HeroSection />
-      {/* <TrustedBrands /> */}
+      <TrustedBrands />
       {/* TEMPORARY: WordPress What We Do content disabled for UI development. */}
       {/* <WhatWeDo services={services.items} /> */}
       <WhatWeDo />
