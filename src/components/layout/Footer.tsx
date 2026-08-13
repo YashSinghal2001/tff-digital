@@ -92,16 +92,16 @@ export function Footer() {
 
   return (
     <footer className="border-t border-border-subtle">
-      <Container size="full" className="max-w-[1280px] py-16">
-        <div className="grid gap-12 lg:grid-cols-[1.2fr_2fr]">
+      <Container size="full" className="max-w-[1280px] py-10 lg:py-12">
+        <div className="grid gap-10 lg:grid-cols-[1.2fr_2fr] lg:gap-12">
           <div>
             <Logo asLink={false} className="h-10" />
-            <p className="mt-5 max-w-xs font-body text-sm text-muted">
+            <p className="mt-4 max-w-xs font-body text-sm text-muted">
               Find Strategy. Target Right. Finish Strong. We build digital growth systems
               for brands that want measurable results.
             </p>
 
-            <p className="mt-6 font-heading text-sm font-semibold text-white">
+            <p className="mt-5 font-heading text-sm font-semibold text-white">
               Get growth insights, monthly.
             </p>
             {subscribed ? (
@@ -124,7 +124,7 @@ export function Footer() {
               </form>
             )}
 
-            <div className="mt-6 flex flex-wrap gap-3">
+            <div className="mt-5 flex flex-wrap gap-3">
               {socialLinks.map(({ label, href, icon: Icon }) => (
                 <a
                   key={label}
@@ -182,22 +182,36 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-16 border-t border-border-subtle pt-8 text-sm text-muted">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <p>© {new Date().getFullYear()} TFF Digital. All rights reserved.</p>
-            <p>Find Strategy · Target Right · Finish Strong</p>
-          </div>
+        <div className="mt-10 border-t border-border-subtle pt-6">
+          {/* Mobile: centered stack (copyright → legal → tagline). Desktop: one
+              row of equal thirds so the copyright is centered across the full
+              footer width, legal links sit left, tagline sits right. */}
+          <div className="flex flex-col items-center gap-3 text-center lg:grid lg:grid-cols-3 lg:items-center lg:gap-4">
+            <div className="order-2 flex items-center gap-x-3 font-body text-xs text-muted lg:order-1 lg:justify-self-start">
+              <Link
+                href={ROUTES.privacyPolicy}
+                className="transition-colors duration-150 hover:text-white"
+              >
+                Privacy Policy
+              </Link>
+              <span aria-hidden="true" className="text-border-strong">
+                |
+              </span>
+              <Link
+                href={ROUTES.termsAndConditions}
+                className="transition-colors duration-150 hover:text-white"
+              >
+                Terms &amp; Conditions
+              </Link>
+            </div>
 
-          <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs">
-            <Link href={ROUTES.privacyPolicy} className="transition-colors hover:text-white">
-              Privacy Policy
-            </Link>
-            <span aria-hidden="true" className="text-border-strong">
-              |
-            </span>
-            <Link href={ROUTES.termsAndConditions} className="transition-colors hover:text-white">
-              Terms &amp; Conditions
-            </Link>
+            <p className="order-1 font-body text-sm text-muted lg:order-2 lg:text-center">
+              © {new Date().getFullYear()} TFF Digital. All rights reserved.
+            </p>
+
+            <p className="order-3 font-body text-xs text-muted lg:justify-self-end lg:text-right">
+              Find Strategy · Target Right · Finish Strong
+            </p>
           </div>
         </div>
       </Container>
