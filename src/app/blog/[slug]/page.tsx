@@ -17,7 +17,7 @@ import { JsonLd } from "@/components/common/JsonLd";
 import { buildBlogPostingJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo/json-ld";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { getCanonicalUrl } from "@/lib/seo/canonical";
-import { withHeadingIds } from "@/lib/content/post-content";
+import { withHeadingIds, stripDuplicateFeaturedImage } from "@/lib/content/post-content";
 import { formatPostDate } from "@/lib/content/format-date";
 import { ROUTES } from "@/constants/routes";
 import type { Post } from "@/types/domain/post";
@@ -39,7 +39,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const post = await getPostBySlug(slug);
   if (!post) notFound();
 
-  const { html, headings } = withHeadingIds(post.content);
+  const dedupedContent = stripDuplicateFeaturedImage(post.content, post.featuredImage?.url);
+  const { html, headings } = withHeadingIds(dedupedContent);
   const canonicalUrl = getCanonicalUrl(ROUTES.blogPost(slug));
 
   const primaryCategory = post.categories[0];
