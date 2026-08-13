@@ -15,17 +15,17 @@ const stats = [
 
 export function HeroSection() {
   return (
-    <section className="relative overflow-hidden">
+    <section className="relative flex flex-col justify-center overflow-hidden lg:flex-1">
       <Glow className="left-1/2 top-0 h-[420px] w-[420px] -translate-x-1/2 opacity-20" />
-      <Container size="full" className="max-w-[1280px] py-10 lg:py-16">
-        <div className="grid items-center gap-12 lg:grid-cols-2">
-          <div className="flex flex-col gap-6">
+      <Container size="full" className="max-w-[1280px] py-10 lg:py-6">
+        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-12">
+          <div className="flex flex-col gap-5">
             <Badge className="self-start">
               <span className="h-1.5 w-1.5 rounded-full bg-primary" />
               Premium Digital Growth Agency
             </Badge>
 
-            <h1 className="font-heading text-[38px] font-bold leading-[1.15] text-white sm:text-[48px] lg:text-[60px] lg:leading-[1.1]">
+            <h1 className="font-heading text-[38px] font-bold leading-[1.15] text-white sm:text-[48px] lg:text-[clamp(44px,4vw,56px)] lg:leading-[1.1]">
               Target Right. <br />
               <GradientText>Find Strategy.</GradientText> <br />
               Finish Strong.
@@ -45,7 +45,7 @@ export function HeroSection() {
               </Link>
             </div>
 
-            <div className="flex flex-wrap gap-x-8 gap-y-4 pt-4">
+            <div className="flex flex-wrap gap-x-8 gap-y-4 pt-2">
               {stats.map((stat) => (
                 <div key={stat.label}>
                   <p className="font-heading text-xl font-bold text-white">{stat.value}</p>

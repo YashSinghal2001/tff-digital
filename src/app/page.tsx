@@ -49,8 +49,13 @@ export default async function Home() {
 
   return (
     <>
-      <HeroSection />
-      <TrustedBrands />
+      {/* Hero + Upwork trust bar form one first-screen composition: the
+          wrapper fills the viewport below the fixed navbar (main pt-24 = 6rem)
+          and the hero flexes to absorb the remaining height. */}
+      <div className="flex flex-col lg:min-h-[calc(100svh-6rem)]">
+        <HeroSection />
+        <TrustedBrands />
+      </div>
       {/* TEMPORARY: WordPress What We Do content disabled for UI development. */}
       {/* <WhatWeDo services={services.items} /> */}
       <WhatWeDo />

@@ -32,7 +32,7 @@ export function Navbar() {
   }, [open]);
 
   return (
-    <header className="fixed inset-x-0 top-6 z-50">
+    <header className="fixed inset-x-0 top-4 z-50">
       {open && (
         <div
           className="fixed inset-0 -z-10 bg-background/80 backdrop-blur-sm xl:hidden"

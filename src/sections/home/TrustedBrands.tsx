@@ -18,11 +18,11 @@ const stats: Array<{ value: string; label: string; highlight?: boolean }> = [
 
 export function TrustedBrands() {
   return (
-    <section className="py-8 sm:py-10">
+    <section className="pb-8 pt-0 sm:pb-10">
       <Container size="full" className="max-w-[1280px]">
         <motion.div
           {...fadeInUp}
-          className="relative overflow-hidden rounded-[24px] border border-white/10 bg-[linear-gradient(115deg,#0e1430_0%,#0c1025_48%,#131033_100%)] px-5 py-7 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] sm:px-10 sm:py-9 lg:px-12 lg:py-10"
+          className="relative overflow-hidden rounded-[24px] border border-white/10 bg-[linear-gradient(115deg,#0e1430_0%,#0c1025_48%,#131033_100%)] px-5 py-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] sm:px-10 sm:py-7 lg:px-10 lg:py-6"
         >
           {/* Top gradient accent line */}
           <span

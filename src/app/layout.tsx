@@ -58,7 +58,7 @@ export default function RootLayout({
         <JsonLd data={[buildOrganizationJsonLd(), buildWebsiteJsonLd()]} />
         <HashScrollHandler />
         <Navbar />
-        <main id="main-content" tabIndex={-1} className="pt-28 outline-none">
+        <main id="main-content" tabIndex={-1} className="pt-24 outline-none">
           {children}
         </main>
         <Footer />

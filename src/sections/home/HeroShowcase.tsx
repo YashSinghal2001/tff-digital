@@ -118,7 +118,7 @@ export function HeroShowcase() {
   }, []);
 
   return (
-    <div className="relative mx-auto flex h-[320px] w-[320px] items-center justify-center rounded-full bg-white/5 sm:h-[400px] sm:w-[400px]">
+    <div className="relative mx-auto flex h-[320px] w-[320px] items-center justify-center rounded-full bg-white/5 sm:h-[400px] sm:w-[400px] lg:h-[min(400px,52vh)] lg:w-[min(400px,52vh)]">
       <div className="absolute inset-0 rounded-full border border-primary/40 shadow-[var(--shadow-glow)]" />
 
       <div className="absolute inset-0 overflow-hidden rounded-full">

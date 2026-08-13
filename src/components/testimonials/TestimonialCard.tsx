@@ -22,17 +22,21 @@ export function TestimonialCard({ testimonial }: TestimonialCardProps) {
   const reviewId = `testimonial-review-${testimonial.id}`;
 
   return (
-    <Card className="flex h-full flex-col gap-4 transition-all duration-200 hover:-translate-y-1 hover:border-primary/40 motion-reduce:transition-none motion-reduce:hover:translate-y-0">
-      <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-border-subtle bg-white/5 px-3 py-1 font-body text-[10px] font-semibold uppercase tracking-[0.12em] text-[#14A800]">
+    <Card className="hover:border-primary/40 flex h-full flex-col gap-4 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_12px_32px_-12px_rgba(56,130,246,0.3)] motion-reduce:transition-none motion-reduce:hover:translate-y-0">
+      <span className="border-border-subtle font-body inline-flex w-fit items-center gap-1.5 rounded-full border bg-white/5 px-3 py-1 text-[10px] font-semibold tracking-[0.12em] text-[#14A800] uppercase">
         <UpworkIcon className="h-3 w-3" />
         Upwork Client Feedback
       </span>
 
-      <h3 className="font-heading text-base font-bold text-white">{testimonial.title}</h3>
+      <h3 className="font-heading text-base font-bold text-white">
+        {testimonial.title}
+      </h3>
 
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 font-body text-xs text-muted">
+      <div className="font-body text-muted flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
         <RatingStars rating={testimonial.rating} />
-        <span className="font-semibold text-white">{testimonial.rating.toFixed(1)}</span>
+        <span className="font-semibold text-white">
+          {testimonial.rating.toFixed(1)}
+        </span>
         <span aria-hidden="true">|</span>
         <span>{testimonial.dateRange}</span>
       </div>
@@ -53,26 +57,32 @@ export function TestimonialCard({ testimonial }: TestimonialCardProps) {
             onClick={() => setExpanded((prev) => !prev)}
             aria-expanded={expanded}
             aria-controls={reviewId}
-            className="mt-2 font-body text-xs font-semibold text-primary outline-none transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-primary/50"
+            className="font-body text-primary focus-visible:ring-primary/50 mt-2 text-xs font-semibold transition-colors outline-none hover:text-white focus-visible:ring-2"
           >
             {expanded ? "Read less" : "Read more"}
-            <span className="sr-only"> of the review for {testimonial.title}</span>
+            <span className="sr-only">
+              {" "}
+              of the review for {testimonial.title}
+            </span>
           </button>
         ) : null}
       </div>
 
       {testimonial.freelancerResponse ? (
-        <div className="border-l-2 border-primary/40 pl-4">
-          <p className="font-body text-[11px] font-medium uppercase tracking-[0.1em] text-muted">
+        <div className="border-primary/40 border-l-2 pl-4">
+          <p className="font-body text-muted text-[11px] font-medium tracking-[0.1em] uppercase">
             Freelancer&apos;s response
           </p>
-          <p className="mt-1 font-body text-sm text-white/70 italic">
+          <p className="font-body mt-1 text-sm text-white/70 italic">
             &ldquo;{testimonial.freelancerResponse}&rdquo;
           </p>
         </div>
       ) : null}
 
-      <EndorsementTags items={testimonial.endorsements} className="mt-auto pt-2" />
+      <EndorsementTags
+        items={testimonial.endorsements}
+        className="mt-auto pt-2"
+      />
     </Card>
   );
 }
