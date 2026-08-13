@@ -15,6 +15,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Card } from "@/components/ui/Card";
+import { Glow } from "@/components/ui/Glow";
 import { Heading } from "@/components/ui/Heading";
 import { GradientText } from "@/components/ui/GradientText";
 import { buttonVariants } from "@/components/ui/button-variants";
@@ -91,16 +92,20 @@ function StepContent({ step }: { step: Step }) {
   const Icon = step.icon;
   return (
     <div className="relative">
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute -top-3 left-14 select-none font-heading text-[56px] font-bold leading-none text-white/5 lg:text-[64px]"
-      >
-        {step.step}
-      </span>
-      <span className="relative inline-flex h-12 w-12 items-center justify-center rounded-full border border-border-strong bg-glass">
-        <Icon className="h-5 w-5" style={iconGradientStroke} />
-      </span>
-      <h3 className="mt-5 font-heading text-lg font-bold text-white">
+      <div className="flex items-center">
+        <span
+          aria-hidden="true"
+          className="select-none font-heading text-[56px] font-bold leading-none text-primary/[0.16] lg:text-[64px]"
+        >
+          {step.step}
+        </span>
+        {/* Negative margin pulls the icon over the numeral's tail so the two
+            read as one integrated mark instead of separate elements. */}
+        <span className="relative -ml-6 inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-border-strong bg-glass backdrop-blur-sm">
+          <Icon className="h-6 w-6" style={iconGradientStroke} />
+        </span>
+      </div>
+      <h3 className="mt-4 font-heading text-lg font-bold text-white">
         {step.title}
       </h3>
       <p className="mt-2 max-w-[280px] font-body text-sm leading-relaxed text-muted">
@@ -134,7 +139,7 @@ function TimelineRow({
       {rowSteps.map((step, index) => (
         <div
           key={step.step}
-          className={`${colStart[index]} pr-8 pt-6 ${contentRow}`}
+          className={`${colStart[index]} pr-8 pt-4 ${contentRow}`}
         >
           <StepContent step={step} />
         </div>
@@ -145,7 +150,12 @@ function TimelineRow({
 
 export function HowWeWork() {
   return (
-    <section id="process" className="py-16 lg:py-24">
+    <section id="process" className="relative overflow-hidden py-16 lg:py-24">
+      <Glow
+        className="left-1/2 top-0 h-[560px] w-[560px] -translate-x-1/2 opacity-10"
+        color="var(--color-secondary)"
+      />
+
       {/* Shared gradient for icon strokes (stroke can't use CSS text gradients) */}
       <svg aria-hidden="true" className="absolute h-0 w-0">
         <defs>
@@ -170,7 +180,7 @@ export function HowWeWork() {
 
         {/* Desktop: two-row zig-zag timeline with a dashed curve joining the rows */}
         <motion.div {...fadeInUp} className="hidden lg:block">
-          <div className="grid grid-cols-[1fr_1fr_1fr_72px] grid-rows-[16px_auto_64px_16px_auto]">
+          <div className="grid grid-cols-[1fr_1fr_1fr_72px] grid-rows-[16px_auto_40px_16px_auto]">
             <TimelineRow
               rowSteps={steps.slice(0, 3)}
               stripRow="row-start-1"
@@ -188,8 +198,8 @@ export function HowWeWork() {
                 >
                   <path
                     d="M0 0 C 70 0, 70 100, 0 100"
-                    stroke="var(--color-secondary)"
-                    strokeOpacity="0.5"
+                    stroke="url(#hww-icon-gradient)"
+                    strokeOpacity="0.6"
                     strokeDasharray="5 6"
                     vectorEffect="non-scaling-stroke"
                   />
@@ -226,7 +236,7 @@ export function HowWeWork() {
 
         {/* Bottom CTA panel */}
         <motion.div {...fadeInUp}>
-          <Card className="mt-14 sm:p-8 lg:mt-20">
+          <Card className="mt-10 sm:p-8 lg:mt-14">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:gap-8">
               <div className="flex flex-1 flex-col gap-5 sm:flex-row sm:items-center">
                 <span className="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-border-strong bg-glass">

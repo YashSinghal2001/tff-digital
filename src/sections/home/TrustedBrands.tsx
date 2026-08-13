@@ -1,61 +1,121 @@
-import { ArrowUpRight } from "lucide-react";
+"use client";
+
+import { motion } from "framer-motion";
+import { ArrowUpRight, BadgeCheck } from "lucide-react";
 import { Container } from "@/components/ui/Container";
-import { buttonVariants } from "@/components/ui/button-variants";
+import { UpworkIcon } from "@/components/icons/UpworkIcon";
+import { fadeInUp } from "@/styles/animations";
+import { cn } from "@/lib/utils";
 
 const UPWORK_PROFILE_URL = "https://www.upwork.com/freelancers/upworkseoexpert";
 
-const stats: Array<{ value: string; label: string }> = [
+const stats: Array<{ value: string; label: string; highlight?: boolean }> = [
   { value: "100%", label: "Job Success" },
-  { value: "Top Rated Plus", label: "Upwork Status" },
+  { value: "Top Rated Plus", label: "Upwork Status", highlight: true },
   { value: "72", label: "Total Jobs" },
   { value: "9,444", label: "Total Hours" },
 ];
 
-function UpworkIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className={className}>
-      <path d="M18.561 13.158c-1.102 0-2.135-.467-3.074-1.227l.228-1.076.008-.042c.207-1.143.849-3.06 2.839-3.06 1.492 0 2.703 1.212 2.703 2.703-.001 1.489-1.212 2.702-2.704 2.702zm0-8.14c-2.539 0-4.51 1.649-5.31 4.366-1.22-1.834-2.148-4.036-2.687-5.892H7.828v7.112c-.002 1.406-1.141 2.546-2.547 2.548-1.405-.002-2.543-1.143-2.545-2.548V3.492H0v7.112c0 2.914 2.37 5.303 5.281 5.303 2.913 0 5.283-2.389 5.283-5.303v-1.19c.529 1.107 1.182 2.229 1.974 3.221l-1.673 7.873h2.797l1.213-5.71c1.063.679 2.285 1.109 3.686 1.109 3 0 5.439-2.452 5.439-5.45 0-3-2.439-5.439-5.439-5.439z" />
-    </svg>
-  );
-}
-
 export function TrustedBrands() {
   return (
-    <section className="border-y border-border-subtle py-8">
-      <Container
-        size="full"
-        className="flex max-w-[1280px] flex-col items-center gap-6 text-center lg:flex-row lg:justify-between lg:gap-8 lg:text-left"
-      >
-        <div className="flex items-center gap-3">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border-strong bg-glass text-[#14A800]">
-            <UpworkIcon className="h-5 w-5" />
-          </span>
-          <div>
-            <p className="font-heading text-sm font-semibold text-white">Verified on Upwork</p>
-            <p className="font-body text-xs text-muted">Kanchan R. — Freelancer Profile</p>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
-          {stats.map((stat) => (
-            <div key={stat.label} className="text-center">
-              <p className="font-heading text-base font-bold text-white">{stat.value}</p>
-              <p className="font-body text-[11px] uppercase tracking-[0.1em] text-muted">
-                {stat.label}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        <a
-          href={UPWORK_PROFILE_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={buttonVariants({ variant: "outline", size: "sm", className: "gap-2" })}
+    <section className="py-8 sm:py-10">
+      <Container size="full" className="max-w-[1280px]">
+        <motion.div
+          {...fadeInUp}
+          className="relative overflow-hidden rounded-[24px] border border-white/10 bg-[linear-gradient(115deg,#0e1430_0%,#0c1025_48%,#131033_100%)] px-5 py-7 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] sm:px-10 sm:py-9 lg:px-12 lg:py-10"
         >
-          View Upwork Profile
-          <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-        </a>
+          {/* Top gradient accent line */}
+          <span
+            aria-hidden
+            className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent_0%,rgba(56,130,246,0.55)_25%,rgba(139,92,246,0.55)_75%,transparent_100%)]"
+          />
+
+          {/* Ambient glows: blue behind the verification block, purple near the CTA */}
+          <span
+            aria-hidden
+            className="bg-primary/10 pointer-events-none absolute top-1/2 -left-20 h-56 w-56 -translate-y-1/2 rounded-full blur-[90px]"
+          />
+          <span
+            aria-hidden
+            className="bg-secondary/10 pointer-events-none absolute top-1/2 -right-16 h-56 w-56 -translate-y-1/2 rounded-full blur-[90px]"
+          />
+
+          <div className="relative grid grid-cols-1 gap-7 md:grid-cols-[1fr_auto] md:items-center md:gap-x-6 min-[80rem]:grid-cols-[auto_1fr_auto]">
+            {/* Verification block */}
+            <div className="flex items-center justify-center gap-4 md:justify-start">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/10 bg-gradient-to-br from-white/10 to-white/[0.02] text-[#14A800] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+                <UpworkIcon className="h-5 w-5" />
+              </span>
+              <div className="text-left whitespace-nowrap">
+                <p className="font-body text-primary text-[10px] tracking-[0.2em] uppercase">
+                  Proven on Upwork
+                </p>
+                <p className="font-heading mt-0.5 flex items-center gap-1.5 text-base font-semibold text-white">
+                  Verified on Upwork
+                  <BadgeCheck
+                    className="h-4 w-4 shrink-0 text-[#14A800]"
+                    aria-hidden="true"
+                  />
+                </p>
+                <p className="font-body text-muted/80 text-xs">
+                  Kanchan R. — Freelancer Profile
+                </p>
+              </div>
+            </div>
+
+            {/* Stats */}
+            <div
+              className={cn(
+                "grid grid-cols-2 gap-x-4 gap-y-6 border-y border-white/5 py-6 text-center",
+                "md:col-span-2 md:row-start-2 md:flex md:items-center md:justify-between md:gap-x-0 md:border-y-0 md:border-t md:pt-7 md:pb-0",
+                "min-[80rem]:col-span-1 min-[80rem]:col-start-2 min-[80rem]:row-start-1 min-[80rem]:border-t-0 min-[80rem]:border-l min-[80rem]:border-white/5 min-[80rem]:py-0 min-[80rem]:pl-6",
+              )}
+            >
+              {stats.map((stat, index) => (
+                <div key={stat.label} className="contents">
+                  {index > 0 && (
+                    <span
+                      aria-hidden
+                      className="hidden h-10 w-px shrink-0 bg-white/10 md:block"
+                    />
+                  )}
+                  <div>
+                    <p className="font-heading text-lg leading-tight font-bold text-white sm:text-xl md:whitespace-nowrap min-[80rem]:text-2xl">
+                      {stat.highlight ? (
+                        <span className="bg-[linear-gradient(90deg,var(--color-primary)_0%,var(--color-secondary)_100%)] bg-clip-text text-transparent">
+                          {stat.value}
+                        </span>
+                      ) : (
+                        stat.value
+                      )}
+                    </p>
+                    <p className="font-body text-muted/70 mt-1 text-[10px] tracking-[0.14em] uppercase sm:text-[11px] md:whitespace-nowrap">
+                      {stat.label}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* CTA */}
+            <div className="flex justify-center md:col-start-2 md:row-start-1 md:justify-end min-[80rem]:col-start-3">
+              <motion.a
+                href={UPWORK_PROFILE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                whileHover={{ y: -2 }}
+                transition={{ duration: 0.15, ease: "easeOut" }}
+                className="group font-heading focus-visible:ring-primary focus-visible:ring-offset-background inline-flex h-11 items-center gap-2 rounded-full bg-[linear-gradient(90deg,var(--color-primary)_0%,var(--color-secondary)_100%)] px-6 text-sm font-semibold whitespace-nowrap text-white shadow-[0_0_24px_rgba(56,130,246,0.25)] transition-[box-shadow,filter] duration-200 outline-none hover:shadow-[0_0_36px_rgba(139,92,246,0.35)] hover:brightness-110 focus-visible:ring-2 focus-visible:ring-offset-2"
+              >
+                View Upwork Profile
+                <ArrowUpRight
+                  className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                  aria-hidden="true"
+                />
+              </motion.a>
+            </div>
+          </div>
+        </motion.div>
       </Container>
     </section>
   );
