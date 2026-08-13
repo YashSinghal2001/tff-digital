@@ -27,9 +27,9 @@ const tff = [
 
 export function WhyTFF() {
   return (
-    <section className="py-16 lg:py-24">
+    <section className="py-12 lg:py-16">
       <Container size="full" className="max-w-[1280px]">
-        <motion.div {...fadeInUp} className="mb-12 text-center">
+        <motion.div {...fadeInUp} className="mb-8 text-center">
           <SectionEyebrow>WHY TFF</SectionEyebrow>
           <Heading as="h2">
             The difference is <GradientText>strategy.</GradientText>

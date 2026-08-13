@@ -45,7 +45,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         ])}
       />
       <BlogHero defaultQuery={query} />
-      <section className="pb-16 lg:pb-24">
+      <section className="pb-12 lg:pb-16">
         <Container size="full" className="max-w-[1280px]">
           <div className="grid gap-10 lg:grid-cols-[1fr_300px]">
             <BlogResults

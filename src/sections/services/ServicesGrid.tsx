@@ -19,7 +19,7 @@ export function ServicesGrid({ services }: ServicesGridProps) {
   }));
 
   return (
-    <section id="grid" className="py-16 lg:py-24">
+    <section id="grid" className="py-12 lg:py-16">
       <Container size="full" className="max-w-[1280px]">
         {/* Visually hidden: keeps the h1 -> h3 card titles in valid heading order without adding a visible section title the design doesn't call for. */}
         <h2 className="sr-only">Our services</h2>

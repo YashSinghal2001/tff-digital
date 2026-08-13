@@ -42,9 +42,9 @@ export function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
-    <section className="py-16 lg:py-24">
+    <section className="py-12 lg:py-16">
       <Container size="full" className="max-w-[1280px]">
-        <motion.div {...fadeInUp} className="mb-12 text-center">
+        <motion.div {...fadeInUp} className="mb-8 text-center">
           <SectionEyebrow>FAQ</SectionEyebrow>
           <Heading as="h2">
             Questions, <GradientText>answered.</GradientText>

@@ -8,9 +8,9 @@ import { fadeInUp } from "@/styles/animations";
 
 export function CTABookForm() {
   return (
-    <section className="py-16 lg:py-24">
+    <section className="py-12 lg:py-16">
       <Container size="full" className="max-w-[1280px]">
-        <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
+        <div className="grid gap-8 lg:grid-cols-2 lg:items-center lg:gap-12">
           <motion.div {...fadeInUp}>
             <h2 className="font-heading text-[32px] font-bold leading-tight text-white sm:text-[40px]">
               Let&apos;s build your next <GradientText>digital success story.</GradientText>

@@ -10,7 +10,7 @@ import { fadeInUp } from "@/styles/animations";
 
 export function OurPhilosophy() {
   return (
-    <section className="py-16 lg:py-24">
+    <section className="py-12 lg:py-16">
       <Container size="full" className="max-w-[1280px]">
         <motion.div {...fadeInUp} className="mb-12">
           <SectionEyebrow>OUR PHILOSOPHY</SectionEyebrow>

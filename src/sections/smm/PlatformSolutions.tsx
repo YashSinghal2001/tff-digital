@@ -20,7 +20,7 @@ const platforms = [
 
 export function PlatformSolutions() {
   return (
-    <section className="py-16 lg:py-24">
+    <section className="py-12 lg:py-16">
       <Container size="full" className="max-w-[1280px]">
         <motion.div {...fadeInUp} className="mb-12">
           <SectionEyebrow>SOCIAL MEDIA MANAGEMENT SERVICES</SectionEyebrow>

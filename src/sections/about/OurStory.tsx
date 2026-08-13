@@ -17,9 +17,9 @@ const stats = [
 
 export function OurStory() {
   return (
-    <section className="py-16 lg:py-24">
+    <section className="py-12 lg:py-16">
       <Container size="full" className="max-w-[1280px]">
-        <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
+        <div className="grid gap-8 lg:grid-cols-2 lg:items-center lg:gap-12">
           <motion.div {...fadeInUp}>
             <SectionEyebrow>OUR STORY</SectionEyebrow>
             <Heading as="h2">

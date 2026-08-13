@@ -20,7 +20,7 @@ export function RelatedServices({ services }: RelatedServicesProps) {
   if (services.length === 0) return null;
 
   return (
-    <div className="mx-auto mt-16 max-w-5xl border-t border-border-subtle pt-12">
+    <div className="mx-auto mt-12 max-w-5xl border-t border-border-subtle pt-10">
       <Heading as="h2" className="mb-6 text-2xl">
         Related services
       </Heading>

@@ -12,11 +12,11 @@ import { fadeInUp } from "@/styles/animations";
 
 export function Testimonials() {
   return (
-    <section id="testimonials" className="py-16 lg:py-24">
+    <section id="testimonials" className="py-12 lg:py-16">
       <Container size="full" className="max-w-[1280px]">
         <motion.div
           {...fadeInUp}
-          className="mx-auto mb-10 max-w-2xl text-center"
+          className="mx-auto mb-6 max-w-2xl text-center"
         >
           <SectionEyebrow>CLIENT FEEDBACK</SectionEyebrow>
           <Heading as="h2">
@@ -28,7 +28,7 @@ export function Testimonials() {
           </p>
         </motion.div>
 
-        <motion.div {...fadeInUp} className="mb-12 flex justify-center">
+        <motion.div {...fadeInUp} className="mb-8 flex justify-center">
           <span className="border-border-strong bg-glass font-body text-muted inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs">
             <UpworkIcon className="h-3.5 w-3.5 text-[#14A800]" />
             Real feedback from Upwork projects

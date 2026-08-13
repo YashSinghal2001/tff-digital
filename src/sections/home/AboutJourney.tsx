@@ -71,9 +71,9 @@ const founders: Array<{
 
 export function AboutJourney() {
   return (
-    <section id="about" className="py-16 lg:py-24">
+    <section id="about" className="py-12 lg:py-16">
       <Container size="full" className="max-w-[1280px]">
-        <motion.div {...fadeInUp} className="mx-auto mb-12 max-w-2xl text-center">
+        <motion.div {...fadeInUp} className="mx-auto mb-8 max-w-2xl text-center">
           <SectionEyebrow>ABOUT US</SectionEyebrow>
           <Heading as="h2">
             Built by <GradientText>growth leaders,</GradientText> for{" "}
@@ -85,7 +85,7 @@ export function AboutJourney() {
           </p>
         </motion.div>
 
-        <div className="mb-16 grid gap-6 lg:grid-cols-2 lg:gap-8">
+        <div className="mb-10 grid gap-6 lg:grid-cols-2 lg:gap-8">
           {founders.map((founder) => (
             <motion.div key={founder.name} {...fadeInUp} className="h-full">
               <div className="group h-full rounded-[25px] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--color-primary)_35%,transparent),color-mix(in_srgb,var(--color-secondary)_35%,transparent))] p-px transition-transform duration-200 hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:translate-y-0">

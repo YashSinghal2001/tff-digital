@@ -26,7 +26,7 @@ export function NewsletterSection() {
   };
 
   return (
-    <section className="py-16 lg:py-24">
+    <section className="py-12 lg:py-16">
       <Container size="full" className="max-w-[1280px]">
         <div className="flex flex-col items-center gap-4 rounded-[25px] border border-border-strong bg-glass p-10 text-center sm:p-14">
           <span className="flex h-12 w-12 items-center justify-center rounded-full border border-border-strong bg-glass text-primary">

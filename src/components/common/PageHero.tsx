@@ -41,9 +41,9 @@ export function PageHero({
   descriptionMaxWidth = "max-w-xl",
 }: PageHeroProps) {
   return (
-    <section className="py-10 lg:py-16">
+    <section className="py-8 lg:py-12">
       <Container size="full" className="max-w-[1280px]">
-        <div className={cn("mx-auto flex flex-col items-center gap-6 text-center", innerMaxWidth)}>
+        <div className={cn("mx-auto flex flex-col items-center gap-5 text-center", innerMaxWidth)}>
           <Badge>
             <span className="h-1.5 w-1.5 rounded-full bg-primary" />
             {badge}
@@ -75,7 +75,7 @@ export function PageHero({
         </div>
 
         {trustedBy?.length ? (
-          <div className="mt-16 flex flex-wrap items-center justify-center gap-x-10 gap-y-4 border-t border-border-subtle pt-8">
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-x-10 gap-y-4 border-t border-border-subtle pt-8">
             {trustedBy.map((brand) => (
               <span key={brand} className="font-heading text-sm font-semibold text-white/50">
                 {brand}

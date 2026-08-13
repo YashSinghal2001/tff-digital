@@ -150,7 +150,7 @@ function TimelineRow({
 
 export function HowWeWork() {
   return (
-    <section id="process" className="relative overflow-hidden py-16 lg:py-24">
+    <section id="process" className="relative overflow-hidden py-12 lg:py-16">
       <Glow
         className="left-1/2 top-0 h-[560px] w-[560px] -translate-x-1/2 opacity-10"
         color="var(--color-secondary)"
@@ -167,7 +167,7 @@ export function HowWeWork() {
       </svg>
 
       <Container size="full" className="max-w-[1280px]">
-        <motion.div {...fadeInUp} className="mb-12 lg:mb-16">
+        <motion.div {...fadeInUp} className="mb-8 lg:mb-10">
           <SectionEyebrow>HOW WE WORK</SectionEyebrow>
           <Heading as="h2">
             A proven <GradientText>six-step</GradientText> growth engine.
@@ -236,7 +236,7 @@ export function HowWeWork() {
 
         {/* Bottom CTA panel */}
         <motion.div {...fadeInUp}>
-          <Card className="mt-10 sm:p-8 lg:mt-14">
+          <Card className="mt-8 sm:p-8 lg:mt-10">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:gap-8">
               <div className="flex flex-1 flex-col gap-5 sm:flex-row sm:items-center">
                 <span className="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-border-strong bg-glass">

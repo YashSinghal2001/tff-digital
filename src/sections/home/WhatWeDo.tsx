@@ -75,9 +75,9 @@ export function WhatWeDo() {
   const services = temporaryWhatWeDoServices;
 
   return (
-    <section id="services" className="py-16 lg:py-24">
+    <section id="services" className="py-12 lg:py-16">
       <Container size="full" className="max-w-[1280px]">
-        <motion.div {...fadeInUp} className="mx-auto mb-12 max-w-2xl text-center">
+        <motion.div {...fadeInUp} className="mx-auto mb-8 max-w-2xl text-center">
           <SectionEyebrow>WHAT WE DO</SectionEyebrow>
           <Heading as="h2">
             A full growth stack,
@@ -141,7 +141,7 @@ export function WhatWeDo() {
             })}
           </div>
 
-          <div className="mt-12 flex justify-center">
+          <div className="mt-8 flex justify-center">
             <Link href={ROUTES.contact} className={buttonVariants({ size: "lg" })}>
               Let&apos;s Grow Together
               <ArrowRight className="h-5 w-5" aria-hidden="true" />

@@ -22,7 +22,7 @@ const socialLinks = [
 
 export function ContactFormSection() {
   return (
-    <section className="py-8 lg:py-12">
+    <section className="pt-2 pb-8 lg:pt-4 lg:pb-12">
       <Container size="full" className="max-w-[1280px]">
         {/* Visually hidden: keeps the h1 -> h3 "Business info" heading in valid order without adding a visible section title the design doesn't call for. */}
         <h2 className="sr-only">Contact form and business information</h2>

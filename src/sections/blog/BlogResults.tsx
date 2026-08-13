@@ -30,7 +30,7 @@ export function BlogResults({ posts, pageInfo, query, basePath }: BlogResultsPro
   return (
     <div>
       {showFeatured ? (
-        <div className="mb-10">
+        <div className="mb-8">
           <FeaturedPost post={featured} />
         </div>
       ) : null}
@@ -43,7 +43,7 @@ export function BlogResults({ posts, pageInfo, query, basePath }: BlogResultsPro
         </div>
       ) : null}
 
-      <div className="mt-12">
+      <div className="mt-10">
         <Pagination
           pageInfo={pageInfo}
           basePath={basePath}

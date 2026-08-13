@@ -16,7 +16,7 @@ const perks = [
 
 export function OurCulture() {
   return (
-    <section className="py-16 lg:py-24">
+    <section className="py-12 lg:py-16">
       <Container size="full" className="max-w-[1280px]">
         <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
           <motion.div {...fadeInUp}>

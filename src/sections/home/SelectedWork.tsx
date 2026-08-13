@@ -22,11 +22,11 @@ export function SelectedWork({ caseStudies }: SelectedWorkProps) {
   // Navbar's /#work anchor always resolves to something — an honest empty
   // state instead of hiding the section (and the anchor with it).
   return (
-    <section id="work" className="py-16 lg:py-24">
+    <section id="work" className="py-12 lg:py-16">
       <Container size="full" className="max-w-[1280px]">
         <motion.div
           {...fadeInUp}
-          className="mb-12 flex flex-col justify-between gap-4 lg:flex-row lg:items-end"
+          className="mb-8 flex flex-col justify-between gap-4 lg:flex-row lg:items-end"
         >
           <div>
             <SectionEyebrow>SELECTED WORK</SectionEyebrow>

@@ -10,7 +10,7 @@ export function Section({ as = "section", className, children, ...rest }: Sectio
   return createElement(
     as,
     {
-      className: cn("py-12 sm:py-16 lg:py-24", className),
+      className: cn("py-10 sm:py-12 lg:py-16", className),
       ...rest,
     },
     children,

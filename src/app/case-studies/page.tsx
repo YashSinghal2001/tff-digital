@@ -40,7 +40,7 @@ export default async function CaseStudiesPage({ searchParams }: CaseStudiesPageP
         heading="Growth, made visible."
         description={["A glimpse at the systems we've built and the results they've earned."]}
       />
-      <section className="pb-16 lg:pb-24">
+      <section className="pb-12 lg:pb-16">
         <Container size="full" className="max-w-[1280px]">
           {caseStudyItems.length === 0 ? (
             <EmptyState
