@@ -11,7 +11,12 @@ import { SectionEyebrow } from "@/components/common/SectionEyebrow";
 import { fadeInUp } from "@/styles/animations";
 import { cn } from "@/lib/utils";
 
-const faqs = [
+export interface FAQItem {
+  question: string;
+  answer: string;
+}
+
+const faqs: FAQItem[] = [
   {
     question: "How is TFF different from other agencies?",
     answer:
@@ -38,7 +43,12 @@ const faqs = [
   },
 ];
 
-export function FAQ() {
+export interface FAQProps {
+  /** Page-specific questions; falls back to the shared defaults. */
+  items?: FAQItem[];
+}
+
+export function FAQ({ items = faqs }: FAQProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
@@ -66,7 +76,7 @@ export function FAQ() {
           </motion.div>
 
           <div className="flex flex-col gap-3">
-            {faqs.map((faq, index) => {
+            {items.map((faq, index) => {
               const isOpen = openIndex === index;
               return (
                 <motion.div

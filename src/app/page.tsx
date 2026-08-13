@@ -15,6 +15,10 @@ import { HowWeWork } from "@/sections/home/HowWeWork";
 import { AboutJourney } from "@/sections/home/AboutJourney";
 import { SelectedWork } from "@/sections/home/SelectedWork";
 import { Testimonials } from "@/sections/home/Testimonials";
+import { WhoThisIsFor } from "@/sections/shared/WhoThisIsFor";
+import { NotSureYet } from "@/sections/home/NotSureYet";
+import { StatementBand } from "@/sections/shared/StatementBand";
+import { GradientText } from "@/components/ui/GradientText";
 import { Industries } from "@/sections/home/Industries";
 import { FAQ } from "@/sections/shared/FAQ";
 import { CTABookForm } from "@/sections/shared/CTABookForm";
@@ -60,12 +64,22 @@ export default async function Home() {
       {/* <WhatWeDo services={services.items} /> */}
       <WhatWeDo />
       <WhyTFF />
+      <StatementBand support="Every quarter should make the next one easier. That's what a growth system is for.">
+        Strategy sets the direction.{" "}
+        <GradientText>Execution compounds it.</GradientText>
+      </StatementBand>
       <HowWeWork />
       <AboutJourney />
       <SelectedWork caseStudies={featuredCaseStudies} />
       <Testimonials />
+      <WhoThisIsFor />
+      <NotSureYet />
       <Industries />
       <FAQ />
+      <StatementBand>
+        Growth isn&apos;t luck.{" "}
+        <GradientText>It&apos;s a system, built deliberately.</GradientText>
+      </StatementBand>
       <CTABookForm />
     </>
   );
