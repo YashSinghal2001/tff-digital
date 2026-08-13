@@ -2,6 +2,17 @@
 @import "../styles/tokens.css";
 
 @theme inline {
+  /*
+   * Default Tailwind `xl` (1280px) collides with real-world 1280-wide laptop
+   * viewports: a non-overlay (Windows) scrollbar shaves ~15-17px off the
+   * usable CSS width, so the same physical display flips between the mobile
+   * nav / 3-col grid and the desktop nav / 5-col grid depending on the OS,
+   * zoom level, or scrollbar presence. Moving the cutover to 1200px keeps
+   * >150px of margin on both sides of every `xl:` layout it drives (see
+   * Navbar and WhatWeDo), so 1280px+ viewports render consistently.
+   */
+  --breakpoint-xl: 75rem;
+
   --color-background: var(--color-background);
   --color-foreground: var(--color-foreground);
   --color-muted: var(--color-muted);
