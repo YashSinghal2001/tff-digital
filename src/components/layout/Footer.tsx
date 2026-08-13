@@ -163,10 +163,16 @@ export function Footer() {
               <h3 className="font-heading text-sm font-semibold text-white">Contact</h3>
               <ul className="mt-4 flex flex-col gap-3">
                 <li className="flex items-center gap-2 font-body text-sm text-muted">
-                  <Mail className="h-4 w-4 shrink-0" /> hello@tffdigital.com
+                  <Mail className="h-4 w-4 shrink-0" />
+                  <a href="mailto:info@tffdigita.com" className="transition-colors hover:text-white">
+                    info@tffdigita.com
+                  </a>
                 </li>
                 <li className="flex items-center gap-2 font-body text-sm text-muted">
-                  <Phone className="h-4 w-4 shrink-0" /> +1 (415) 555-0132
+                  <Phone className="h-4 w-4 shrink-0" />
+                  <a href="tel:+917206809816" className="transition-colors hover:text-white">
+                    +91 72068 09816
+                  </a>
                 </li>
                 <li className="flex items-center gap-2 font-body text-sm text-muted">
                   <MapPin className="h-4 w-4 shrink-0" /> Zirakpur, Punjab, India

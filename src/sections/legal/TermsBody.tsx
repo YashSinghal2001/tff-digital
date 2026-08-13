@@ -119,7 +119,7 @@ export function TermsBody() {
             <p>Questions about these Terms can be directed to:</p>
             <ul>
               <li>
-                Email: <a href="mailto:hello@tffdigital.com">hello@tffdigital.com</a>
+                Email: <a href="mailto:info@tffdigita.com">info@tffdigita.com</a>
               </li>
               <li>Location: Zirakpur, Punjab, India</li>
             </ul>

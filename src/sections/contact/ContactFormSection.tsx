@@ -8,9 +8,9 @@ import { Card } from "@/components/ui/Card";
 import { ContactForm } from "@/features/contact/ContactForm";
 import { fadeInUp } from "@/styles/animations";
 
-const businessInfo = [
-  { icon: Mail, label: "hello@tffdigital.com" },
-  { icon: Phone, label: "+1 (415) 555-0132" },
+const businessInfo: Array<{ icon: typeof Mail; label: string; href?: string }> = [
+  { icon: Mail, label: "info@tffdigita.com", href: "mailto:info@tffdigita.com" },
+  { icon: Phone, label: "+91 72068 09816", href: "tel:+917206809816" },
   { icon: MapPin, label: "Zirakpur, Punjab, India" },
 ];
 
@@ -39,9 +39,16 @@ export function ContactFormSection() {
             <Card>
               <h3 className="font-heading text-base font-bold text-white">Business info</h3>
               <ul className="mt-4 flex flex-col gap-3">
-                {businessInfo.map(({ icon: Icon, label }) => (
+                {businessInfo.map(({ icon: Icon, label, href }) => (
                   <li key={label} className="flex items-center gap-2 font-body text-sm text-muted">
-                    <Icon className="h-4 w-4 shrink-0 text-primary" /> {label}
+                    <Icon className="h-4 w-4 shrink-0 text-primary" />
+                    {href ? (
+                      <a href={href} className="transition-colors hover:text-white">
+                        {label}
+                      </a>
+                    ) : (
+                      label
+                    )}
                   </li>
                 ))}
               </ul>
