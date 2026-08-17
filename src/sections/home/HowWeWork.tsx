@@ -99,9 +99,10 @@ function StepContent({ step }: { step: Step }) {
         >
           {step.step}
         </span>
-        {/* Negative margin pulls the icon over the numeral's tail so the two
-            read as one integrated mark instead of separate elements. */}
-        <span className="relative -ml-6 inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-border-strong bg-glass backdrop-blur-sm">
+        {/* On desktop the negative margin pulls the icon over the numeral's
+            tail so the two read as one integrated mark; on mobile the icon
+            sits beside the number to avoid covering the digits. */}
+        <span className="relative ml-3 inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-border-strong bg-glass backdrop-blur-sm lg:-ml-6">
           <Icon className="h-6 w-6" style={iconGradientStroke} />
         </span>
       </div>
