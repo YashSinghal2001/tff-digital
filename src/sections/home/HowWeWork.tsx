@@ -92,24 +92,24 @@ function StepContent({ step }: { step: Step }) {
   const Icon = step.icon;
   return (
     <div className="relative">
-      <div className="flex items-center">
+      <div className="flex items-center gap-3 lg:gap-4">
         <span
           aria-hidden="true"
           className="select-none font-heading text-[56px] font-bold leading-none text-primary/[0.16] lg:text-[64px]"
         >
           {step.step}
         </span>
-        {/* On desktop the negative margin pulls the icon over the numeral's
-            tail so the two read as one integrated mark; on mobile the icon
-            sits beside the number to avoid covering the digits. */}
-        <span className="relative ml-3 inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-border-strong bg-glass backdrop-blur-sm lg:-ml-6">
+        {/* The icon sits beside the numeral at every breakpoint — the circle is
+            translucent and blurred, so overlapping it onto the digits reads as
+            a clipped number rather than as one integrated mark. */}
+        <span className="relative inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-border-strong bg-glass backdrop-blur-sm">
           <Icon className="h-6 w-6" style={iconGradientStroke} />
         </span>
       </div>
       <h3 className="mt-4 font-heading text-lg font-bold text-white">
         {step.title}
       </h3>
-      <p className="mt-2 max-w-[280px] font-body text-sm leading-relaxed text-muted">
+      <p className="mt-2 max-w-[280px] font-body text-sm leading-relaxed text-muted lg:max-w-none">
         {step.description}
       </p>
     </div>
@@ -130,6 +130,8 @@ function TimelineRow({
   return (
     <>
       <div className={`relative col-start-1 col-span-3 h-4 ${stripRow}`}>
+        {/* The rail runs from the first node to the right edge of the grid so
+            both rows terminate flush with the container. */}
         <span
           className={`absolute left-2 right-0 top-1/2 h-px -translate-y-1/2 ${gradientLine}`}
         />
@@ -140,7 +142,7 @@ function TimelineRow({
       {rowSteps.map((step, index) => (
         <div
           key={step.step}
-          className={`${colStart[index]} pr-8 pt-4 ${contentRow}`}
+          className={`${colStart[index]} pr-10 pt-4 ${contentRow}`}
         >
           <StepContent step={step} />
         </div>
@@ -179,34 +181,14 @@ export function HowWeWork() {
           </p>
         </motion.div>
 
-        {/* Desktop: two-row zig-zag timeline with a dashed curve joining the rows */}
+        {/* Desktop: two full-width timeline rows, three steps each */}
         <motion.div {...fadeInUp} className="hidden lg:block">
-          <div className="grid grid-cols-[1fr_1fr_1fr_72px] grid-rows-[16px_auto_40px_16px_auto]">
+          <div className="grid grid-cols-3 grid-rows-[16px_auto_40px_16px_auto]">
             <TimelineRow
               rowSteps={steps.slice(0, 3)}
               stripRow="row-start-1"
               contentRow="row-start-2"
             />
-            <div className="relative col-start-4 row-start-1 row-span-3">
-              {/* top-2/-bottom-2 anchors the curve to both rows' line centers */}
-              <div className="absolute inset-x-0 top-2 -bottom-2">
-                <svg
-                  className="h-full w-full overflow-visible"
-                  viewBox="0 0 72 100"
-                  preserveAspectRatio="none"
-                  fill="none"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M0 0 C 70 0, 70 100, 0 100"
-                    stroke="url(#hww-icon-gradient)"
-                    strokeOpacity="0.6"
-                    strokeDasharray="5 6"
-                    vectorEffect="non-scaling-stroke"
-                  />
-                </svg>
-              </div>
-            </div>
             <TimelineRow
               rowSteps={steps.slice(3, 6)}
               stripRow="row-start-4"
