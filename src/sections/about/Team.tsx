@@ -1,47 +1,33 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { User } from "lucide-react";
 import { Container } from "@/components/ui/Container";
-import { Card } from "@/components/ui/Card";
 import { Heading } from "@/components/ui/Heading";
 import { GradientText } from "@/components/ui/GradientText";
 import { SectionEyebrow } from "@/components/common/SectionEyebrow";
+import { TeamCarousel } from "@/components/team/TeamCarousel";
+import { teamSlides } from "@/data/team";
 import { fadeInUp } from "@/styles/animations";
-
-const team = Array.from({ length: 4 }, () => ({
-  name: "Name",
-  position: "Position",
-}));
 
 export function Team() {
   return (
     <section className="py-12 lg:py-16">
       <Container size="full" className="max-w-[1280px]">
         <motion.div {...fadeInUp} className="mb-12">
-          <SectionEyebrow>TEAM</SectionEyebrow>
+          <SectionEyebrow>OUR TEAM</SectionEyebrow>
           <Heading as="h2">
-            Meet the <GradientText>operators.</GradientText>
+            Meet the people behind <GradientText>the growth.</GradientText>
           </Heading>
+          <p className="font-body text-muted mt-4 max-w-2xl text-sm leading-relaxed">
+            Strategy, creativity, and execution don&apos;t run on autopilot —
+            they&apos;re driven by operators who treat your growth like their
+            own.
+          </p>
         </motion.div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {team.map((member, index) => (
-            <motion.div
-              key={index}
-              {...fadeInUp}
-              transition={{ ...fadeInUp.transition, delay: index * 0.05 }}
-            >
-              <Card className="flex flex-col items-center gap-3 text-center">
-                <span className="flex h-24 w-24 items-center justify-center rounded-2xl bg-white/5">
-                  <User className="h-10 w-10 text-white/30" strokeWidth={1} />
-                </span>
-                <h3 className="font-heading text-base font-bold text-white">{member.name}</h3>
-                <p className="font-body text-xs font-semibold text-primary">{member.position}</p>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
+        <motion.div {...fadeInUp}>
+          <TeamCarousel slides={teamSlides} />
+        </motion.div>
       </Container>
     </section>
   );
