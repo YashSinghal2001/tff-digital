@@ -18,7 +18,7 @@ export function TeamMemberCard({ member, emphasized }: TeamMemberCardProps) {
   return (
     <article
       className={cn(
-        "group bg-glass hover:border-primary/60 flex h-full flex-col overflow-hidden rounded-[25px] border transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_36px_0_rgba(56,130,246,0.16)] motion-reduce:transition-none motion-reduce:hover:translate-y-0",
+        "group bg-glass hover:border-primary/60 relative flex h-full flex-col overflow-hidden rounded-[25px] border transition-all duration-300 hover:z-10 hover:-translate-y-1 hover:shadow-[0_0_36px_0_rgba(56,130,246,0.16)] motion-reduce:transition-none motion-reduce:hover:translate-y-0",
         emphasized
           ? "border-primary/45 shadow-[0_0_28px_0_rgba(56,130,246,0.12)]"
           : "border-border-strong",

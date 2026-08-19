@@ -95,13 +95,16 @@ export function TeamCarousel({ members }: TeamCarouselProps) {
     const slide = firstSlideRef.current;
     if (!viewport || !track || !slide) return;
 
+    // Geometry is anchored to the track, not the viewport: the viewport
+    // carries breathing padding for the hover lift/glow, so its clientWidth
+    // includes that padding and would skew the flush-edge math.
     const measure = () => {
       const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
       const step = slide.getBoundingClientRect().width + gap;
-      const maxOffset = Math.max(0, track.scrollWidth - viewport.clientWidth);
+      const maxOffset = Math.max(0, track.scrollWidth - track.clientWidth);
       const visibleCount = Math.max(
         1,
-        Math.round((viewport.clientWidth + gap) / step),
+        Math.round((track.clientWidth + gap) / step),
       );
       setMetrics({ step, maxOffset, visibleCount });
     };
@@ -253,10 +256,16 @@ export function TeamCarousel({ members }: TeamCarouselProps) {
     >
       {/* [contain:paint] stops the off-screen track from adding phantom
           horizontal scroll range to the page in Chromium, which overflow-hidden
-          alone does not prevent for composited (transformed) children. */}
+          alone does not prevent for composited (transformed) children.
+          The padding (cancelled by matching negative margins, so layout
+          rhythm is untouched) moves the clip boundary away from the cards:
+          the hover lift + glow get 40px of vertical room, and the sides get
+          20px — no more than the track gap, so off-screen slides still can't
+          peek in at resting positions. Paint containment clips at the
+          padding edge, which is exactly what makes this trick work. */}
       <div
         ref={viewportRef}
-        className="cursor-grab overflow-hidden [contain:paint]"
+        className="-mx-5 -my-10 cursor-grab overflow-hidden px-5 py-10 [contain:paint]"
         style={{ touchAction: "pan-y" }}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
