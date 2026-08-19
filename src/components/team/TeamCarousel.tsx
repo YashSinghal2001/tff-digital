@@ -3,12 +3,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { TeamSlideCard } from "@/components/team/TeamSlideCard";
+import { TeamMemberCard } from "@/components/team/TeamMemberCard";
 import { cn } from "@/lib/utils";
-import type { TeamSlide } from "@/data/team";
+import type { TeamMember } from "@/data/team";
 
 export interface TeamCarouselProps {
-  slides: TeamSlide[];
+  members: TeamMember[];
 }
 
 const AUTOPLAY_MS = 6000;
@@ -36,12 +36,12 @@ interface SwipeSession {
  * position can never be left mid-flight when rAF is throttled (background
  * or fully occluded windows produce zero frames). React renders the track
  * with a constant transform so re-renders never clobber the imperatively
- * written position. Widths are exact fractions (1 / 2 / 3 slides per view,
- * no peek) because each slide is a self-contained 1:1 design card, so every
- * index lands the last slide flush with the right edge. Swipe uses raw
- * pointer events, mirroring TestimonialSlider.
+ * written position. Widths are exact fractions (1 / 2 / 3 cards per view,
+ * no peek) so every index lands the last card flush with the right edge;
+ * the flex track's stretch keeps all cards equal height regardless of bio
+ * length. Swipe uses raw pointer events, mirroring TestimonialSlider.
  */
-export function TeamCarousel({ slides }: TeamCarouselProps) {
+export function TeamCarousel({ members }: TeamCarouselProps) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const firstSlideRef = useRef<HTMLDivElement>(null);
@@ -62,7 +62,7 @@ export function TeamCarousel({ slides }: TeamCarouselProps) {
   const maxIndex =
     metrics.step > 0
       ? Math.max(0, Math.ceil(metrics.maxOffset / metrics.step - 0.001))
-      : slides.length - 1;
+      : members.length - 1;
 
   const offsetFor = useCallback(
     (i: number) => Math.min(i * metrics.step, metrics.maxOffset),
@@ -110,7 +110,7 @@ export function TeamCarousel({ slides }: TeamCarouselProps) {
     const observer = new ResizeObserver(measure);
     observer.observe(viewport);
     return () => observer.disconnect();
-  }, [slides.length]);
+  }, [members.length]);
 
   // Re-snap (without animating) after a resize changes the geometry under
   // the current index.
@@ -222,6 +222,12 @@ export function TeamCarousel({ slides }: TeamCarouselProps) {
     metrics.step > 0 ? Math.round(offsetFor(index) / metrics.step) : 0;
   const isSlideHidden = (i: number) =>
     i < firstVisible || i > firstVisible + metrics.visibleCount - 1;
+  // Middle card of the visible trio (or the lone mobile card) gets slightly
+  // stronger emphasis; with 2-up there is no center, so nothing is raised.
+  const centerIndex =
+    metrics.visibleCount % 2 === 1
+      ? firstVisible + (metrics.visibleCount - 1) / 2
+      : -1;
 
   return (
     <div
@@ -265,17 +271,17 @@ export function TeamCarousel({ slides }: TeamCarouselProps) {
           className="flex items-stretch gap-5 md:gap-6"
           style={{ transform: "translate3d(0, 0, 0)" }}
         >
-          {slides.map((slide, i) => (
+          {members.map((member, i) => (
             <div
-              key={slide.id}
+              key={member.id}
               ref={i === 0 ? firstSlideRef : undefined}
               role="group"
               aria-roledescription="slide"
-              aria-label={`${i + 1} of ${slides.length}`}
+              aria-label={`${member.name} — ${i + 1} of ${members.length}`}
               inert={isSlideHidden(i) || undefined}
               className="w-full flex-none md:w-[calc((100%-1.5rem)/2)] lg:w-[calc((100%-3rem)/3)]"
             >
-              <TeamSlideCard slide={slide} />
+              <TeamMemberCard member={member} emphasized={i === centerIndex} />
             </div>
           ))}
         </div>

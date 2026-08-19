@@ -1,68 +1,102 @@
-export interface TeamSlide {
+export interface TeamMember {
   id: string;
-  src: string;
-  alt: string;
+  name: string;
+  role: string;
+  company: string;
+  image: { src: string; alt: string };
+  bio: string;
+  personalLine: string;
 }
 
 /**
- * The "Meet the Team" spotlight series from the WordPress media library.
- * Each PNG is a finished 1:1 design card — branding, name, role, and bio
- * are baked into the artwork — so slides must always render uncropped at
- * their native square aspect ratio. Names and roles in the alt text are
- * transcribed from the artwork (full founder names from AboutJourney);
- * do not invent or extend them here.
+ * Content transcribed verbatim from the "Meet the Team" spotlight series
+ * (the 9-page Canva deck mirrored in the WordPress media library); full
+ * founder names match AboutJourney. Do not invent or extend entries here.
  *
- * srcs point at WordPress's own 1024x1024 renditions, not the 2528px
- * originals (N.png): the CMS host transfers at ~400KB/s, so the 3-4MB
- * originals blow through next/image's fixed 7s upstream timeout and 500
- * on every request (same constraint documented on minimumCacheTTL in
- * next.config.ts). The ~500KB renditions fetch in ~1.5s and exceed the
- * largest rendered size (~750 device px), so nothing is lost visually.
+ * Portraits in /public/team are extracted from the 2528px deck originals
+ * (each member's photo region cropped out of pages 3-8), so the carousel can
+ * render native cards instead of the flattened slide artwork. Every crop
+ * keeps the person's face in the top portion of the frame — cards display
+ * them with `object-cover` + `object-top`, so any container ratio stays
+ * face-safe.
  */
-export const teamSlides: TeamSlide[] = [
-  {
-    id: "who-we-are",
-    src: "https://cms.tffdigital.com/wp-content/uploads/2026/08/1-1024x1024.png",
-    alt: "Who We Are — the TFF Digital team brings strategy, creativity, and performance together",
-  },
-  {
-    id: "meet-our-team",
-    src: "https://cms.tffdigital.com/wp-content/uploads/2026/08/2-1024x1024.png",
-    alt: "Meet Our Team — the people behind the work: experienced, collaborative, and ready to make an impact",
-  },
+export const teamMembers: TeamMember[] = [
   {
     id: "raju",
-    src: "https://cms.tffdigital.com/wp-content/uploads/2026/08/3-1024x1024.png",
-    alt: "Raju Gorai — Founder & Performance Marketing Specialist",
+    name: "Raju",
+    role: "Founder & Performance Marketing Specialist",
+    company: "TFF Digital",
+    image: {
+      src: "/team/raju.jpg",
+      alt: "Raju Gorai, Founder & Performance Marketing Specialist at TFF Digital",
+    },
+    bio: "With over 10 years of experience in performance marketing, Raju brings strategic thinking, a results-focused mindset, and a strong commitment to turning challenges into opportunities and delivering meaningful growth for every client.",
+    personalLine:
+      "I love meeting new people, exploring new places, chasing Bengali sweets, and disappearing wherever the weather feels magical.",
   },
   {
     id: "kanchan",
-    src: "https://cms.tffdigital.com/wp-content/uploads/2026/08/4-1024x1024.png",
-    alt: "Kanchan Rana — Founder & SEO Strategist",
+    name: "Kanchan",
+    role: "Founder & SEO Strategist",
+    company: "TFF Digital",
+    image: {
+      src: "/team/kanchan.jpg",
+      alt: "Kanchan Rana, Founder & SEO Strategist at TFF Digital",
+    },
+    bio: "With over 12 years of SEO experience and more than 1,500 successful projects delivered, Kanchan brings deep expertise, strategic thinking, and a results-driven approach to every campaign.",
+    personalLine:
+      "Fueled by music, moved by dance, and completely obsessed with dogs. 🐶🎶💃",
   },
   {
     id: "lalit",
-    src: "https://cms.tffdigital.com/wp-content/uploads/2026/08/5-1024x1024.png",
-    alt: "Lalit — Business Development Manager",
+    name: "Lalit",
+    role: "Business Development Manager",
+    company: "TFF Digital",
+    image: {
+      src: "/team/lalit.jpg",
+      alt: "Lalit, Business Development Manager at TFF Digital",
+    },
+    bio: "With over 10 years of experience in sales leadership and BPO management, Lalit has built strong pipelines, nurtured client relationships, led teams with positivity, embraced challenges, and celebrated every win along the way.",
+    personalLine:
+      "Beyond work, I love travelling, trekking, exploring new places, and cooking delicious Indian dishes.",
   },
   {
     id: "aniket",
-    src: "https://cms.tffdigital.com/wp-content/uploads/2026/08/6-1024x1024.png",
-    alt: "Aniket — Creative Video Editor",
+    name: "Aniket",
+    role: "Creative Video Editor",
+    company: "TFF Digital",
+    image: {
+      src: "/team/aniket.jpg",
+      alt: "Aniket, Creative Video Editor at TFF Digital",
+    },
+    bio: "My passion is Video Editing and Creative Storytelling. I enjoy taking an idea and turning it into a video that captures attention, creates emotion, and tells a story.",
+    personalLine:
+      "Passion drives me, focus keeps me moving, quality is my standard, and collaboration makes the journey better.",
   },
   {
     id: "suraj",
-    src: "https://cms.tffdigital.com/wp-content/uploads/2026/08/7-1024x1024.png",
-    alt: "Suraj — SEO Analyst",
+    name: "Suraj",
+    role: "SEO Analyst",
+    company: "TFF Digital",
+    image: {
+      src: "/team/suraj.jpg",
+      alt: "Suraj, SEO Analyst at TFF Digital",
+    },
+    bio: "In SEO, I focus on understanding search behaviour, building strong strategies, and turning data into meaningful growth. As a professional cricketer, I’ve learned the value of discipline, teamwork, staying composed under pressure, and adapting to every situation.",
+    personalLine:
+      "Fueled by a passion for cricket, gaming, bikes, technology, music, and the thrill of motorsport.",
   },
   {
     id: "yash",
-    src: "https://cms.tffdigital.com/wp-content/uploads/2026/08/8-1024x1024.png",
-    alt: "Yash — Full Stack Developer",
-  },
-  {
-    id: "lets-work-together",
-    src: "https://cms.tffdigital.com/wp-content/uploads/2026/08/9-1024x1024.png",
-    alt: "Let's Work Together — reach out to TFF Digital to start a conversation",
+    name: "Yash",
+    role: "Full Stack Developer",
+    company: "TFF Digital",
+    image: {
+      src: "/team/yash.jpg",
+      alt: "Yash, Full Stack Developer at TFF Digital",
+    },
+    bio: "Passionate about building smart, scalable solutions that turn ideas into seamless digital experiences. Yash brings technical expertise, creative problem-solving, and a constant curiosity to learn and explore new technologies.",
+    personalLine:
+      "I’m passionate about music, love the freedom of bike rides, and enjoy exploring new technologies. I’m always curious to learn, discover, and experience something new.",
   },
 ];
