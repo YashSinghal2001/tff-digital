@@ -26,8 +26,18 @@ export function TeamMemberCard({ member, emphasized }: TeamMemberCardProps) {
     >
       {/* 1:1 on single-card (sub-md) views keeps the mobile card from
           growing taller than a phone viewport; crops stay face-safe via
-          object-top. */}
-      <div className="relative aspect-square overflow-hidden bg-white/5 md:aspect-[4/5]">
+          object-top. Portraits are transparent cutouts staged on a deep
+          navy surface with a restrained blue/purple ambient glow; the
+          bottom fade dissolves the torso crop line into the surface. */}
+      <div className="border-border-subtle relative aspect-square overflow-hidden border-b bg-[color-mix(in_srgb,var(--color-background)_82%,#000000)] md:aspect-[4/5]">
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-[radial-gradient(120%_85%_at_50%_28%,color-mix(in_srgb,var(--color-primary)_20%,transparent)_0%,transparent_62%)]"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 bottom-0 h-1/2 bg-[linear-gradient(to_top,color-mix(in_srgb,var(--color-secondary)_15%,transparent),transparent)]"
+        />
         <Image
           src={member.image.src}
           alt={member.image.alt}
@@ -35,6 +45,10 @@ export function TeamMemberCard({ member, emphasized }: TeamMemberCardProps) {
           sizes="(min-width: 1280px) 358px, (min-width: 1024px) 30vw, (min-width: 768px) 46vw, 92vw"
           className="object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
           draggable={false}
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 bottom-0 h-14 bg-[linear-gradient(to_top,color-mix(in_srgb,var(--color-background)_82%,#000000),transparent)]"
         />
       </div>
 

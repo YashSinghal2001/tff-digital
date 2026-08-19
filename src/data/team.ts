@@ -12,9 +12,10 @@ export interface TeamMember {
  * (the 9-page Canva deck mirrored in the WordPress media library); full
  * founder names match AboutJourney. Do not invent or extend entries here.
  *
- * Portraits in /public/team are extracted from the 2528px deck originals
- * (each member's photo region cropped out of pages 3-8), so the carousel can
- * render native cards instead of the flattened slide artwork. Every crop
+ * Portraits in /public/team are transparent cutouts: each member's photo
+ * region is cropped from the 2528px deck originals (pages 3-8), then the
+ * deck's white backdrop is removed via Vision's foreground mask so the
+ * cards can stage the person on the site's own dark surface. Every crop
  * keeps the person's face in the top portion of the frame — cards display
  * them with `object-cover` + `object-top`, so any container ratio stays
  * face-safe.
@@ -26,7 +27,7 @@ export const teamMembers: TeamMember[] = [
     role: "Founder & Performance Marketing Specialist",
     company: "TFF Digital",
     image: {
-      src: "/team/raju.jpg",
+      src: "/team/raju.webp",
       alt: "Raju Gorai, Founder & Performance Marketing Specialist at TFF Digital",
     },
     personalLine:
@@ -38,7 +39,7 @@ export const teamMembers: TeamMember[] = [
     role: "Founder & SEO Strategist",
     company: "TFF Digital",
     image: {
-      src: "/team/kanchan.jpg",
+      src: "/team/kanchan.webp",
       alt: "Kanchan Rana, Founder & SEO Strategist at TFF Digital",
     },
     personalLine:
@@ -50,7 +51,7 @@ export const teamMembers: TeamMember[] = [
     role: "Business Development Manager",
     company: "TFF Digital",
     image: {
-      src: "/team/lalit.jpg",
+      src: "/team/lalit.webp",
       alt: "Lalit, Business Development Manager at TFF Digital",
     },
     personalLine:
@@ -62,7 +63,7 @@ export const teamMembers: TeamMember[] = [
     role: "Creative Video Editor",
     company: "TFF Digital",
     image: {
-      src: "/team/aniket.jpg",
+      src: "/team/aniket.webp",
       alt: "Aniket, Creative Video Editor at TFF Digital",
     },
     personalLine:
@@ -74,7 +75,7 @@ export const teamMembers: TeamMember[] = [
     role: "SEO Analyst",
     company: "TFF Digital",
     image: {
-      src: "/team/suraj.jpg",
+      src: "/team/suraj.webp",
       alt: "Suraj, SEO Analyst at TFF Digital",
     },
     personalLine:
@@ -86,7 +87,7 @@ export const teamMembers: TeamMember[] = [
     role: "Full Stack Developer",
     company: "TFF Digital",
     image: {
-      src: "/team/yash.jpg",
+      src: "/team/yash.webp",
       alt: "Yash, Full Stack Developer at TFF Digital",
     },
     personalLine:
