@@ -54,11 +54,7 @@ export function TeamMemberCard({ member, emphasized }: TeamMemberCardProps) {
           className="mt-4 h-0.5 w-10 rounded-full bg-[linear-gradient(90deg,var(--color-primary)_0%,var(--color-secondary)_100%)]"
         />
 
-        <p className="font-body mt-4 text-sm leading-relaxed text-white/80">
-          {member.bio}
-        </p>
-
-        <div className="mt-auto pt-5">
+        <div className="mt-auto pt-4">
           <p className="border-primary/40 font-body border-l-2 pl-4 text-sm text-white/60 italic">
             {member.personalLine}
           </p>
