@@ -24,12 +24,13 @@ export function TeamMemberCard({ member, emphasized }: TeamMemberCardProps) {
           : "border-border-strong",
       )}
     >
-      {/* 1:1 on single-card (sub-md) views keeps the mobile card from
-          growing taller than a phone viewport; crops stay face-safe via
-          object-top. Portraits are transparent cutouts staged on a deep
-          navy surface with a restrained blue/purple ambient glow; the
-          bottom fade dissolves the torso crop line into the surface. */}
-      <div className="border-border-subtle relative aspect-square overflow-hidden border-b bg-[color-mix(in_srgb,var(--color-background)_82%,#000000)] md:aspect-[4/5]">
+      {/* Fixed-height stage with object-contain: every portrait is a
+          transparent cutout shown in full — never cropped — standing on
+          the panel's bottom edge over a deep navy surface with a
+          restrained blue/purple ambient glow. Figure size varies with
+          each source's own framing (chest-up vs full-body); the panel
+          height, not the image, controls the card height. */}
+      <div className="border-border-subtle relative h-64 overflow-hidden border-b bg-[color-mix(in_srgb,var(--color-background)_82%,#000000)] md:h-72">
         <div
           aria-hidden="true"
           className="absolute inset-0 bg-[radial-gradient(120%_85%_at_50%_28%,color-mix(in_srgb,var(--color-primary)_20%,transparent)_0%,transparent_62%)]"
@@ -43,16 +44,16 @@ export function TeamMemberCard({ member, emphasized }: TeamMemberCardProps) {
           alt={member.image.alt}
           fill
           sizes="(min-width: 1280px) 358px, (min-width: 1024px) 30vw, (min-width: 768px) 46vw, 92vw"
-          className="object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+          className="object-contain object-bottom transition-transform duration-500 ease-out group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
           draggable={false}
         />
         <div
           aria-hidden="true"
-          className="absolute inset-x-0 bottom-0 h-14 bg-[linear-gradient(to_top,color-mix(in_srgb,var(--color-background)_82%,#000000),transparent)]"
+          className="absolute inset-x-0 bottom-0 h-10 bg-[linear-gradient(to_top,color-mix(in_srgb,var(--color-background)_55%,transparent),transparent)]"
         />
       </div>
 
-      <div className="flex flex-1 flex-col p-6">
+      <div className="flex flex-1 flex-col p-5">
         <p className="font-body text-primary text-[10px] font-semibold tracking-[0.2em] uppercase">
           {member.company}
         </p>
@@ -65,14 +66,12 @@ export function TeamMemberCard({ member, emphasized }: TeamMemberCardProps) {
 
         <span
           aria-hidden="true"
-          className="mt-4 h-0.5 w-10 rounded-full bg-[linear-gradient(90deg,var(--color-primary)_0%,var(--color-secondary)_100%)]"
+          className="mt-3 h-0.5 w-10 rounded-full bg-[linear-gradient(90deg,var(--color-primary)_0%,var(--color-secondary)_100%)]"
         />
 
-        <div className="mt-auto pt-4">
-          <p className="border-primary/40 font-body border-l-2 pl-4 text-sm text-white/60 italic">
-            {member.personalLine}
-          </p>
-        </div>
+        <p className="border-primary/40 font-body mt-3 border-l-2 pl-4 text-sm text-white/60 italic">
+          {member.personalLine}
+        </p>
       </div>
     </article>
   );
