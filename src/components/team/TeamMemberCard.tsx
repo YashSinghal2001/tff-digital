@@ -24,12 +24,15 @@ export function TeamMemberCard({ member, emphasized }: TeamMemberCardProps) {
           : "border-border-strong",
       )}
     >
-      {/* Fixed-height stage with object-contain: every portrait is a
-          transparent cutout shown in full — never cropped — standing on
-          the panel's bottom edge over a deep navy surface with a
-          restrained blue/purple ambient glow. Figure size varies with
-          each source's own framing (chest-up vs full-body); the panel
-          height, not the image, controls the card height. */}
+      {/* Fixed-height stage over a deep navy surface with a restrained
+          blue/purple ambient glow. The portrait sits on an inset stage
+          (never touching the card edges) and is top-anchored inside a
+          wrapper whose height is the member's zoom factor: zoom > 1
+          enlarges the figure and lets only the region below the hands
+          (jacket, hips, legs — chosen per member from the source
+          composition) bleed past the divider, so heads, shoulders, and
+          hands are never clipped. The panel height, not the image,
+          controls the card height. */}
       <div className="border-border-subtle relative h-64 overflow-hidden border-b bg-[color-mix(in_srgb,var(--color-background)_82%,#000000)] md:h-72">
         <div
           aria-hidden="true"
@@ -39,14 +42,21 @@ export function TeamMemberCard({ member, emphasized }: TeamMemberCardProps) {
           aria-hidden="true"
           className="absolute inset-x-0 bottom-0 h-1/2 bg-[linear-gradient(to_top,color-mix(in_srgb,var(--color-secondary)_15%,transparent),transparent)]"
         />
-        <Image
-          src={member.image.src}
-          alt={member.image.alt}
-          fill
-          sizes="(min-width: 1280px) 358px, (min-width: 1024px) 30vw, (min-width: 768px) 46vw, 92vw"
-          className="object-contain object-bottom transition-transform duration-500 ease-out group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
-          draggable={false}
-        />
+        <div className="absolute inset-x-4 top-3 bottom-0">
+          <div
+            className="relative w-full"
+            style={{ height: `${member.image.zoom * 100}%` }}
+          >
+            <Image
+              src={member.image.src}
+              alt={member.image.alt}
+              fill
+              sizes="(min-width: 1280px) 358px, (min-width: 1024px) 30vw, (min-width: 768px) 46vw, 92vw"
+              className="object-contain object-top transition-transform duration-500 ease-out group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+              draggable={false}
+            />
+          </div>
+        </div>
         <div
           aria-hidden="true"
           className="absolute inset-x-0 bottom-0 h-10 bg-[linear-gradient(to_top,color-mix(in_srgb,var(--color-background)_55%,transparent),transparent)]"
