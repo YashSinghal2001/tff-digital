@@ -67,7 +67,7 @@ export function FAQ({ items = faqs }: FAQProps) {
             className="relative mx-auto flex h-64 w-64 items-center justify-center overflow-hidden rounded-full bg-white/5"
           >
             <Image
-              src="https://cms.tffdigital.com/wp-content/uploads/2026/08/faq-1.jpg"
+              src="/faq-team.jpg"
               alt="Our team ready to answer your questions about working with TFF Digital"
               fill
               sizes="256px"

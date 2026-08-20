@@ -3,7 +3,11 @@ import { getCanonicalUrl } from "@/lib/seo/canonical";
 import { ROUTES } from "@/constants/routes";
 import { getPosts } from "@/services/post.service";
 import { getCaseStudies } from "@/services/case-study.service";
-import { getServiceOfferings } from "@/services/service-offering.service";
+// TEMPORARY: WP service entries removed from the sitemap while the CMS holds
+// placeholder services — see src/data/temporary-services.ts.
+// TODO: RESTORE WORDPRESS DATA
+// import { getServiceOfferings } from "@/services/service-offering.service";
+import { withCaseStudyFallback } from "@/lib/fallback/case-studies.fallback";
 
 export interface SitemapEntry {
   url: string;
@@ -51,7 +55,10 @@ async function getBlogPostEntries(): Promise<SitemapEntry[]> {
 async function getCaseStudyEntries(): Promise<SitemapEntry[]> {
   try {
     const caseStudies = await getCaseStudies({ first: 1000 });
-    return caseStudies.items.map((caseStudy) => ({
+    // Same source of truth as the listing/detail pages: the throwaway WP
+    // "test" entry never appears, and while WordPress has no real case
+    // studies the two fallback entries (which are live, linked pages) do.
+    return withCaseStudyFallback(caseStudies.items).map((caseStudy) => ({
       url: getCanonicalUrl(ROUTES.caseStudy(caseStudy.slug)),
       lastModified: caseStudy.updatedAt,
     }));
@@ -64,32 +71,33 @@ async function getCaseStudyEntries(): Promise<SitemapEntry[]> {
   }
 }
 
-async function getServiceOfferingEntries(): Promise<SitemapEntry[]> {
-  try {
-    const services = await getServiceOfferings({ first: 1000 });
-    return services.items.map((service) => ({
-      url: getCanonicalUrl(ROUTES.service(service.slug)),
-      lastModified: service.updatedAt,
-    }));
-  } catch (error) {
-    console.error(
-      "[getAllSitemapEntries] WPGraphQL request failed; sitemap will omit services for this build.",
-      error,
-    );
-    return [];
-  }
-}
+// TEMPORARY: WP service entries removed while the CMS holds placeholder
+// services. TODO: RESTORE WORDPRESS DATA — restore this alongside the grids:
+// async function getServiceOfferingEntries(): Promise<SitemapEntry[]> {
+//   try {
+//     const services = await getServiceOfferings({ first: 1000 });
+//     return services.items.map((service) => ({
+//       url: getCanonicalUrl(ROUTES.service(service.slug)),
+//       lastModified: service.updatedAt,
+//     }));
+//   } catch (error) {
+//     console.error(
+//       "[getAllSitemapEntries] WPGraphQL request failed; sitemap will omit services for this build.",
+//       error,
+//     );
+//     return [];
+//   }
+// }
 
 export async function getAllSitemapEntries(): Promise<SitemapEntry[]> {
   const staticEntries: SitemapEntry[] = STATIC_ROUTES.map((route) => ({
     url: getCanonicalUrl(route),
   }));
 
-  const [postEntries, caseStudyEntries, serviceEntries] = await Promise.all([
+  const [postEntries, caseStudyEntries] = await Promise.all([
     getBlogPostEntries(),
     getCaseStudyEntries(),
-    getServiceOfferingEntries(),
   ]);
 
-  return [...staticEntries, ...postEntries, ...caseStudyEntries, ...serviceEntries];
+  return [...staticEntries, ...postEntries, ...caseStudyEntries];
 }

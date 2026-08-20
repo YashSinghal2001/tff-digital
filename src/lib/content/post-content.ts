@@ -4,6 +4,11 @@ export function stripHtml(html: string): string {
   return html.replace(/<[^>]*>/g, " ");
 }
 
+/** Plain-text version of a WP HTML fragment: tags stripped, whitespace collapsed. */
+export function htmlToPlainText(html: string): string {
+  return stripHtml(html).replace(/\s+/g, " ").trim();
+}
+
 export function getReadingTimeMinutes(html: string): number {
   const text = stripHtml(html).trim();
   if (!text) return 0;
@@ -13,16 +18,23 @@ export function getReadingTimeMinutes(html: string): number {
 
 // WordPress content images use a specific registered size (e.g.
 // "photo-1024x576.jpg") while the featured image field points at the
-// original ("photo.jpg") — strip that size suffix so the two can be
-// compared as the same underlying media item.
+// original ("photo.jpg") — and WP renames very large originals to
+// "photo-scaled.jpg". Strip both suffixes so all variants of the same
+// underlying media item compare equal.
 function getImageFilenameStem(url: string): string {
   const path = url.split(/[?#]/)[0];
   const filename = path.split("/").pop() ?? path;
-  return filename.replace(/-\d+x\d+(?=\.\w+$)/, "").toLowerCase();
+  return filename
+    .replace(/-\d+x\d+(?=\.\w+$)/, "")
+    .replace(/-scaled(?=\.\w+$)/, "")
+    .toLowerCase();
 }
 
+// The image may sit bare, inside a <figure> (with optional link/caption), or
+// inside a <p>, optionally wrapped in an <a> (editors often link the image to
+// its full-size file). Leading whitespace and HTML comments are skipped.
 const LEADING_IMAGE_BLOCK =
-  /^\s*(?:<figure[^>]*>[\s\S]*?<img[^>]*>[\s\S]*?<\/figure>|<p[^>]*>\s*<img[^>]*\/?>\s*<\/p>|<img[^>]*\/?>)/i;
+  /^(?:\s|<!--[\s\S]*?-->)*(?:<figure[^>]*>[\s\S]*?<img[^>]*>[\s\S]*?<\/figure>|<p[^>]*>\s*(?:<a[^>]*>\s*)?<img[^>]*\/?>\s*(?:<\/a>\s*)?<\/p>|(?:<a[^>]*>\s*)?<img[^>]*\/?>(?:\s*<\/a>)?)/i;
 
 /**
  * WordPress editors often drag the featured image into the top of the post

@@ -31,10 +31,20 @@ export const metadata: Metadata = {
   description: "Digital growth agency — strategy, branding, and performance marketing.",
   // Pages that don't declare their own openGraph/twitter inherit this; Next
   // falls the title/description back to the page's own resolved metadata.
+  // The image is the sitewide default share card — WP-sourced pages with a
+  // Yoast OG image override the whole openGraph object via buildMetadata.
   openGraph: {
     siteName: siteConfig.name,
     type: "website",
     locale: siteConfig.defaultLocale,
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: `${siteConfig.name} — Digital Growth Agency`,
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",

@@ -9,5 +9,7 @@ export const seoConfig = {
   // tag is never emitted empty.
   defaultDescription: "Digital growth agency — strategy, branding, and performance marketing.",
   twitterHandle: "",
-  defaultOgImage: null as string | null,
+  // Sitewide share card (see src/app/layout.tsx openGraph.images); pages with
+  // their own Yoast OG image override it.
+  defaultOgImage: "/og-image.png" as string | null,
 } as const;

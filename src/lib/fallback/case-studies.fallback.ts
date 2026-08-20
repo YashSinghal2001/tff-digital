@@ -15,6 +15,13 @@ import type { CaseStudy } from "@/types/domain/case-study";
 // fallback. Real case studies added later are unaffected.
 const PLACEHOLDER_SLUGS = new Set(["test"]);
 
+/** True for throwaway CMS entries that must never render — the detail route
+ *  404s them so they can't be reached directly while hidden from the listing
+ *  and sitemap. */
+export function isPlaceholderCaseStudySlug(slug: string): boolean {
+  return PLACEHOLDER_SLUGS.has(slug);
+}
+
 export const fallbackCaseStudies: CaseStudy[] = [
   {
     id: "fallback-case-study-1",

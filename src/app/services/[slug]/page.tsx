@@ -12,6 +12,7 @@ import { JsonLd } from "@/components/common/JsonLd";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/json-ld";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { getCanonicalUrl } from "@/lib/seo/canonical";
+import { htmlToPlainText } from "@/lib/content/post-content";
 import { getServiceIcon } from "@/lib/content/service-icons";
 import { ROUTES } from "@/constants/routes";
 
@@ -24,7 +25,12 @@ export async function generateMetadata({ params }: ServiceDetailPageProps): Prom
   const service = await getServiceOfferingBySlug(slug);
   if (!service) return {};
 
-  return buildMetadata(service.seo, getCanonicalUrl(ROUTES.service(slug)));
+  // Content-derived fallback so a service without Yoast data still gets its
+  // own title/description instead of the site defaults.
+  return buildMetadata(service.seo, getCanonicalUrl(ROUTES.service(slug)), {
+    title: service.title,
+    description: service.summary ? htmlToPlainText(service.summary) : undefined,
+  });
 }
 
 export default async function ServiceDetailPage({ params }: ServiceDetailPageProps) {

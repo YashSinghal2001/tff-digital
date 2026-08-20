@@ -5,7 +5,10 @@ import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import { getCaseStudyBySlug } from "@/services/case-study.service";
 // TEMPORARY demo fallback — remove once real case studies exist in WordPress.
-import { getFallbackCaseStudyBySlug } from "@/lib/fallback/case-studies.fallback";
+import {
+  getFallbackCaseStudyBySlug,
+  isPlaceholderCaseStudySlug,
+} from "@/lib/fallback/case-studies.fallback";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { Heading } from "@/components/ui/Heading";
@@ -18,6 +21,7 @@ import { JsonLd } from "@/components/common/JsonLd";
 import { buildCaseStudyJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo/json-ld";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { getCanonicalUrl } from "@/lib/seo/canonical";
+import { htmlToPlainText } from "@/lib/content/post-content";
 import { ROUTES } from "@/constants/routes";
 
 interface CaseStudyPageProps {
@@ -26,15 +30,25 @@ interface CaseStudyPageProps {
 
 export async function generateMetadata({ params }: CaseStudyPageProps): Promise<Metadata> {
   const { slug } = await params;
+  if (isPlaceholderCaseStudySlug(slug)) return {};
   const caseStudy =
     (await getCaseStudyBySlug(slug)) ?? getFallbackCaseStudyBySlug(slug);
   if (!caseStudy) return {};
 
-  return buildMetadata(caseStudy.seo, getCanonicalUrl(ROUTES.caseStudy(slug)));
+  // Content-derived fallback so a case study without Yoast data still gets
+  // its own title/description instead of the site defaults.
+  const summary = caseStudy.summary || caseStudy.excerpt;
+  return buildMetadata(caseStudy.seo, getCanonicalUrl(ROUTES.caseStudy(slug)), {
+    title: caseStudy.title,
+    description: summary ? htmlToPlainText(summary) : undefined,
+  });
 }
 
 export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
   const { slug } = await params;
+  // Throwaway CMS entries (e.g. "test") are hidden from the listing and
+  // sitemap — 404 them here too so the URL can't be reached directly.
+  if (isPlaceholderCaseStudySlug(slug)) notFound();
   const caseStudy =
     (await getCaseStudyBySlug(slug)) ?? getFallbackCaseStudyBySlug(slug);
   if (!caseStudy) notFound();

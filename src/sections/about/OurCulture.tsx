@@ -1,10 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 import { Heading } from "@/components/ui/Heading";
 import { GradientText } from "@/components/ui/GradientText";
 import { SectionEyebrow } from "@/components/common/SectionEyebrow";
+import { teamMembers } from "@/data/team";
 import { fadeInUp } from "@/styles/animations";
 
 const perks = [
@@ -38,11 +40,33 @@ export function OurCulture() {
             </ul>
           </motion.div>
 
+          {/* Mosaic of the team's portraits (same assets as the Team
+              carousel) on the carousel's navy stage — fills what was an
+              empty placeholder panel without introducing new imagery. */}
           <motion.div
             {...fadeInUp}
             transition={{ ...fadeInUp.transition, delay: 0.1 }}
-            className="aspect-[4/3] w-full rounded-[25px] border border-border-strong bg-white/5"
-          />
+            className="grid aspect-[4/3] w-full grid-cols-3 grid-rows-2 gap-2 overflow-hidden rounded-[25px] border border-border-strong bg-white/5 p-2"
+          >
+            {teamMembers.map((member) => (
+              <div
+                key={member.id}
+                className="relative overflow-hidden rounded-xl bg-[color-mix(in_srgb,var(--color-background)_82%,#000000)]"
+              >
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0 bg-[radial-gradient(120%_85%_at_50%_28%,color-mix(in_srgb,var(--color-primary)_18%,transparent)_0%,transparent_62%)]"
+                />
+                <Image
+                  src={member.image.src}
+                  alt={member.image.alt}
+                  fill
+                  sizes="(min-width: 1024px) 200px, 30vw"
+                  className="object-cover object-top"
+                />
+              </div>
+            ))}
+          </motion.div>
         </div>
       </Container>
     </section>

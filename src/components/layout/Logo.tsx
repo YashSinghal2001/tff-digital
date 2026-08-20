@@ -3,7 +3,9 @@ import Link from "next/link";
 import { ROUTES } from "@/constants/routes";
 import { cn } from "@/lib/utils";
 
-const LOGO_SRC = "https://cms.tffdigital.com/wp-content/uploads/2026/08/Logo.png";
+// Self-hosted copy of the CMS logo (wp-content/uploads/2026/08/Logo.png):
+// the brand mark must not disappear sitewide when the WordPress host is down.
+const LOGO_SRC = "/logo.png";
 const LOGO_WIDTH = 467;
 const LOGO_HEIGHT = 181;
 

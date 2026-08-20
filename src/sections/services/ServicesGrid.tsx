@@ -6,8 +6,21 @@ import { ROUTES } from "@/constants/routes";
 import { getServiceIcon } from "@/lib/content/service-icons";
 import type { ServiceOffering } from "@/types/domain/service-offering";
 
+type ServicesGridService = Pick<
+  ServiceOffering,
+  "id" | "slug" | "title" | "summary"
+> & {
+  /**
+   * Optional explicit link target. Undefined keeps the default
+   * /services/[slug] link (the WordPress-driven behavior); null renders the
+   * card unlinked — used by the temporary data for disciplines whose detail
+   * page doesn't exist yet.
+   */
+  href?: string | null;
+};
+
 interface ServicesGridProps {
-  services: ServiceOffering[];
+  services: ServicesGridService[];
 }
 
 export function ServicesGrid({ services }: ServicesGridProps) {
@@ -15,7 +28,10 @@ export function ServicesGrid({ services }: ServicesGridProps) {
     icon: getServiceIcon(service.slug),
     title: service.title,
     description: service.summary,
-    href: ROUTES.service(service.slug),
+    href:
+      service.href === undefined
+        ? ROUTES.service(service.slug)
+        : (service.href ?? undefined),
   }));
 
   return (

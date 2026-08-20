@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { getCanonicalUrl } from "@/lib/seo/canonical";
 import { ROUTES } from "@/constants/routes";
-import { getServiceOfferings } from "@/services/service-offering.service";
+// TEMPORARY: WordPress services grid disabled — the CMS still holds
+// placeholder entries ("AI Consulting Updated", "Web Development 2", …).
+// TODO: RESTORE WORDPRESS DATA (see src/data/temporary-services.ts)
+// import { getServiceOfferings } from "@/services/service-offering.service";
+import { temporaryServices } from "@/data/temporary-services";
 import { ServicesHero } from "@/sections/services/ServicesHero";
 import { TrustedBrands } from "@/sections/home/TrustedBrands";
 import { ServicesGrid } from "@/sections/services/ServicesGrid";
@@ -59,14 +63,16 @@ export const metadata: Metadata = {
   alternates: { canonical: getCanonicalUrl(ROUTES.services) },
 };
 
-export default async function ServicesPage() {
-  const services = await getServiceOfferings();
-
+export default function ServicesPage() {
+  // TEMPORARY: WordPress services grid disabled for UI development.
+  // TODO: RESTORE WORDPRESS DATA — uncomment the fetch and the import above:
+  // const services = await getServiceOfferings();
+  // <ServicesGrid services={services.items} />
   return (
     <>
       <ServicesHero />
       <TrustedBrands />
-      <ServicesGrid services={services.items} />
+      <ServicesGrid services={temporaryServices} />
       <WhySeniorLed />
       <WhoThisIsFor
         eyebrow="WHO WE WORK WITH"

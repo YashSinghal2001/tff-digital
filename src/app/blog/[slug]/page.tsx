@@ -17,7 +17,11 @@ import { JsonLd } from "@/components/common/JsonLd";
 import { buildBlogPostingJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo/json-ld";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { getCanonicalUrl } from "@/lib/seo/canonical";
-import { withHeadingIds, stripDuplicateFeaturedImage } from "@/lib/content/post-content";
+import {
+  withHeadingIds,
+  stripDuplicateFeaturedImage,
+  htmlToPlainText,
+} from "@/lib/content/post-content";
 import { formatPostDate } from "@/lib/content/format-date";
 import { ROUTES } from "@/constants/routes";
 import type { Post } from "@/types/domain/post";
@@ -31,7 +35,12 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
   const post = await getPostBySlug(slug);
   if (!post) return {};
 
-  return buildMetadata(post.seo, getCanonicalUrl(ROUTES.blogPost(slug)));
+  // Content-derived fallback so a post without Yoast data still gets its own
+  // title/description instead of the site defaults.
+  return buildMetadata(post.seo, getCanonicalUrl(ROUTES.blogPost(slug)), {
+    title: post.title,
+    description: post.excerpt ? htmlToPlainText(post.excerpt) : undefined,
+  });
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {

@@ -1,11 +1,17 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Link from "next/link";
-import { Mail, Phone, MapPin, Link2, Globe, Send, MapPinned } from "lucide-react";
+import { Mail, Phone, MapPin } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Card } from "@/components/ui/Card";
 import { ContactForm } from "@/features/contact/ContactForm";
+import { SOCIAL_LINKS } from "@/constants/social";
+import {
+  XIcon,
+  InstagramIcon,
+  LinkedInIcon,
+  FacebookIcon,
+} from "@/components/icons/social-icons";
 import { fadeInUp } from "@/styles/animations";
 
 const businessInfo: Array<{ icon: typeof Mail; label: string; href?: string }> = [
@@ -15,9 +21,10 @@ const businessInfo: Array<{ icon: typeof Mail; label: string; href?: string }> =
 ];
 
 const socialLinks = [
-  { label: "LinkedIn", href: "#", icon: Link2 },
-  { label: "Instagram", href: "#", icon: Globe },
-  { label: "YouTube", href: "#", icon: Send },
+  { label: "LinkedIn", href: SOCIAL_LINKS.linkedin, icon: LinkedInIcon },
+  { label: "Instagram", href: SOCIAL_LINKS.instagram, icon: InstagramIcon },
+  { label: "X (Twitter)", href: SOCIAL_LINKS.x, icon: XIcon },
+  { label: "Facebook", href: SOCIAL_LINKS.facebook, icon: FacebookIcon },
 ];
 
 export function ContactFormSection() {
@@ -54,23 +61,31 @@ export function ContactFormSection() {
               </ul>
               <div className="mt-5 flex gap-3">
                 {socialLinks.map(({ label, href, icon: Icon }) => (
-                  <Link
+                  <a
                     key={label}
                     href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     aria-label={label}
-                    className="flex h-9 w-9 items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--color-primary)_0%,var(--color-secondary)_100%)] text-white"
+                    className="flex h-9 w-9 items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--color-primary)_0%,var(--color-secondary)_100%)] text-white transition-opacity hover:opacity-85"
                   >
                     <Icon className="h-4 w-4" />
-                  </Link>
+                  </a>
                 ))}
               </div>
             </Card>
 
-            <Card className="relative flex min-h-[220px] flex-1 items-center justify-center overflow-hidden">
-              <MapPinned className="h-8 w-8 text-white/30" strokeWidth={1} />
-              <span className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full border border-border-strong bg-glass px-4 py-2 font-body text-xs text-muted">
-                Map placeholder
-              </span>
+            <Card className="relative min-h-[220px] flex-1 overflow-hidden p-0">
+              {/* Keyless Google Maps embed of the business location shown in
+                  the card above; next.config.ts CSP frame-src allows it. */}
+              <iframe
+                src="https://www.google.com/maps?q=Zirakpur,+Punjab,+India&output=embed"
+                title="Map showing TFF Digital's location in Zirakpur, Punjab, India"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+                className="absolute inset-0 h-full w-full border-0 grayscale-[15%]"
+              />
             </Card>
           </motion.div>
         </div>

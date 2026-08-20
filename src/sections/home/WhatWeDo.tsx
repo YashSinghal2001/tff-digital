@@ -12,67 +12,22 @@ import { buttonVariants } from "@/components/ui/button-variants";
 import { ROUTES } from "@/constants/routes";
 import { fadeInUp } from "@/styles/animations";
 import { getServiceCardIcon } from "@/components/icons/service-icons";
-import type { ServiceOffering } from "@/types/domain/service-offering";
+import { temporaryServices } from "@/data/temporary-services";
 
-// TEMPORARY: WordPress What We Do content disabled for UI development.
-// Mock cards reuse the real ServiceOffering fields the UI needs, plus the
-// `features` list the new design calls for (not yet modeled in WordPress).
-type TemporaryWhatWeDoService = Pick<
-  ServiceOffering,
-  "id" | "slug" | "title" | "summary"
-> & { features: string[] };
-
-const temporaryWhatWeDoServices: TemporaryWhatWeDoService[] = [
-  {
-    id: "temp-aeo-seo",
-    slug: "seo",
-    title: "AEO & SEO Services",
-    summary: "Get found. Build authority. Drive organic growth.",
-    features: ["Answer Engine Optimization", "Technical SEO", "Organic Growth"],
-  },
-  {
-    id: "temp-smm",
-    slug: "smm",
-    title: "SMM Services",
-    summary: "Build brand love. Grow your community.",
-    features: ["Content Strategy", "Engagement Growth", "Social Visibility"],
-  },
-  {
-    id: "temp-meta-ads",
-    slug: "google-meta-ads",
-    title: "Meta Ads",
-    summary: "Reach the right people. Turn clicks into customers.",
-    features: ["Targeted Campaigns", "Lower CPA", "Higher ROI"],
-  },
-  {
-    id: "temp-web-dev",
-    slug: "web-development",
-    title: "Web Development",
-    summary: "Fast. Modern. Conversion focused websites.",
-    features: ["SEO-Friendly Structure", "Mobile Responsive", "Better User Experience"],
-  },
-  {
-    id: "temp-video-editing",
-    slug: "video-editing",
-    title: "Video Editing",
-    summary: "Create scroll-stopping content that converts.",
-    features: ["Engaging Visuals", "Social Ready Videos", "Brand Storytelling"],
-  },
-];
-
-// TEMPORARY: WordPress What We Do content disabled for UI development.
-// Original WordPress-driven signature — restore this and delete the mock above:
+// TEMPORARY: WordPress What We Do content disabled for UI development — cards
+// come from src/data/temporary-services.ts (shared with /services).
+// Original WordPress-driven signature — restore this and drop the import above:
 // interface WhatWeDoProps {
 //   services: ServiceOffering[];
 // }
 // export function WhatWeDo({ services }: WhatWeDoProps) {
 //
 // TODO: RESTORE WORDPRESS DATA
-// Remove temporaryWhatWeDoServices usage and restore the existing WordPress
+// Remove the temporaryServices usage and restore the existing WordPress
 // service data source (the `services` prop passed from src/app/page.tsx).
 // WordPress integration has intentionally NOT been deleted.
 export function WhatWeDo() {
-  const services = temporaryWhatWeDoServices;
+  const services = temporaryServices;
 
   return (
     <section id="services" className="py-12 lg:py-16">
@@ -123,17 +78,21 @@ export function WhatWeDo() {
                           </li>
                         ))}
                       </ul>
-                      <Link
-                        href={ROUTES.service(service.slug)}
-                        className="relative mt-auto flex items-center gap-1 pt-2 font-body text-sm font-semibold text-primary transition-colors hover:text-white"
-                      >
-                        Learn more
-                        <span className="sr-only"> about {service.title}</span>{" "}
-                        <ArrowRight
-                          className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-0.5 motion-reduce:transition-none"
-                          aria-hidden="true"
-                        />
-                      </Link>
+                      {/* Only disciplines with a live detail page get a link —
+                          the other WP slugs don't exist yet and would 404. */}
+                      {service.href ? (
+                        <Link
+                          href={service.href}
+                          className="relative mt-auto flex items-center gap-1 pt-2 font-body text-sm font-semibold text-primary transition-colors hover:text-white"
+                        >
+                          Learn more
+                          <span className="sr-only"> about {service.title}</span>{" "}
+                          <ArrowRight
+                            className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-0.5 motion-reduce:transition-none"
+                            aria-hidden="true"
+                          />
+                        </Link>
+                      ) : null}
                     </Card>
                   </div>
                 </div>

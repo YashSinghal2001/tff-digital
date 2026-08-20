@@ -30,7 +30,7 @@ const founders: Array<{
     name: "Raju Gorai",
     role: "Performance Marketing Expert",
     image: {
-      src: "https://cms.tffdigital.com/wp-content/uploads/2026/08/f1-1.jpg",
+      src: "/founders/raju.jpg",
       alt: "Raju Gorai",
     },
     highlights: [
@@ -51,7 +51,7 @@ const founders: Array<{
     name: "Kanchan Rana",
     role: "SEO & Organic Growth Expert",
     image: {
-      src: "https://cms.tffdigital.com/wp-content/uploads/2026/08/f2.jpg",
+      src: "/founders/kanchan.jpg",
       alt: "Kanchan Rana",
     },
     highlights: [

@@ -31,7 +31,7 @@ interface Slide {
 const slides: Slide[] = [
   {
     image: {
-      src: "https://cms.tffdigital.com/wp-content/uploads/2026/08/f2.jpg",
+      src: "/founders/kanchan.jpg",
       alt: "Kanchan Rana, TFF Digital co-founder and SEO expert",
       positionClassName: "object-top",
     },
@@ -61,7 +61,7 @@ const slides: Slide[] = [
   },
   {
     image: {
-      src: "https://cms.tffdigital.com/wp-content/uploads/2026/08/f1-1.jpg",
+      src: "/founders/raju.jpg",
       alt: "Raju Gorai, TFF Digital co-founder and performance marketing expert",
       positionClassName: "object-top",
     },

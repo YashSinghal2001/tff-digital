@@ -24,8 +24,9 @@ const cspDirectives = [
   `font-src 'self'`,
   // WordPress media host + the placehold.co mock fallback (see images.remotePatterns below), plus data: for any inline/blur placeholders.
   `img-src 'self' data:${wordpressMediaHostname ? ` https://${wordpressMediaHostname}` : ""} https://placehold.co`,
-  // WP oEmbed YouTube embeds rendered inside ArticleContent (see src/components/blog/ArticleContent.tsx).
-  `frame-src 'self' https://www.youtube.com https://youtube.com https://www.youtube-nocookie.com`,
+  // WP oEmbed YouTube embeds rendered inside ArticleContent (see src/components/blog/ArticleContent.tsx),
+  // plus the Google Maps embed on the contact page (src/sections/contact/ContactFormSection.tsx).
+  `frame-src 'self' https://www.youtube.com https://youtube.com https://www.youtube-nocookie.com https://www.google.com`,
   `frame-ancestors 'self'`,
   `connect-src 'self'`,
   `object-src 'none'`,
