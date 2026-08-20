@@ -28,9 +28,9 @@ export const metadata: Metadata = {
   // it's the same route segment as app/layout.tsx that defines the template
   // — so this must spell out the site name explicitly, or the homepage
   // <title> renders as the bare string below with no brand name at all.
-  title: seoConfig.defaultTitle,
+  title: `${seoConfig.defaultTitle} | Digital Growth Agency`,
   description:
-    "TFF Digital — strategy, branding, and performance marketing built to compound.",
+    "TFF Digital is a strategy-led digital growth agency driving measurable growth through SEO, digital marketing, web development, and performance marketing.",
   alternates: { canonical: getCanonicalUrl(ROUTES.home) },
 };
 

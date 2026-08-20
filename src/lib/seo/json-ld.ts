@@ -1,4 +1,5 @@
 import { siteConfig } from "@/config/site.config";
+import { SOCIAL_LINKS } from "@/constants/social";
 import { stripHtml } from "@/lib/content/post-content";
 import type { Post } from "@/types/domain/post";
 import type { CaseStudy } from "@/types/domain/case-study";
@@ -14,8 +15,15 @@ export function buildOrganizationJsonLd(): Record<string, unknown> {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
+    // Stable @id so Google merges the Organization node embedded here with
+    // the `publisher` references in WebSite/BlogPosting/CreativeWork.
+    "@id": `${siteConfig.url}/#organization`,
     name: siteConfig.name,
     url: siteConfig.url,
+    // Served from /public; Google's Organization-logo guideline wants a
+    // crawlable image of at least 112x112px — this one is 512x512.
+    logo: `${siteConfig.url}/icon-512.png`,
+    sameAs: Object.values(SOCIAL_LINKS),
   };
 }
 
@@ -25,6 +33,7 @@ export function buildWebsiteJsonLd(): Record<string, unknown> {
     "@type": "WebSite",
     name: siteConfig.name,
     url: siteConfig.url,
+    publisher: { "@id": `${siteConfig.url}/#organization` },
   };
 }
 
