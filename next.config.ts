@@ -23,7 +23,8 @@ const cspDirectives = [
   // next/font self-hosts Google Fonts at build time (no fonts.gstatic.com request at runtime).
   `font-src 'self'`,
   // WordPress media host + the placehold.co mock fallback (see images.remotePatterns below), plus data: for any inline/blur placeholders.
-  `img-src 'self' data:${wordpressMediaHostname ? ` https://${wordpressMediaHostname}` : ""} https://placehold.co`,
+  // s.wordpress.com serves the Selected Work website-preview screenshots (src/lib/content/website-preview.ts).
+  `img-src 'self' data:${wordpressMediaHostname ? ` https://${wordpressMediaHostname}` : ""} https://placehold.co https://s.wordpress.com`,
   // WP oEmbed YouTube embeds rendered inside ArticleContent (see src/components/blog/ArticleContent.tsx),
   // plus the Google Maps embed on the contact page (src/sections/contact/ContactFormSection.tsx).
   `frame-src 'self' https://www.youtube.com https://youtube.com https://www.youtube-nocookie.com https://www.google.com`,
@@ -49,6 +50,12 @@ const nextConfig: NextConfig = {
       // "admin" author. Without this, next/image's optimizer 400s on every such
       // avatar (see src/components/blog/AuthorCard.tsx).
       { protocol: "https" as const, hostname: "secure.gravatar.com" },
+      // WordPress.com's mshots screenshot service — powers the Selected Work
+      // website-preview cards (src/lib/content/website-preview.ts) from each
+      // Case Study's Project URL. One fixed, trusted host; the target URL it
+      // screenshots is validated (http/https, no local/private addresses)
+      // before this app ever builds a URL pointing at it.
+      { protocol: "https" as const, hostname: "s.wordpress.com" },
     ],
     // The WordPress media host sends no Cache-Control header, so optimized
     // images fall back to the 60s default TTL — and the host is slow enough
