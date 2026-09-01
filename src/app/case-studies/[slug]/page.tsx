@@ -4,12 +4,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import { getCaseStudies, getCaseStudyBySlug } from "@/services/case-study.service";
-// TEMPORARY demo fallback — remove once real case studies exist in WordPress.
 import {
-  getFallbackCaseStudyBySlug,
+  filterPlaceholderCaseStudies,
   isPlaceholderCaseStudySlug,
-  withCaseStudyFallback,
-} from "@/lib/fallback/case-studies.fallback";
+} from "@/lib/content/case-study-placeholders";
 import type { CaseStudy } from "@/types/domain/case-study";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
@@ -30,33 +28,16 @@ interface CaseStudyPageProps {
   params: Promise<{ slug: string }>;
 }
 
-// Prerender all case studies — the same filtered set the listing and sitemap
-// use. Soft getCaseStudies: even a build-time CMS outage still yields the two
-// repo fallback slugs (withCaseStudyFallback fills them in), so the pages the
-// sitemap advertises always exist statically and revalidate via ISR — a
-// runtime outage serves the last good HTML instead of the 500 seen live.
+// Prerender every published WordPress case study — the same filtered set the
+// listing and sitemap use — so ISR keeps serving the last good HTML through a
+// CMS outage. Soft getCaseStudies: a build-time outage yields [] and the
+// build still succeeds; slugs then render on demand (dynamicParams stays on,
+// so case studies published between deploys work immediately).
 export async function generateStaticParams() {
   const caseStudies = await getCaseStudies({ first: 100 });
-  return withCaseStudyFallback(caseStudies.items).map((caseStudy) => ({
+  return filterPlaceholderCaseStudies(caseStudies.items).map((caseStudy) => ({
     slug: caseStudy.slug,
   }));
-}
-
-/**
- * getCaseStudyBySlug distinguishes "missing" (null) from "CMS failed"
- * (throw). On a failure, a slug covered by the repo fallback set still
- * renders — that content is local and must not die with the CMS. Any other
- * slug rethrows so a temporary outage surfaces as the error boundary (5xx),
- * never as a wrong 404 that could get real content de-indexed.
- */
-async function resolveCaseStudy(slug: string): Promise<CaseStudy | null> {
-  try {
-    return (await getCaseStudyBySlug(slug)) ?? getFallbackCaseStudyBySlug(slug);
-  } catch (error) {
-    const fallback = getFallbackCaseStudyBySlug(slug);
-    if (fallback) return fallback;
-    throw error;
-  }
 }
 
 export async function generateMetadata({ params }: CaseStudyPageProps): Promise<Metadata> {
@@ -64,7 +45,7 @@ export async function generateMetadata({ params }: CaseStudyPageProps): Promise<
   if (isPlaceholderCaseStudySlug(slug)) return {};
   let caseStudy: CaseStudy | null;
   try {
-    caseStudy = await resolveCaseStudy(slug);
+    caseStudy = await getCaseStudyBySlug(slug);
   } catch {
     // Metadata must never be the reason a route dies: on a CMS failure fall
     // back to the site defaults and let the page component decide the outcome.
@@ -86,7 +67,10 @@ export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
   // Throwaway CMS entries (e.g. "test") are hidden from the listing and
   // sitemap — 404 them here too so the URL can't be reached directly.
   if (isPlaceholderCaseStudySlug(slug)) notFound();
-  const caseStudy = await resolveCaseStudy(slug);
+  // getCaseStudyBySlug distinguishes "missing" (null → 404) from "CMS
+  // failed" (throw → error boundary, a 5xx) — a temporary outage must never
+  // become a wrong 404 that could get real content de-indexed.
+  const caseStudy = await getCaseStudyBySlug(slug);
   if (!caseStudy) notFound();
 
   const canonicalUrl = getCanonicalUrl(ROUTES.caseStudy(slug));

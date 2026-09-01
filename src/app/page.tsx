@@ -5,8 +5,7 @@ import { ROUTES } from "@/constants/routes";
 // TEMPORARY: WordPress What We Do content disabled for UI development.
 // import { getServiceOfferings } from "@/services/service-offering.service";
 import { getCaseStudies } from "@/services/case-study.service";
-// TEMPORARY demo fallback — remove once real case studies exist in WordPress.
-import { withCaseStudyFallback } from "@/lib/fallback/case-studies.fallback";
+import { filterPlaceholderCaseStudies } from "@/lib/content/case-study-placeholders";
 import { HeroSection } from "@/sections/home/HeroSection";
 import { TrustedBrands } from "@/sections/home/TrustedBrands";
 import { WhatWeDo } from "@/sections/home/WhatWeDo";
@@ -45,9 +44,13 @@ export default async function Home() {
   //   getServiceOfferings({ first: 5 }),
   //   getCaseStudies({ first: 20 }),
   // ]);
+  // Soft fetch: the homepage must render even when the CMS is down. Selected
+  // Work shows the WordPress case studies whose "Featured on homepage" field
+  // is ticked (newest first, max 4) and falls back to its designed empty
+  // state — never invented content — while none are published.
   const caseStudies = await getCaseStudies({ first: 20 });
 
-  const featuredCaseStudies = withCaseStudyFallback(caseStudies.items)
+  const featuredCaseStudies = filterPlaceholderCaseStudies(caseStudies.items)
     .filter((caseStudy) => caseStudy.featuredOnHomepage)
     .slice(0, 4);
 

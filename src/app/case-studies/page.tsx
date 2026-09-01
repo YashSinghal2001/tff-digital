@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import { getCaseStudies } from "@/services/case-study.service";
-// TEMPORARY demo fallback — remove once real case studies exist in WordPress.
-import { withCaseStudyFallback } from "@/lib/fallback/case-studies.fallback";
+import { getCaseStudiesStrict } from "@/services/case-study.service";
+import { filterPlaceholderCaseStudies } from "@/lib/content/case-study-placeholders";
 import { PageHero } from "@/components/common/PageHero";
 import { Container } from "@/components/ui/Container";
 import { Pagination } from "@/components/blog/Pagination";
@@ -24,8 +23,11 @@ interface CaseStudiesPageProps {
 
 export default async function CaseStudiesPage({ searchParams }: CaseStudiesPageProps) {
   const { after } = await searchParams;
-  const result = await getCaseStudies({ first: 9, after });
-  const caseStudyItems = withCaseStudyFallback(result.items);
+  // Strict: case studies are this page's PRIMARY content, so a CMS failure
+  // surfaces as the route's error boundary (5xx) instead of a 200 claiming
+  // "No case studies yet" — the same strict/soft split as the blog listing.
+  const result = await getCaseStudiesStrict({ first: 9, after });
+  const caseStudyItems = filterPlaceholderCaseStudies(result.items);
 
   return (
     <>

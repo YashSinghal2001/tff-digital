@@ -29,37 +29,43 @@ export function buildMetadata(
     // template so they still end in "| TFF Digital".
     title: seo?.title ? { absolute: title } : title,
     description,
-    alternates: resolvedCanonical ? { canonical: resolvedCanonical } : undefined,
-    robots: seo
-      ? {
-          index: seo.robots.index,
-          follow: seo.robots.follow,
-        }
-      : undefined,
-    openGraph: seo
-      ? {
-          title: seo.openGraph.title,
-          description: seo.openGraph.description,
-          type: seo.openGraph.type,
-          url: resolvedCanonical,
-          // A page-level openGraph replaces the root layout's wholesale, so
-          // pages without a Yoast OG image must re-supply the sitewide card.
-          images: seo.openGraph.image
-            ? [{ url: seo.openGraph.image.url }]
-            : seoConfig.defaultOgImage
-              ? [{ url: seoConfig.defaultOgImage }]
-              : undefined,
-        }
-      : undefined,
-    twitter: seo
-      ? {
-          card: seo.twitter.card,
-          title: seo.twitter.title,
-          description: seo.twitter.description,
-          images: seo.twitter.image ? [seo.twitter.image.url] : undefined,
-        }
-      : undefined,
   };
+
+  // Fields are added only when they carry a value. Next.js treats an
+  // explicitly-undefined field as "defined as nothing" and stops inheriting
+  // the parent segment's value for it — so `openGraph: undefined` here
+  // silently stripped the root layout's default OG/Twitter card from every
+  // page without Yoast SEO data (observed live on case-study pages with
+  // seo: null). Omitting the keys lets the layout defaults flow through.
+  if (resolvedCanonical) {
+    metadata.alternates = { canonical: resolvedCanonical };
+  }
+
+  if (seo) {
+    metadata.robots = {
+      index: seo.robots.index,
+      follow: seo.robots.follow,
+    };
+    metadata.openGraph = {
+      title: seo.openGraph.title,
+      description: seo.openGraph.description,
+      type: seo.openGraph.type,
+      url: resolvedCanonical,
+      // A page-level openGraph replaces the root layout's wholesale, so
+      // pages without a Yoast OG image must re-supply the sitewide card.
+      images: seo.openGraph.image
+        ? [{ url: seo.openGraph.image.url }]
+        : seoConfig.defaultOgImage
+          ? [{ url: seoConfig.defaultOgImage }]
+          : undefined,
+    };
+    metadata.twitter = {
+      card: seo.twitter.card,
+      title: seo.twitter.title,
+      description: seo.twitter.description,
+      images: seo.twitter.image ? [seo.twitter.image.url] : undefined,
+    };
+  }
 
   return { ...metadata, ...overrides };
 }

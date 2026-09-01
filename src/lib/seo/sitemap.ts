@@ -7,7 +7,7 @@ import { getCaseStudies } from "@/services/case-study.service";
 // placeholder services — see src/data/temporary-services.ts.
 // TODO: RESTORE WORDPRESS DATA
 // import { getServiceOfferings } from "@/services/service-offering.service";
-import { withCaseStudyFallback } from "@/lib/fallback/case-studies.fallback";
+import { filterPlaceholderCaseStudies } from "@/lib/content/case-study-placeholders";
 
 export interface SitemapEntry {
   url: string;
@@ -55,10 +55,9 @@ async function getBlogPostEntries(): Promise<SitemapEntry[]> {
 async function getCaseStudyEntries(): Promise<SitemapEntry[]> {
   try {
     const caseStudies = await getCaseStudies({ first: 1000 });
-    // Same source of truth as the listing/detail pages: the throwaway WP
-    // "test" entry never appears, and while WordPress has no real case
-    // studies the two fallback entries (which are live, linked pages) do.
-    return withCaseStudyFallback(caseStudies.items).map((caseStudy) => ({
+    // Same source of truth as the listing/detail pages: published WordPress
+    // case studies appear; the throwaway WP "test" entry never does.
+    return filterPlaceholderCaseStudies(caseStudies.items).map((caseStudy) => ({
       url: getCanonicalUrl(ROUTES.caseStudy(caseStudy.slug)),
       lastModified: caseStudy.updatedAt,
     }));

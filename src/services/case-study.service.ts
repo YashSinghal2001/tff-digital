@@ -23,7 +23,14 @@ const EMPTY_CASE_STUDIES: Paginated<CaseStudy> = {
   totalCount: 0,
 };
 
-export async function getCaseStudies(params?: {
+/**
+ * Throwing variant: a WPGraphQL failure propagates to the caller. Use for a
+ * page's PRIMARY content (the /case-studies listing) so an outage surfaces
+ * as the route's error boundary (a 5xx — "temporary, come back later")
+ * instead of a 200 asserting no case studies exist — the same strict/soft
+ * split the blog listing uses (see getPostsStrict).
+ */
+export async function getCaseStudiesStrict(params?: {
   first?: number;
   after?: string;
 }): Promise<Paginated<CaseStudy>> {
@@ -31,17 +38,25 @@ export async function getCaseStudies(params?: {
     return getMockCaseStudies();
   }
 
+  const { caseStudies } = await findAllCaseStudies(params);
+  return {
+    items: caseStudies.nodes.map(adaptCaseStudy),
+    pageInfo: caseStudies.pageInfo,
+    totalCount: caseStudies.nodes.length,
+  };
+}
+
+export async function getCaseStudies(params?: {
+  first?: number;
+  after?: string;
+}): Promise<Paginated<CaseStudy>> {
   try {
-    const { caseStudies } = await findAllCaseStudies(params);
-    return {
-      items: caseStudies.nodes.map(adaptCaseStudy),
-      pageInfo: caseStudies.pageInfo,
-      totalCount: caseStudies.nodes.length,
-    };
+    return await getCaseStudiesStrict(params);
   } catch (error) {
-    // A live WPGraphQL outage would otherwise throw here and take down the
-    // entire homepage. Degrade to an empty (still-live-sourced, not mock)
-    // result, matching getServiceOfferings' resilience pattern.
+    // Soft variant for secondary surfaces (the homepage Selected Work
+    // section, sitemap, generateStaticParams): a live WPGraphQL outage
+    // would otherwise take down pages that render fine without case
+    // studies, matching getServiceOfferings' resilience pattern.
     console.error(
       "[getCaseStudies] WPGraphQL request failed; rendering without live case studies for this build.",
       error,
