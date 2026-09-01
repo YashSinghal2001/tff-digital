@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { draftMode } from "next/headers";
 import Image from "next/image";
-import { getServiceOfferingBySlug } from "@/services/service-offering.service";
+import {
+  getServiceOfferingBySlug,
+  getServiceOfferingPreviewBySlug,
+} from "@/services/service-offering.service";
 import type { ServiceOffering } from "@/types/domain/service-offering";
 import { Container } from "@/components/ui/Container";
 import { IconCircle } from "@/components/ui/IconCircle";
@@ -23,9 +27,12 @@ interface ServiceDetailPageProps {
 
 export async function generateMetadata({ params }: ServiceDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
+  const { isEnabled: isPreview } = await draftMode();
   let service: ServiceOffering | null;
   try {
-    service = await getServiceOfferingBySlug(slug);
+    service = isPreview
+      ? await getServiceOfferingPreviewBySlug(slug)
+      : await getServiceOfferingBySlug(slug);
   } catch {
     // Metadata must never be the reason a route dies: on a CMS failure fall
     // back to the site defaults and let the page component decide the outcome.
@@ -35,15 +42,27 @@ export async function generateMetadata({ params }: ServiceDetailPageProps): Prom
 
   // Content-derived fallback so a service without Yoast data still gets its
   // own title/description instead of the site defaults.
-  return buildMetadata(service.seo, getCanonicalUrl(ROUTES.service(slug)), {
+  const metadata = buildMetadata(service.seo, getCanonicalUrl(ROUTES.service(slug)), {
     title: service.title,
     description: service.summary ? htmlToPlainText(service.summary) : undefined,
   });
+
+  // Draft/unpublished content must never be indexed, regardless of what the
+  // service's own SEO fields say.
+  return isPreview ? { ...metadata, robots: { index: false, follow: false } } : metadata;
 }
 
 export default async function ServiceDetailPage({ params }: ServiceDetailPageProps) {
   const { slug } = await params;
-  const service = await getServiceOfferingBySlug(slug);
+  const { isEnabled: isPreview } = await draftMode();
+  // getServiceOfferingBySlug throws on a CMS failure (surfaces as the error
+  // boundary, a 5xx) rather than a wrong 404 — matches the resilience
+  // pattern used everywhere else in this app. Preview mode can only ever be
+  // reached via /api/preview/service's signed, WordPress-authenticated
+  // flow — a bare ?preview=true with no draft-mode cookie has no effect.
+  const service = isPreview
+    ? await getServiceOfferingPreviewBySlug(slug)
+    : await getServiceOfferingBySlug(slug);
   if (!service) notFound();
 
   const canonicalUrl = getCanonicalUrl(ROUTES.service(slug));

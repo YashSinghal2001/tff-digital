@@ -58,3 +58,18 @@ export const GET_SERVICE_BY_SLUG = gql`
   }
   ${SERVICE_FIELDS}
 `;
+
+// Preview-only — mirrors GET_CASE_STUDY_PREVIEW exactly (see that query's
+// comment for the asPreview/authentication rationale, which applies
+// identically here; live-verified this WPGraphQL install supports
+// idType: DATABASE_ID + asPreview on the service query the same way).
+export const GET_SERVICE_PREVIEW = gql`
+  query GetServicePreview($id: ID!, $idType: ServiceIdType!, $asPreview: Boolean) {
+    service(id: $id, idType: $idType, asPreview: $asPreview) {
+      databaseId
+      status
+      ...ServiceFields
+    }
+  }
+  ${SERVICE_FIELDS}
+`;

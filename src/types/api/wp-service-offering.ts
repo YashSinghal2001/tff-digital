@@ -19,6 +19,10 @@ export interface WPServiceOffering {
   featuredImage: { node: WPMediaItem } | null;
   serviceFields: WPServiceFields | null;
   seo: WPSeo | null;
+  // Only requested by the preview query (GET_SERVICE_PREVIEW) — undefined
+  // on every public query's response.
+  databaseId?: number;
+  status?: string;
 }
 
 export interface WPServiceOfferingsQueryResult {

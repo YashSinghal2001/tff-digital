@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name:       TFF Headless Leads API
- * Description:       Public REST endpoint (POST /wp-json/headless/v1/leads) that accepts contact-form submissions from the Next.js frontend, headless hardening that keeps this CMS domain (noindex) out of search engines, and Case Study preview + public permalink redirects to the Next.js frontend. See docs/contact-form-wordpress-endpoint.md and docs/wordpress-contact-form-installation.md in the tff-digital repository for the full contract.
- * Version:           1.3.0
+ * Description:       Public REST endpoint (POST /wp-json/headless/v1/leads) that accepts contact-form submissions from the Next.js frontend, headless hardening that keeps this CMS domain (noindex) out of search engines, and View + Preview redirects to the Next.js frontend for Case Studies, Services, and Blog Posts (View only). See docs/contact-form-wordpress-endpoint.md and docs/wordpress-contact-form-installation.md in the tff-digital repository for the full contract.
+ * Version:           1.4.0
  * Requires at least: 5.9
  * Requires PHP:      7.4
  * Author:            TFF Digital
@@ -28,7 +28,7 @@
  * -----------------------------------------------------------------------
  *
  * -----------------------------------------------------------------------
- * CASE STUDY PREVIEW REQUIRES ONE SHARED SECRET
+ * HEADLESS PREVIEW REQUIRES ONE SHARED SECRET (Case Studies + Services)
  * -----------------------------------------------------------------------
  * Add this to wp-config.php (above "That's all, stop editing!"), matching
  * the Next.js app's WORDPRESS_PREVIEW_SECRET environment variable exactly:
@@ -39,9 +39,12 @@
  *
  *   define( 'TFF_HEADLESS_FRONTEND_URL', 'https://www.tffdigital.com' );
  *
- * Until TFF_HEADLESS_PREVIEW_SECRET is defined, the Preview button keeps
- * its default WordPress behavior (opens on this CMS domain) rather than
- * redirecting anywhere broken.
+ * Until TFF_HEADLESS_PREVIEW_SECRET is defined, Preview keeps its default
+ * WordPress behavior (opens on this CMS domain) for every post type,
+ * rather than redirecting anywhere broken. View/permalink redirects (Case
+ * Studies, Services, Blog Posts) do not depend on this secret at all — see
+ * tff_headless_route_map() vs. tff_headless_preview_route_map() below for
+ * exactly which post types get which behavior, and why.
  * -----------------------------------------------------------------------
  */
 
@@ -446,13 +449,13 @@ add_filter( 'wpseo_enable_xml_sitemap', '__return_false' );
 add_filter( 'wp_sitemaps_enabled', '__return_false' );
 
 // ---------------------------------------------------------------------
-// Case Study preview — redirect to the Next.js frontend, not this CMS.
+// Headless View + Preview — redirect supported content types to the
+// Next.js frontend instead of this CMS.
 // ---------------------------------------------------------------------
 
 /**
- * The Next.js frontend origin, shared by every headless URL rewrite below
- * (preview redirect + the public permalink filter that follows it). One
- * definition, reused, rather than repeating the same fallback in each
+ * The Next.js frontend origin, shared by every headless URL rewrite below.
+ * One definition, reused, rather than repeating the same fallback in each
  * filter — see the class-level doc comment for the optional wp-config.php
  * override.
  */
@@ -463,30 +466,78 @@ function tff_headless_frontend_url() {
 }
 
 /**
+ * Every WordPress post type with a real, working Next.js detail page —
+ * verified against the actual App Router source before being added here,
+ * not assumed. post_type => frontend URL path segment.
+ *
+ * Deliberately excludes types with no live frontend route to render them:
+ * projects, testimonial, team, and faq have no repository/service/GraphQL
+ * query/route anywhere in the Next.js app (testimonials and team are
+ * local static data; faq is a hardcoded array) — nothing to redirect to.
+ * `page` has a dormant, unused content-page data layer with zero routes.
+ * Redirecting any of these would send an editor's "View" click at a URL
+ * that can only 404.
+ */
+function tff_headless_route_map() {
+	return array(
+		'case-study' => 'case-studies',
+		'service'    => 'services',
+		'post'       => 'blog',
+	);
+}
+
+/**
+ * Subset of tff_headless_route_map() that ALSO has a working Next.js
+ * preview-fetch path (an authenticated asPreview GraphQL query + a
+ * draftMode()-aware page — see src/app/api/preview/<slug>/route.ts and the
+ * corresponding [slug]/page.tsx). post_type => /api/preview/<slug> segment.
+ *
+ * `post` (standard blog posts) is intentionally NOT included: no preview
+ * query/repository/service function exists yet for post.service.ts, and
+ * building one is real, unreviewed new work — reported as a follow-up
+ * rather than wired up as an unsafe shortcut. Blog posts still get their
+ * View link fixed below; Preview keeps WordPress's original CMS-domain
+ * behavior until that Next.js work exists (see the status-gate note on
+ * tff_headless_permalink_filter — this is what makes that fallback safe).
+ */
+function tff_headless_preview_route_map() {
+	return array(
+		'case-study' => 'case-study',
+		'service'    => 'service',
+	);
+}
+
+/**
  * WordPress's native "Preview" (and, on an already-published post,
  * "Preview changes") button calls get_preview_post_link(), which by
- * default builds a URL on THIS site using the case-study CPT's own
- * permalink — the incomplete/incorrect CMS-domain rendering reported by
- * the editor. This filter overrides that URL for Case Studies only,
- * pointing instead at the Next.js frontend's preview endpoint
- * (src/app/api/preview/case-study/route.ts), which authenticates the
- * request, enables Next.js Draft Mode, and redirects to the real
- * /case-studies/[slug] page.
+ * default builds a URL on THIS site using the post type's own permalink —
+ * the incomplete/incorrect CMS-domain rendering originally reported for
+ * Case Studies. This filter overrides that URL for every post type listed
+ * in tff_headless_preview_route_map(), pointing instead at the matching
+ * Next.js preview endpoint (src/app/api/preview/<type>/route.ts), which
+ * authenticates the request, enables Next.js Draft Mode, and redirects to
+ * the real frontend detail page.
  *
- * Only $post->ID and TFF_HEADLESS_PREVIEW_SECRET cross this boundary —
- * no post content, no WordPress credentials. The Next.js route is what
+ * Only $post->ID and TFF_HEADLESS_PREVIEW_SECRET cross this boundary — no
+ * post content, no WordPress credentials. The Next.js route is what
  * actually authenticates back into WordPress (via a separate Application
  * Password, configured only in Vercel) to fetch the draft content, so
  * nothing here weakens WordPress's own authentication.
  *
  * Note: get_preview_post_link() internally calls get_permalink() to build
- * its base URL, which now also passes through the post_type_link filter
- * below — but this callback discards that input entirely ($preview_link
- * is never read once the case-study branch is entered) and always builds
- * its own URL from scratch, so that filter has no effect on preview.
+ * its base URL, which also passes through tff_headless_permalink_filter()
+ * below — but for any post type handled in THIS filter, that base URL is
+ * discarded entirely and a fresh one built from scratch, so the permalink
+ * filter's output never matters here. It only matters for post types NOT
+ * in the preview map (e.g. blog posts) — see that filter's own comment.
  */
 add_filter( 'preview_post_link', function ( $preview_link, $post ) {
-	if ( ! $post instanceof WP_Post || 'case-study' !== $post->post_type ) {
+	if ( ! $post instanceof WP_Post ) {
+		return $preview_link;
+	}
+
+	$preview_map = tff_headless_preview_route_map();
+	if ( ! isset( $preview_map[ $post->post_type ] ) ) {
 		return $preview_link;
 	}
 
@@ -501,37 +552,55 @@ add_filter( 'preview_post_link', function ( $preview_link, $post ) {
 			'secret' => rawurlencode( TFF_HEADLESS_PREVIEW_SECRET ),
 			'id'     => $post->ID,
 		),
-		tff_headless_frontend_url() . '/api/preview/case-study'
+		tff_headless_frontend_url() . '/api/preview/' . $preview_map[ $post->post_type ]
 	);
 }, 10, 2 );
 
 /**
- * Published Case Study permalink — point "View" (and every other internal
- * use of get_permalink() for this CPT: the REST API's own `link` field,
- * Yoast's default canonical, etc.) at the real public page instead of this
- * CMS domain, which has no visitor-facing template worth linking to for a
- * headless post type.
+ * Published permalink — point "View" (and every other internal use of
+ * get_permalink()/get_post_permalink() for a supported post type: the REST
+ * API's own `link` field, Yoast's default canonical, etc.) at the real
+ * public page instead of this CMS domain, which has no visitor-facing
+ * template worth linking to for a headless content type.
  *
- * get_permalink() delegates to get_post_permalink() for any non-builtin
- * post type, which applies this exact filter
- * (apply_filters('post_type_link', $post_link, $post, $leavename, $sample))
- * before returning — that's the single choke point wp-admin's "View" row
- * action, get_permalink() callers elsewhere in WP core, and REST/Yoast all
- * go through, so one filter here covers all of them without touching
- * WPGraphQL (this app's own case-study queries never request a link/uri
- * field, so their responses are unaffected either way) or any other post
- * type — the post_type check below is the only thing that runs for
- * everything else (posts, pages, services, testimonials, FAQs, leads,
- * media), returning $post_link unchanged.
+ * WordPress core uses TWO different filters here depending on the post
+ * type, which is why this one callback is registered on both hooks below:
+ *   - post_type_link — applied by get_post_permalink(), which
+ *     get_permalink() delegates to for any non-builtin CPT (case-study,
+ *     service). 4 args upstream (link, post, leavename, sample); this
+ *     callback only needs the first two.
+ *   - post_link — applied directly inside get_permalink() for the
+ *     built-in `post` type (standard blog posts) — a separate code path,
+ *     confirmed from WordPress core, that post_type_link never touches.
+ * (`page` uses a third filter, page_link, via get_page_link() — not
+ * registered here at all, since Pages have no live frontend route.)
  *
- * Applies regardless of $post->post_status: the public URL for a given
- * slug is a property of the CPT's URL structure, not of any one post's
- * current status, matching how the rest of this rewrite is scoped.
+ * Only rewrites when $post->post_status is 'publish': an unpublished
+ * post's "public" URL doesn't really exist yet, so leaving get_permalink()
+ * at its original CMS-domain output for anything else is more correct —
+ * and for post types with no Preview support (see
+ * tff_headless_preview_route_map(), currently just `post`),
+ * get_preview_post_link()'s internal get_permalink() call relies on
+ * exactly that original, unrewritten output as its preview base URL. This
+ * status gate is what keeps blog-post Preview safely on its existing
+ * WordPress behavior without this filter having to know anything about
+ * preview mechanics itself.
  */
-add_filter( 'post_type_link', function ( $post_link, $post ) {
-	if ( ! $post instanceof WP_Post || 'case-study' !== $post->post_type ) {
+function tff_headless_permalink_filter( $post_link, $post ) {
+	if ( ! $post instanceof WP_Post ) {
 		return $post_link;
 	}
 
-	return tff_headless_frontend_url() . '/case-studies/' . $post->post_name;
-}, 10, 2 );
+	$route_map = tff_headless_route_map();
+	if ( ! isset( $route_map[ $post->post_type ] ) ) {
+		return $post_link;
+	}
+
+	if ( 'publish' !== $post->post_status ) {
+		return $post_link;
+	}
+
+	return tff_headless_frontend_url() . '/' . $route_map[ $post->post_type ] . '/' . $post->post_name;
+}
+add_filter( 'post_type_link', 'tff_headless_permalink_filter', 10, 2 );
+add_filter( 'post_link', 'tff_headless_permalink_filter', 10, 2 );

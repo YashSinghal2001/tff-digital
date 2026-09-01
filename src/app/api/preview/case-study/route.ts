@@ -1,11 +1,10 @@
 import "server-only";
-import { timingSafeEqual } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
 import { draftMode } from "next/headers";
 import { getCaseStudyPreviewByDatabaseId } from "@/services/case-study.service";
 import { isPlaceholderCaseStudySlug } from "@/lib/content/case-study-placeholders";
 import { isWordPressError } from "@/lib/wordpress/errors";
-import { previewConfig } from "@/config/preview.config";
+import { isValidPreviewSecret, parsePreviewId } from "@/lib/wordpress/preview-request";
 import { ROUTES } from "@/constants/routes";
 
 /**
@@ -29,13 +28,12 @@ import { ROUTES } from "@/constants/routes";
  */
 export async function GET(request: NextRequest) {
   const secret = request.nextUrl.searchParams.get("secret");
-  if (!isValidSecret(secret)) {
+  if (!isValidPreviewSecret(secret)) {
     return new NextResponse("Invalid preview secret", { status: 401 });
   }
 
-  const idParam = request.nextUrl.searchParams.get("id");
-  const id = idParam ? Number(idParam) : NaN;
-  if (!Number.isInteger(id) || id <= 0) {
+  const id = parsePreviewId(request.nextUrl.searchParams.get("id"));
+  if (id === null) {
     return new NextResponse("Missing or invalid case study id", { status: 400 });
   }
 
@@ -62,15 +60,4 @@ export async function GET(request: NextRequest) {
   // whether the content page actually fetches/renders draft data.
   const target = new URL(`${ROUTES.caseStudy(caseStudy.slug)}?preview=true`, request.url);
   return NextResponse.redirect(target);
-}
-
-function isValidSecret(secret: string | null): boolean {
-  if (!previewConfig.secret || !secret) return false;
-  const expected = Buffer.from(previewConfig.secret);
-  const actual = Buffer.from(secret);
-  // timingSafeEqual throws on length mismatch rather than returning false —
-  // guard that case first so an attacker can't distinguish "wrong length"
-  // from "wrong secret" via timing either.
-  if (expected.length !== actual.length) return false;
-  return timingSafeEqual(expected, actual);
 }

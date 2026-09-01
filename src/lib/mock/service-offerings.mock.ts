@@ -55,3 +55,13 @@ export function getMockServiceOfferingBySlug(
 ): ServiceOffering | null {
   return mockServiceOfferings.find((service) => service.slug === slug) ?? null;
 }
+
+// Mock stand-in for WordPress's numeric post ID, so the preview redirect
+// route's databaseId → slug resolution is exercisable in local/mock dev —
+// mirrors case-studies.mock.ts's identical helper. Index-based (id 1 =
+// first fixture), not a real WP convention.
+export function getMockServiceOfferingPreviewByDatabaseId(
+  id: number,
+): ServiceOffering | null {
+  return mockServiceOfferings[id - 1] ?? null;
+}
