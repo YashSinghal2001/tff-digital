@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name:       TFF Headless Leads API
- * Description:       Public REST endpoint (POST /wp-json/headless/v1/leads) that accepts contact-form submissions from the Next.js frontend, plus headless hardening that keeps this CMS domain (noindex) out of search engines so only the public site is indexed. See docs/contact-form-wordpress-endpoint.md and docs/wordpress-contact-form-installation.md in the tff-digital repository for the full contract.
- * Version:           1.1.0
+ * Description:       Public REST endpoint (POST /wp-json/headless/v1/leads) that accepts contact-form submissions from the Next.js frontend, headless hardening that keeps this CMS domain (noindex) out of search engines, and a Case Study preview redirect to the Next.js frontend. See docs/contact-form-wordpress-endpoint.md and docs/wordpress-contact-form-installation.md in the tff-digital repository for the full contract.
+ * Version:           1.2.0
  * Requires at least: 5.9
  * Requires PHP:      7.4
  * Author:            TFF Digital
@@ -25,6 +25,23 @@
  * (validation, sanitization, HTTP status codes, JSON shape) is complete
  * and testable either way; only the persistence backend is a decision
  * left to the site owner.
+ * -----------------------------------------------------------------------
+ *
+ * -----------------------------------------------------------------------
+ * CASE STUDY PREVIEW REQUIRES ONE SHARED SECRET
+ * -----------------------------------------------------------------------
+ * Add this to wp-config.php (above "That's all, stop editing!"), matching
+ * the Next.js app's WORDPRESS_PREVIEW_SECRET environment variable exactly:
+ *
+ *   define( 'TFF_HEADLESS_PREVIEW_SECRET', 'some-long-random-string' );
+ *
+ * Optional — override only if the frontend origin ever changes:
+ *
+ *   define( 'TFF_HEADLESS_FRONTEND_URL', 'https://www.tffdigital.com' );
+ *
+ * Until TFF_HEADLESS_PREVIEW_SECRET is defined, the Preview button keeps
+ * its default WordPress behavior (opens on this CMS domain) rather than
+ * redirecting anywhere broken.
  * -----------------------------------------------------------------------
  */
 
@@ -427,3 +444,48 @@ add_filter( 'wpseo_robots', function () {
 add_filter( 'wpseo_enable_xml_sitemap', '__return_false' );
 // ... and WP core's fallback /wp-sitemap.xml, for completeness.
 add_filter( 'wp_sitemaps_enabled', '__return_false' );
+
+// ---------------------------------------------------------------------
+// Case Study preview — redirect to the Next.js frontend, not this CMS.
+// ---------------------------------------------------------------------
+
+/**
+ * WordPress's native "Preview" (and, on an already-published post,
+ * "Preview changes") button calls get_preview_post_link(), which by
+ * default builds a URL on THIS site using the case-study CPT's own
+ * permalink — the incomplete/incorrect CMS-domain rendering reported by
+ * the editor. This filter overrides that URL for Case Studies only,
+ * pointing instead at the Next.js frontend's preview endpoint
+ * (src/app/api/preview/case-study/route.ts), which authenticates the
+ * request, enables Next.js Draft Mode, and redirects to the real
+ * /case-studies/[slug] page.
+ *
+ * Only $post->ID and TFF_HEADLESS_PREVIEW_SECRET cross this boundary —
+ * no post content, no WordPress credentials. The Next.js route is what
+ * actually authenticates back into WordPress (via a separate Application
+ * Password, configured only in Vercel) to fetch the draft content, so
+ * nothing here weakens WordPress's own authentication.
+ */
+add_filter( 'preview_post_link', function ( $preview_link, $post ) {
+	if ( ! $post instanceof WP_Post || 'case-study' !== $post->post_type ) {
+		return $preview_link;
+	}
+
+	if ( ! defined( 'TFF_HEADLESS_PREVIEW_SECRET' ) || '' === TFF_HEADLESS_PREVIEW_SECRET ) {
+		// Not configured yet — leave WordPress's default preview link alone
+		// rather than redirecting the editor somewhere broken.
+		return $preview_link;
+	}
+
+	$frontend_url = defined( 'TFF_HEADLESS_FRONTEND_URL' ) && '' !== TFF_HEADLESS_FRONTEND_URL
+		? TFF_HEADLESS_FRONTEND_URL
+		: 'https://www.tffdigital.com';
+
+	return add_query_arg(
+		array(
+			'secret' => rawurlencode( TFF_HEADLESS_PREVIEW_SECRET ),
+			'id'     => $post->ID,
+		),
+		rtrim( $frontend_url, '/' ) . '/api/preview/case-study'
+	);
+}, 10, 2 );

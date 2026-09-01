@@ -35,6 +35,10 @@ export interface WPCaseStudy {
   featuredImage: { node: WPMediaItem } | null;
   caseStudyFields: WPCaseStudyFields | null;
   seo: WPSeo | null;
+  // Only requested by the preview query (GET_CASE_STUDY_PREVIEW) — undefined
+  // on every public query's response.
+  databaseId?: number;
+  status?: string;
 }
 
 export interface WPCaseStudiesQueryResult {

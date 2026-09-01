@@ -48,3 +48,11 @@ export function getMockCaseStudies(): Paginated<CaseStudy> {
 export function getMockCaseStudyBySlug(slug: string): CaseStudy | null {
   return mockCaseStudies.find((caseStudy) => caseStudy.slug === slug) ?? null;
 }
+
+// Mock stand-in for WordPress's numeric post ID, so the preview redirect
+// route's databaseId → slug resolution is exercisable in local/mock dev
+// without a real WordPress install. Index-based (id 1 = first fixture) —
+// not a real WP convention, only meaningful within mock mode.
+export function getMockCaseStudyPreviewByDatabaseId(id: number): CaseStudy | null {
+  return mockCaseStudies[id - 1] ?? null;
+}

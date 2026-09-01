@@ -75,3 +75,21 @@ export const GET_CASE_STUDY_BY_SLUG = gql`
   }
   ${CASE_STUDY_FIELDS}
 `;
+
+// Preview-only: identical field set to the public query (so adaptCaseStudy
+// needs no changes) plus databaseId/status and the asPreview argument.
+// asPreview resolves the latest revision/autosave — not just the last saved
+// draft — matching WordPress's own native preview behavior; WPGraphQL only
+// returns data here when the request is authenticated as a user who can
+// edit the post (see src/lib/wordpress/preview-auth.ts), so this query
+// yields nothing for anonymous callers regardless of id/idType supplied.
+export const GET_CASE_STUDY_PREVIEW = gql`
+  query GetCaseStudyPreview($id: ID!, $idType: CaseStudyIdType!, $asPreview: Boolean) {
+    caseStudy(id: $id, idType: $idType, asPreview: $asPreview) {
+      databaseId
+      status
+      ...CaseStudyFields
+    }
+  }
+  ${CASE_STUDY_FIELDS}
+`;

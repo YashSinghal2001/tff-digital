@@ -14,6 +14,10 @@ interface GraphQLResponse<TData> {
 export interface FetchGraphQLOptions {
   cache?: RequestCache;
   next?: NextFetchRequestConfig;
+  // Additional request headers (e.g. preview's Basic Auth) — merged in
+  // alongside the default Content-Type. Only the preview fetch path passes
+  // this today; every other caller is unaffected.
+  headers?: Record<string, string>;
 }
 
 // Hard ceiling on every WPGraphQL round-trip. Healthy queries answer in well
@@ -49,7 +53,7 @@ export async function fetchGraphQL<TData>(
   try {
     response = await fetch(wordpressConfig.graphqlEndpoint, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...options?.headers },
       body: JSON.stringify({ query, variables }),
       cache: cacheOption,
       next: nextOption,

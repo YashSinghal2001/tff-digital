@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { draftMode } from "next/headers";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
-import { getCaseStudies, getCaseStudyBySlug } from "@/services/case-study.service";
+import {
+  getCaseStudies,
+  getCaseStudyBySlug,
+  getCaseStudyPreviewBySlug,
+} from "@/services/case-study.service";
 import {
   filterPlaceholderCaseStudies,
   isPlaceholderCaseStudySlug,
@@ -43,9 +48,12 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: CaseStudyPageProps): Promise<Metadata> {
   const { slug } = await params;
   if (isPlaceholderCaseStudySlug(slug)) return {};
+  const { isEnabled: isPreview } = await draftMode();
   let caseStudy: CaseStudy | null;
   try {
-    caseStudy = await getCaseStudyBySlug(slug);
+    caseStudy = isPreview
+      ? await getCaseStudyPreviewBySlug(slug)
+      : await getCaseStudyBySlug(slug);
   } catch {
     // Metadata must never be the reason a route dies: on a CMS failure fall
     // back to the site defaults and let the page component decide the outcome.
@@ -56,21 +64,34 @@ export async function generateMetadata({ params }: CaseStudyPageProps): Promise<
   // Content-derived fallback so a case study without Yoast data still gets
   // its own title/description instead of the site defaults.
   const summary = caseStudy.summary || caseStudy.excerpt;
-  return buildMetadata(caseStudy.seo, getCanonicalUrl(ROUTES.caseStudy(slug)), {
+  const metadata = buildMetadata(caseStudy.seo, getCanonicalUrl(ROUTES.caseStudy(slug)), {
     title: caseStudy.title,
     description: summary ? htmlToPlainText(summary) : undefined,
   });
+
+  // Draft/unpublished content must never be indexed, regardless of what the
+  // case study's own SEO fields say (they describe the eventual published
+  // page, not this in-progress preview).
+  return isPreview ? { ...metadata, robots: { index: false, follow: false } } : metadata;
 }
 
 export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
   const { slug } = await params;
   // Throwaway CMS entries (e.g. "test") are hidden from the listing and
-  // sitemap — 404 them here too so the URL can't be reached directly.
+  // sitemap — 404 them here too so the URL can't be reached directly, even
+  // under preview.
   if (isPlaceholderCaseStudySlug(slug)) notFound();
+  const { isEnabled: isPreview } = await draftMode();
   // getCaseStudyBySlug distinguishes "missing" (null → 404) from "CMS
   // failed" (throw → error boundary, a 5xx) — a temporary outage must never
-  // become a wrong 404 that could get real content de-indexed.
-  const caseStudy = await getCaseStudyBySlug(slug);
+  // become a wrong 404 that could get real content de-indexed. Preview mode
+  // can only ever be reached via /api/preview/case-study's signed,
+  // WordPress-authenticated flow — this branch never runs for ordinary
+  // public requests, and a bare ?preview=true with no draft-mode cookie has
+  // no effect (isPreview stays false).
+  const caseStudy = isPreview
+    ? await getCaseStudyPreviewBySlug(slug)
+    : await getCaseStudyBySlug(slug);
   if (!caseStudy) notFound();
 
   const canonicalUrl = getCanonicalUrl(ROUTES.caseStudy(slug));
