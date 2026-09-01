@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name:       TFF Headless Leads API
- * Description:       Public REST endpoint (POST /wp-json/headless/v1/leads) that accepts contact-form submissions from the Next.js frontend. See docs/contact-form-wordpress-endpoint.md and docs/wordpress-contact-form-installation.md in the tff-digital repository for the full contract.
- * Version:           1.0.0
+ * Description:       Public REST endpoint (POST /wp-json/headless/v1/leads) that accepts contact-form submissions from the Next.js frontend, plus headless hardening that keeps this CMS domain (noindex) out of search engines so only the public site is indexed. See docs/contact-form-wordpress-endpoint.md and docs/wordpress-contact-form-installation.md in the tff-digital repository for the full contract.
+ * Version:           1.1.0
  * Requires at least: 5.9
  * Requires PHP:      7.4
  * Author:            TFF Digital
@@ -362,3 +362,68 @@ function tff_headless_leads_persist_as_email( array $lead ) {
 	// the frontend contract (WPLeadResponse.id is always a number).
 	return 0;
 }
+
+// ---------------------------------------------------------------------
+// Headless hardening — keep this CMS domain out of search engines.
+// ---------------------------------------------------------------------
+
+/**
+ * This WordPress install is a headless backend: the same content is served
+ * to the public at https://www.tffdigital.com, which must remain the only
+ * indexed copy. Before this module, Google was free to index
+ * cms.tffdigital.com — the robots meta said "index, follow", every page
+ * self-canonicalized to the cms domain, and robots.txt advertised a full
+ * Yoast sitemap (audited live 2026-09-01).
+ *
+ * Strategy — three layers, with robots.txt deliberately left permissive:
+ * a crawler that is blocked from crawling can never SEE a noindex, so
+ * Disallow rules would strand any already-indexed URL in the index.
+ *
+ *   1. `X-Robots-Tag: noindex, nofollow` on every WP-rendered response —
+ *      the authoritative, markup-independent signal. REST (/wp-json) and
+ *      WPGraphQL (/graphql) already send their own noindex header on a
+ *      code path that bypasses `send_headers`, so they need nothing here.
+ *      Media under /wp-content/uploads is served by Apache without PHP
+ *      and therefore needs an .htaccess rule instead (manual step,
+ *      documented in the repo).
+ *   2. The same directives forced into the robots meta tag. Yoast feeds
+ *      its directives through WP core's wp_robots API, so one late
+ *      wp_robots filter overrides both core and Yoast output; the
+ *      wpseo_robots filter covers Yoast's legacy string path as belt and
+ *      braces.
+ *   3. XML sitemaps switched off (Yoast + core) so the site stops
+ *      handing crawlers an index-me list; with its sitemaps disabled,
+ *      Yoast also stops printing the "Sitemap:" line into robots.txt.
+ *
+ * None of this affects the Next.js frontend or admin use: robots signals
+ * instruct search-engine indexers only — they never block HTTP
+ * consumption, so Vercel's GraphQL/REST/media fetches, wp-admin, and
+ * authenticated workflows are untouched. Do NOT additionally enable
+ * Settings → Reading → "Discourage search engines": it would add a
+ * robots.txt Disallow that hides these noindex signals from crawlers.
+ */
+
+add_action( 'send_headers', function () {
+	header( 'X-Robots-Tag: noindex, nofollow', true );
+} );
+
+add_filter( 'wp_robots', function ( array $robots ) {
+	// Drop any index/follow a plugin (Yoast included) already added, then
+	// assert the opposite; unrelated directives (max-image-preview etc.)
+	// are harmless alongside noindex and left alone.
+	unset( $robots['index'], $robots['follow'] );
+	$robots['noindex']  = true;
+	$robots['nofollow'] = true;
+	return $robots;
+}, 999 );
+
+// Yoast's legacy front-end robots string — a no-op on Yoast versions that
+// render exclusively through wp_robots (the filter above already won).
+add_filter( 'wpseo_robots', function () {
+	return 'noindex, nofollow';
+}, 999 );
+
+// Yoast XML sitemaps (/sitemap_index.xml and children) ...
+add_filter( 'wpseo_enable_xml_sitemap', '__return_false' );
+// ... and WP core's fallback /wp-sitemap.xml, for completeness.
+add_filter( 'wp_sitemaps_enabled', '__return_false' );
