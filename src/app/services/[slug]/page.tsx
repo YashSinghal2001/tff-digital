@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { getServiceOfferingBySlug } from "@/services/service-offering.service";
+import type { ServiceOffering } from "@/types/domain/service-offering";
 import { Container } from "@/components/ui/Container";
 import { IconCircle } from "@/components/ui/IconCircle";
 import { Breadcrumbs } from "@/components/blog/Breadcrumbs";
@@ -22,7 +23,14 @@ interface ServiceDetailPageProps {
 
 export async function generateMetadata({ params }: ServiceDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const service = await getServiceOfferingBySlug(slug);
+  let service: ServiceOffering | null;
+  try {
+    service = await getServiceOfferingBySlug(slug);
+  } catch {
+    // Metadata must never be the reason a route dies: on a CMS failure fall
+    // back to the site defaults and let the page component decide the outcome.
+    return {};
+  }
   if (!service) return {};
 
   // Content-derived fallback so a service without Yoast data still gets its

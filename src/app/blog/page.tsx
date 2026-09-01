@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
-import { getPosts, getPostsBySearch } from "@/services/post.service";
+import {
+  getPosts,
+  getPostsStrict,
+  getPostsBySearchStrict,
+} from "@/services/post.service";
 import { getCategories, getTags } from "@/services/taxonomy.service";
 import { BlogHero } from "@/sections/blog/BlogHero";
 import { BlogResults } from "@/sections/blog/BlogResults";
@@ -26,8 +30,14 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const { q, after } = await searchParams;
   const query = q?.trim() || undefined;
 
+  // Primary results are strict: a CMS failure surfaces as the route's error
+  // boundary (5xx) instead of a 200 claiming "No articles yet" — that false
+  // empty state is indexable and shipped live during the 2026-08 outage.
+  // Sidebar data stays soft; it degrades to empty without taking the page down.
   const [result, categories, tags, sidebarPosts] = await Promise.all([
-    query ? getPostsBySearch(query, { first: 9, after }) : getPosts({ first: 9, after }),
+    query
+      ? getPostsBySearchStrict(query, { first: 9, after })
+      : getPostsStrict({ first: 9, after }),
     getCategories(),
     getTags(),
     getPosts({ first: 8 }),

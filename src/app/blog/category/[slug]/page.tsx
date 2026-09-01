@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getPosts, getPostsByCategory } from "@/services/post.service";
-import { getCategories, getTags } from "@/services/taxonomy.service";
+import {
+  getCategories,
+  getCategoriesStrict,
+  getTags,
+} from "@/services/taxonomy.service";
 import { PageHero } from "@/components/common/PageHero";
 import { Container } from "@/components/ui/Container";
 import { Breadcrumbs } from "@/components/blog/Breadcrumbs";
@@ -35,8 +39,12 @@ export default async function BlogCategoryPage({ params, searchParams }: Categor
   const { slug } = await params;
   const { after } = await searchParams;
 
+  // Strict: the category list doubles as the existence check for notFound()
+  // below. The soft variant swallows a CMS outage into [], which turned every
+  // live category URL into a wrong 404 — a de-indexing signal for a page that
+  // exists. With strict, an outage hits the error boundary (5xx) instead.
   const [categories, tags, sidebarPosts] = await Promise.all([
-    getCategories(),
+    getCategoriesStrict(),
     getTags(),
     getPosts({ first: 8 }),
   ]);

@@ -16,6 +16,13 @@ export interface FetchGraphQLOptions {
   next?: NextFetchRequestConfig;
 }
 
+// Hard ceiling on every WPGraphQL round-trip. Healthy queries answer in well
+// under 1s; without a bound, a hanging CMS held requests open indefinitely
+// (observed live 2026-09: cold hits ran 12s+ until the platform killed the
+// function). 8s stays inside Vercel's default function budget so the error
+// path — caught fallbacks or the route's error boundary — always runs.
+const REQUEST_TIMEOUT_MS = 8_000;
+
 export async function fetchGraphQL<TData>(
   query: string,
   variables?: Record<string, unknown>,
@@ -46,12 +53,17 @@ export async function fetchGraphQL<TData>(
       body: JSON.stringify({ query, variables }),
       cache: cacheOption,
       next: nextOption,
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });
   } catch (cause) {
+    // AbortSignal.timeout rejects with a DOMException named "TimeoutError".
+    const timedOut = cause instanceof Error && cause.name === "TimeoutError";
     throw new WordPressError(
-      `Could not reach WPGraphQL at ${wordpressConfig.graphqlEndpoint}: ${
-        cause instanceof Error ? cause.message : String(cause)
-      }`,
+      timedOut
+        ? `WPGraphQL request timed out after ${REQUEST_TIMEOUT_MS}ms (${wordpressConfig.graphqlEndpoint})`
+        : `Could not reach WPGraphQL at ${wordpressConfig.graphqlEndpoint}: ${
+            cause instanceof Error ? cause.message : String(cause)
+          }`,
       "network",
     );
   }

@@ -30,9 +30,28 @@ interface BlogPostPageProps {
   params: Promise<{ slug: string }>;
 }
 
+// Prerender every known post at build time. The static copies revalidate via
+// the fetch-level 60s ISR window, and when a revalidation fails Next keeps
+// serving the last good HTML — so a CMS outage can no longer 500 an existing
+// article (observed live 2026-09 on the only real post). Soft getPosts: a
+// build-time outage yields [] and the build still succeeds; slugs then render
+// on demand exactly as before (dynamicParams stays on for new posts).
+export async function generateStaticParams() {
+  const posts = await getPosts({ first: 100 });
+  return posts.items.map((post) => ({ slug: post.slug }));
+}
+
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = await getPostBySlug(slug);
+  let post: Post | null;
+  try {
+    post = await getPostBySlug(slug);
+  } catch {
+    // Metadata must never be the reason a route dies: on a CMS failure fall
+    // back to the root layout's site defaults (no canonical, no robots
+    // signals) and let the page component decide how the request ends.
+    return {};
+  }
   if (!post) return {};
 
   // Content-derived fallback so a post without Yoast data still gets its own

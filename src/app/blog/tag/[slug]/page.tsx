@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getPosts, getPostsByTag } from "@/services/post.service";
-import { getCategories, getTags } from "@/services/taxonomy.service";
+import {
+  getCategories,
+  getTags,
+  getTagsStrict,
+} from "@/services/taxonomy.service";
 import { PageHero } from "@/components/common/PageHero";
 import { Container } from "@/components/ui/Container";
 import { Breadcrumbs } from "@/components/blog/Breadcrumbs";
@@ -35,9 +39,11 @@ export default async function BlogTagPage({ params, searchParams }: TagPageProps
   const { slug } = await params;
   const { after } = await searchParams;
 
+  // Strict: the tag list doubles as the existence check for notFound() below —
+  // same wrong-404-on-outage fix as the category route (see its comment).
   const [categories, tags, sidebarPosts] = await Promise.all([
     getCategories(),
-    getTags(),
+    getTagsStrict(),
     getPosts({ first: 8 }),
   ]);
   const tag = tags.find((item) => item.slug === slug);

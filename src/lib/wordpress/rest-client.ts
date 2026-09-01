@@ -2,6 +2,11 @@ import "server-only";
 import { wordpressConfig } from "@/config/wordpress.config";
 import { WordPressError } from "@/lib/wordpress/errors";
 
+// Same ceiling as the GraphQL client (src/lib/wordpress/client.ts): a hanging
+// CMS must fail the contact-form Server Action into its friendly error state,
+// not leave the visitor's submit spinner running until the platform gives up.
+const REQUEST_TIMEOUT_MS = 8_000;
+
 export async function postToWordPress<TResponse, TBody = unknown>(
   path: string,
   body: TBody,
@@ -19,12 +24,16 @@ export async function postToWordPress<TResponse, TBody = unknown>(
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });
   } catch (cause) {
+    const timedOut = cause instanceof Error && cause.name === "TimeoutError";
     throw new WordPressError(
-      `Could not reach WordPress REST API at ${wordpressConfig.restUrl}${path}: ${
-        cause instanceof Error ? cause.message : String(cause)
-      }`,
+      timedOut
+        ? `WordPress REST request timed out after ${REQUEST_TIMEOUT_MS}ms (${path})`
+        : `Could not reach WordPress REST API at ${wordpressConfig.restUrl}${path}: ${
+            cause instanceof Error ? cause.message : String(cause)
+          }`,
       "network",
     );
   }

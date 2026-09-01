@@ -39,7 +39,15 @@ const EMPTY_POSTS: Paginated<Post> = {
   totalCount: 0,
 };
 
-export async function getPosts(params?: {
+/**
+ * Throwing variant: a WPGraphQL failure propagates to the caller. Use for a
+ * page's PRIMARY content (the blog listing's results) so an outage surfaces
+ * as the route's error boundary (a 5xx — "temporary, come back later")
+ * instead of a 200 asserting the blog is empty. That misleading empty state
+ * shipped live during the 2026-08 CMS outage and is exactly what crawlers
+ * must not index.
+ */
+export async function getPostsStrict(params?: {
   first?: number;
   after?: string;
 }): Promise<Paginated<Post>> {
@@ -47,13 +55,21 @@ export async function getPosts(params?: {
     return getMockPosts(params);
   }
 
+  const { posts } = await findAllPosts(params);
+  return adaptPaginatedPosts(posts);
+}
+
+export async function getPosts(params?: {
+  first?: number;
+  after?: string;
+}): Promise<Paginated<Post>> {
   try {
-    const { posts } = await findAllPosts(params);
-    return adaptPaginatedPosts(posts);
+    return await getPostsStrict(params);
   } catch (error) {
-    // A live WPGraphQL outage would otherwise throw here and take down the
-    // entire blog listing page, matching getServiceOfferings' resilience
-    // pattern.
+    // Soft variant for secondary surfaces (sidebars, related posts,
+    // generateStaticParams) and the sitemap: a live WPGraphQL outage would
+    // otherwise take down content that renders fine without posts, matching
+    // getServiceOfferings' resilience pattern.
     console.error(
       "[getPosts] WPGraphQL request failed; rendering without live posts for this build.",
       error,
@@ -111,7 +127,8 @@ export async function getPostsByTag(
   }
 }
 
-export async function getPostsBySearch(
+/** Throwing variant of getPostsBySearch — see getPostsStrict for when. */
+export async function getPostsBySearchStrict(
   search: string,
   params?: { first?: number; after?: string },
 ): Promise<Paginated<Post>> {
@@ -119,9 +136,16 @@ export async function getPostsBySearch(
     return getMockPostsBySearch(search, params);
   }
 
+  const { posts } = await findPostsBySearch(search, params);
+  return adaptPaginatedPosts(posts);
+}
+
+export async function getPostsBySearch(
+  search: string,
+  params?: { first?: number; after?: string },
+): Promise<Paginated<Post>> {
   try {
-    const { posts } = await findPostsBySearch(search, params);
-    return adaptPaginatedPosts(posts);
+    return await getPostsBySearchStrict(search, params);
   } catch (error) {
     console.error(
       "[getPostsBySearch] WPGraphQL request failed; rendering without live posts for this build.",
