@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name:       TFF Headless Leads API
- * Description:       Public REST endpoint (POST /wp-json/headless/v1/leads) that accepts contact-form submissions from the Next.js frontend, headless hardening that keeps this CMS domain (noindex) out of search engines, and a Case Study preview redirect to the Next.js frontend. See docs/contact-form-wordpress-endpoint.md and docs/wordpress-contact-form-installation.md in the tff-digital repository for the full contract.
- * Version:           1.2.0
+ * Description:       Public REST endpoint (POST /wp-json/headless/v1/leads) that accepts contact-form submissions from the Next.js frontend, headless hardening that keeps this CMS domain (noindex) out of search engines, and Case Study preview + public permalink redirects to the Next.js frontend. See docs/contact-form-wordpress-endpoint.md and docs/wordpress-contact-form-installation.md in the tff-digital repository for the full contract.
+ * Version:           1.3.0
  * Requires at least: 5.9
  * Requires PHP:      7.4
  * Author:            TFF Digital
@@ -450,6 +450,19 @@ add_filter( 'wp_sitemaps_enabled', '__return_false' );
 // ---------------------------------------------------------------------
 
 /**
+ * The Next.js frontend origin, shared by every headless URL rewrite below
+ * (preview redirect + the public permalink filter that follows it). One
+ * definition, reused, rather than repeating the same fallback in each
+ * filter — see the class-level doc comment for the optional wp-config.php
+ * override.
+ */
+function tff_headless_frontend_url() {
+	return defined( 'TFF_HEADLESS_FRONTEND_URL' ) && '' !== TFF_HEADLESS_FRONTEND_URL
+		? rtrim( TFF_HEADLESS_FRONTEND_URL, '/' )
+		: 'https://www.tffdigital.com';
+}
+
+/**
  * WordPress's native "Preview" (and, on an already-published post,
  * "Preview changes") button calls get_preview_post_link(), which by
  * default builds a URL on THIS site using the case-study CPT's own
@@ -465,6 +478,12 @@ add_filter( 'wp_sitemaps_enabled', '__return_false' );
  * actually authenticates back into WordPress (via a separate Application
  * Password, configured only in Vercel) to fetch the draft content, so
  * nothing here weakens WordPress's own authentication.
+ *
+ * Note: get_preview_post_link() internally calls get_permalink() to build
+ * its base URL, which now also passes through the post_type_link filter
+ * below — but this callback discards that input entirely ($preview_link
+ * is never read once the case-study branch is entered) and always builds
+ * its own URL from scratch, so that filter has no effect on preview.
  */
 add_filter( 'preview_post_link', function ( $preview_link, $post ) {
 	if ( ! $post instanceof WP_Post || 'case-study' !== $post->post_type ) {
@@ -477,15 +496,42 @@ add_filter( 'preview_post_link', function ( $preview_link, $post ) {
 		return $preview_link;
 	}
 
-	$frontend_url = defined( 'TFF_HEADLESS_FRONTEND_URL' ) && '' !== TFF_HEADLESS_FRONTEND_URL
-		? TFF_HEADLESS_FRONTEND_URL
-		: 'https://www.tffdigital.com';
-
 	return add_query_arg(
 		array(
 			'secret' => rawurlencode( TFF_HEADLESS_PREVIEW_SECRET ),
 			'id'     => $post->ID,
 		),
-		rtrim( $frontend_url, '/' ) . '/api/preview/case-study'
+		tff_headless_frontend_url() . '/api/preview/case-study'
 	);
+}, 10, 2 );
+
+/**
+ * Published Case Study permalink — point "View" (and every other internal
+ * use of get_permalink() for this CPT: the REST API's own `link` field,
+ * Yoast's default canonical, etc.) at the real public page instead of this
+ * CMS domain, which has no visitor-facing template worth linking to for a
+ * headless post type.
+ *
+ * get_permalink() delegates to get_post_permalink() for any non-builtin
+ * post type, which applies this exact filter
+ * (apply_filters('post_type_link', $post_link, $post, $leavename, $sample))
+ * before returning — that's the single choke point wp-admin's "View" row
+ * action, get_permalink() callers elsewhere in WP core, and REST/Yoast all
+ * go through, so one filter here covers all of them without touching
+ * WPGraphQL (this app's own case-study queries never request a link/uri
+ * field, so their responses are unaffected either way) or any other post
+ * type — the post_type check below is the only thing that runs for
+ * everything else (posts, pages, services, testimonials, FAQs, leads,
+ * media), returning $post_link unchanged.
+ *
+ * Applies regardless of $post->post_status: the public URL for a given
+ * slug is a property of the CPT's URL structure, not of any one post's
+ * current status, matching how the rest of this rewrite is scoped.
+ */
+add_filter( 'post_type_link', function ( $post_link, $post ) {
+	if ( ! $post instanceof WP_Post || 'case-study' !== $post->post_type ) {
+		return $post_link;
+	}
+
+	return tff_headless_frontend_url() . '/case-studies/' . $post->post_name;
 }, 10, 2 );
