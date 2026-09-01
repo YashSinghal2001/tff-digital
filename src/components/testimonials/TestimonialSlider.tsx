@@ -228,6 +228,7 @@ export function TestimonialSlider({ testimonials }: TestimonialSliderProps) {
       role="region"
       aria-roledescription="carousel"
       aria-label="Client testimonials"
+      className="flex flex-col"
       onPointerEnter={() => setPaused(true)}
       onPointerLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)}
@@ -247,10 +248,15 @@ export function TestimonialSlider({ testimonials }: TestimonialSliderProps) {
     >
       {/* [contain:paint] stops the off-screen track from adding phantom
           horizontal scroll range to the page in Chromium, which overflow-hidden
-          alone does not prevent for composited (transformed) children. */}
+          alone does not prevent for composited (transformed) children.
+          py-8/-my-8 give the clip box vertical room for a card's hover lift
+          and shadow without shifting layout: padding pushes the clip edge
+          out, the matching negative margin cancels it back to the original
+          height. The parent is a flex column so that negative margin can't
+          collapse into the badge/dots' own margins above and below. */}
       <div
         ref={viewportRef}
-        className="cursor-grab overflow-hidden [contain:paint]"
+        className="-my-8 cursor-grab overflow-hidden py-8 [contain:paint]"
         style={{ touchAction: "pan-y" }}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
