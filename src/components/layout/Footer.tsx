@@ -129,8 +129,8 @@ export function Footer() {
               <ul className="mt-4 flex flex-col gap-3">
                 <li className="flex items-center gap-2 font-body text-sm text-muted">
                   <Mail className="h-4 w-4 shrink-0" />
-                  <a href="mailto:info@tffdigita.com" className="transition-colors hover:text-white">
-                    info@tffdigita.com
+                  <a href="mailto:info@tffdigital.com" className="transition-colors hover:text-white">
+                    info@tffdigital.com
                   </a>
                 </li>
                 <li className="flex items-center gap-2 font-body text-sm text-muted">

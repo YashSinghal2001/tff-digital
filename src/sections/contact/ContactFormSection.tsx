@@ -15,7 +15,7 @@ import {
 import { fadeInUp } from "@/styles/animations";
 
 const businessInfo: Array<{ icon: typeof Mail; label: string; href?: string }> = [
-  { icon: Mail, label: "info@tffdigita.com", href: "mailto:info@tffdigita.com" },
+  { icon: Mail, label: "info@tffdigital.com", href: "mailto:info@tffdigital.com" },
   { icon: Phone, label: "+91 72068 09816", href: "tel:+917206809816" },
   { icon: MapPin, label: "Zirakpur, Punjab, India" },
 ];
