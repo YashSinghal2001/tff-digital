@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       TFF Headless Leads API
  * Description:       Public REST endpoint (POST /wp-json/headless/v1/leads) that accepts contact-form submissions from the Next.js frontend, headless hardening that keeps this CMS domain (noindex) out of search engines, and View + Preview redirects to the Next.js frontend for Case Studies, Services, and Blog Posts (View only). See docs/contact-form-wordpress-endpoint.md and docs/wordpress-contact-form-installation.md in the tff-digital repository for the full contract.
- * Version:           1.4.0
+ * Version:           1.5.0
  * Requires at least: 5.9
  * Requires PHP:      7.4
  * Author:            TFF Digital
@@ -406,11 +406,20 @@ function tff_headless_leads_persist_as_email( array $lead ) {
  *      Media under /wp-content/uploads is served by Apache without PHP
  *      and therefore needs an .htaccess rule instead (manual step,
  *      documented in the repo).
- *   2. The same directives forced into the robots meta tag. Yoast feeds
- *      its directives through WP core's wp_robots API, so one late
- *      wp_robots filter overrides both core and Yoast output; the
- *      wpseo_robots filter covers Yoast's legacy string path as belt and
- *      braces.
+ *   2. The same directives forced into the robots meta tag for WordPress's
+ *      own rendered front-end pages. Yoast feeds its directives through WP
+ *      core's wp_robots API, so one late wp_robots filter overrides both
+ *      core and Yoast output; the wpseo_robots filter covers Yoast's
+ *      legacy string path as belt and braces. Both filters exempt REST
+ *      (/wp-json) and WPGraphQL (/graphql) requests: Yoast computes this
+ *      same "effective robots" value for yoast_head_json and for the
+ *      WPGraphQL SEO field, and the headless Next.js frontend depends on
+ *      that value reflecting each post's real per-post Yoast setting —
+ *      not this CMS-domain-only override. (Fixed in v1.5.0 — the original
+ *      unconditional version silently forced every post's indexable/
+ *      followable fields to noindex/nofollow over both APIs regardless of
+ *      its actual Yoast setting, confirmed live 2026-09-02 on all 10 real
+ *      content pieces.)
  *   3. XML sitemaps switched off (Yoast + core) so the site stops
  *      handing crawlers an index-me list; with its sitemaps disabled,
  *      Yoast also stops printing the "Sitemap:" line into robots.txt.
@@ -418,9 +427,14 @@ function tff_headless_leads_persist_as_email( array $lead ) {
  * None of this affects the Next.js frontend or admin use: robots signals
  * instruct search-engine indexers only — they never block HTTP
  * consumption, so Vercel's GraphQL/REST/media fetches, wp-admin, and
- * authenticated workflows are untouched. Do NOT additionally enable
- * Settings → Reading → "Discourage search engines": it would add a
- * robots.txt Disallow that hides these noindex signals from crawlers.
+ * authenticated workflows are untouched. The v1.5.0 REST/GraphQL
+ * exemption above is what makes "untouched" true for the SEO *data* those
+ * fetches return, not just the HTTP layer — REST and GraphQL keep their
+ * own independent noindex X-Robots-Tag header either way (see layer 1),
+ * so this exemption cannot make either API endpoint itself indexable. Do
+ * NOT additionally enable Settings → Reading → "Discourage search
+ * engines": it would add a robots.txt Disallow that hides these noindex
+ * signals from crawlers.
  */
 
 add_action( 'send_headers', function () {
@@ -428,6 +442,22 @@ add_action( 'send_headers', function () {
 } );
 
 add_filter( 'wp_robots', function ( array $robots ) {
+	// REST (/wp-json) and WPGraphQL (/graphql) already carry their own
+	// noindex X-Robots-Tag header independent of this plugin (WP core and
+	// WPGraphQL both add it natively — verified live) — so it's safe, and
+	// necessary, to let Yoast's real per-post value pass through here
+	// instead of forcing noindex/nofollow into the SEO data those APIs
+	// hand to the headless Next.js frontend. That frontend needs the true
+	// per-post setting to correctly render index/follow on the public
+	// https://www.tffdigital.com page; this override must stay scoped to
+	// WordPress's own rendered HTML only.
+	if (
+		( defined( 'REST_REQUEST' ) && REST_REQUEST ) ||
+		( defined( 'GRAPHQL_REQUEST' ) && GRAPHQL_REQUEST )
+	) {
+		return $robots;
+	}
+
 	// Drop any index/follow a plugin (Yoast included) already added, then
 	// assert the opposite; unrelated directives (max-image-preview etc.)
 	// are harmless alongside noindex and left alone.
@@ -439,7 +469,15 @@ add_filter( 'wp_robots', function ( array $robots ) {
 
 // Yoast's legacy front-end robots string — a no-op on Yoast versions that
 // render exclusively through wp_robots (the filter above already won).
-add_filter( 'wpseo_robots', function () {
+// Same REST/GraphQL exemption as wp_robots above, for the same reason.
+add_filter( 'wpseo_robots', function ( $robots ) {
+	if (
+		( defined( 'REST_REQUEST' ) && REST_REQUEST ) ||
+		( defined( 'GRAPHQL_REQUEST' ) && GRAPHQL_REQUEST )
+	) {
+		return $robots;
+	}
+
 	return 'noindex, nofollow';
 }, 999 );
 
