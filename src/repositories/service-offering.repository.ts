@@ -1,6 +1,11 @@
 import "server-only";
 import { fetchGraphQL } from "@/lib/wordpress/client";
+import { parseWordPressResponse } from "@/lib/wordpress/parse-response";
 import { buildPreviewAuthHeaders } from "@/lib/wordpress/preview-auth";
+import {
+  wpServiceOfferingQueryResultSchema,
+  wpServiceOfferingsQueryResultSchema,
+} from "@/schemas/api/wp-service-offering.schema";
 import {
   GET_SERVICE_BY_SLUG,
   GET_SERVICES,
@@ -11,17 +16,28 @@ import type {
   WPServiceOfferingsQueryResult,
 } from "@/types/api/wp-service-offering";
 
-export function findAllServiceOfferings(variables?: {
+// Responses validated at the boundary (audit CQ-1) — see
+// src/lib/wordpress/parse-response.ts and post.repository.ts.
+
+export async function findAllServiceOfferings(variables?: {
   first?: number;
   after?: string;
-}) {
-  return fetchGraphQL<WPServiceOfferingsQueryResult>(GET_SERVICES, variables);
+}): Promise<WPServiceOfferingsQueryResult> {
+  return parseWordPressResponse(
+    wpServiceOfferingsQueryResultSchema,
+    await fetchGraphQL(GET_SERVICES, variables),
+    "GetServices",
+  );
 }
 
-export function findServiceOfferingBySlug(slug: string) {
-  return fetchGraphQL<WPServiceOfferingQueryResult>(GET_SERVICE_BY_SLUG, {
-    slug,
-  });
+export async function findServiceOfferingBySlug(
+  slug: string,
+): Promise<WPServiceOfferingQueryResult> {
+  return parseWordPressResponse(
+    wpServiceOfferingQueryResultSchema,
+    await fetchGraphQL(GET_SERVICE_BY_SLUG, { slug }),
+    "GetServiceBySlug",
+  );
 }
 
 /**
@@ -29,13 +45,17 @@ export function findServiceOfferingBySlug(slug: string) {
  * case-study.repository.ts's findCaseStudyPreview exactly (same
  * cache/security rationale applies unchanged).
  */
-export function findServiceOfferingPreview(
+export async function findServiceOfferingPreview(
   id: string,
   idType: "SLUG" | "DATABASE_ID",
-) {
-  return fetchGraphQL<WPServiceOfferingQueryResult>(
-    GET_SERVICE_PREVIEW,
-    { id, idType, asPreview: true },
-    { headers: buildPreviewAuthHeaders(), cache: "no-store" },
+): Promise<WPServiceOfferingQueryResult> {
+  return parseWordPressResponse(
+    wpServiceOfferingQueryResultSchema,
+    await fetchGraphQL(
+      GET_SERVICE_PREVIEW,
+      { id, idType, asPreview: true },
+      { headers: buildPreviewAuthHeaders(), cache: "no-store" },
+    ),
+    "GetServicePreview",
   );
 }

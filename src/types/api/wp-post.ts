@@ -15,8 +15,13 @@ export interface WPPost {
   modified: string;
   featuredImage: { node: WPMediaItem } | null;
   author: WPAuthor | null;
-  categories: WPConnection<WPCategory> | null;
-  tags: WPConnection<WPTag> | null;
+  // Nodes-only, not WPConnection: the PostFields fragment selects only
+  // `nodes` on these nested connections (no pageInfo), so a full
+  // WPConnection here would claim a key the response never contains —
+  // caught while pinning the CQ-1 schemas to these types. Mirrors the
+  // relatedServices shape in wp-case-study.ts.
+  categories: { nodes: WPCategory[] } | null;
+  tags: { nodes: WPTag[] } | null;
   seo: WPSeo | null;
 }
 
