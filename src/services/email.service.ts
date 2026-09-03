@@ -6,6 +6,8 @@ import { buildLeadNotificationEmail } from "@/lib/email/templates/lead-notificat
 import { buildLeadConfirmationEmail } from "@/lib/email/templates/lead-confirmation";
 import type { Lead } from "@/types/domain/lead";
 
+const SEND_LABELS = ["notification", "confirmation"] as const;
+
 /**
  * Sends the client/agency notification and the lead's confirmation email
  * for an already-persisted lead. Never throws: the lead is already saved by
@@ -15,16 +17,40 @@ import type { Lead } from "@/types/domain/lead";
  * reaches the browser.
  */
 export async function sendLeadEmails(lead: Lead): Promise<void> {
+  const { smtpHost, smtpPort, smtpSecure, smtpUser, smtpPassword, emailFrom, leadNotificationEmail } =
+    emailConfig;
+  console.log("[email.service] Sending lead emails", {
+    smtpHost,
+    smtpPort,
+    smtpSecure,
+    smtpUser,
+    smtpPasswordSet: Boolean(smtpPassword),
+    emailFrom,
+    leadNotificationEmail,
+  });
+
   const results = await Promise.allSettled([
     sendLeadNotificationEmail(lead),
     sendLeadConfirmationEmail(lead),
   ]);
 
-  for (const result of results) {
-    if (result.status === "rejected") {
-      console.error("[email.service] Failed to send lead email", result.reason);
-    }
-  }
+  results.forEach((result, index) => {
+    if (result.status !== "rejected") return;
+
+    const reason = result.reason;
+    const cause = reason instanceof EmailError ? reason.cause : undefined;
+    const nodemailerError = cause as
+      | (Error & { code?: string; responseCode?: number; command?: string })
+      | undefined;
+
+    console.error(`[email.service] Failed to send lead ${SEND_LABELS[index]} email`, {
+      kind: reason instanceof EmailError ? reason.kind : undefined,
+      message: reason instanceof Error ? reason.message : String(reason),
+      code: nodemailerError?.code,
+      responseCode: nodemailerError?.responseCode,
+      command: nodemailerError?.command,
+    });
+  });
 }
 
 async function sendLeadNotificationEmail(lead: Lead): Promise<void> {
@@ -52,6 +78,7 @@ async function sendLeadNotificationEmail(lead: Lead): Promise<void> {
     throw new EmailError(
       error instanceof Error ? error.message : "SMTP send failed",
       "smtp",
+      { cause: error },
     );
   }
 }
@@ -77,6 +104,7 @@ async function sendLeadConfirmationEmail(lead: Lead): Promise<void> {
     throw new EmailError(
       error instanceof Error ? error.message : "SMTP send failed",
       "smtp",
+      { cause: error },
     );
   }
 }

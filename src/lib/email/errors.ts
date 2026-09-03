@@ -9,8 +9,8 @@ export type EmailErrorKind = "config" | "smtp";
 export class EmailError extends Error {
   readonly kind: EmailErrorKind;
 
-  constructor(message: string, kind: EmailErrorKind) {
-    super(message);
+  constructor(message: string, kind: EmailErrorKind, options?: { cause?: unknown }) {
+    super(message, options);
     this.name = "EmailError";
     this.kind = kind;
   }

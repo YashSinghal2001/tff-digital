@@ -9,11 +9,26 @@ function buildTransporter(): Transporter {
   const { smtpHost, smtpPort, smtpSecure, smtpUser, smtpPassword } = emailConfig;
 
   if (!smtpHost || !smtpUser || !smtpPassword) {
+    console.error("[smtp-client] Missing required SMTP config", {
+      smtpHostSet: Boolean(smtpHost),
+      smtpPort,
+      smtpSecure,
+      smtpUserSet: Boolean(smtpUser),
+      smtpPasswordSet: Boolean(smtpPassword),
+    });
     throw new EmailError(
       "SMTP_HOST, SMTP_USER, or SMTP_PASSWORD is not configured. Set them in your environment.",
       "config",
     );
   }
+
+  console.log("[smtp-client] SMTP transporter configured", {
+    smtpHost,
+    smtpPort,
+    smtpSecure,
+    smtpUser,
+    smtpPasswordSet: true,
+  });
 
   return nodemailer.createTransport({
     host: smtpHost,
