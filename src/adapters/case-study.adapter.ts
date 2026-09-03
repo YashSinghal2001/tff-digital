@@ -47,7 +47,7 @@ export function adaptCaseStudy(wpCaseStudy: WPCaseStudy): CaseStudy {
       ? adaptMedia(wpCaseStudy.featuredImage.node)
       : null,
     relatedServices:
-      fields?.relatedServices?.nodes.map(adaptServiceOffering) ?? [],
+      fields?.relatedServices?.nodes?.map(adaptServiceOffering) ?? [],
     seo: adaptSeo(wpCaseStudy.seo, {
       title: wpCaseStudy.title,
       description: summary,

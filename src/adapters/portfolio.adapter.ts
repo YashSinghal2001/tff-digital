@@ -16,7 +16,7 @@ export function adaptPortfolioItem(wpItem: WPPortfolioItem): PortfolioItem {
       ? adaptMedia(wpItem.featuredImage.node)
       : null,
     gallery: wpItem.gallery?.map(adaptMedia) ?? [],
-    categories: wpItem.categories?.nodes.map(adaptCategory) ?? [],
+    categories: wpItem.categories?.nodes?.map(adaptCategory) ?? [],
     seo: adaptSeo(wpItem.seo, {
       title: wpItem.title,
       description: wpItem.summary ?? "",

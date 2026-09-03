@@ -27,8 +27,8 @@ export function adaptPost(wpPost: WPPost): Post {
       ? adaptMedia(wpPost.featuredImage.node)
       : null,
     author: wpPost.author ? adaptAuthor(wpPost.author.node) : null,
-    categories: wpPost.categories?.nodes.map(adaptCategory) ?? [],
-    tags: wpPost.tags?.nodes.map(adaptTag) ?? [],
+    categories: wpPost.categories?.nodes?.map(adaptCategory) ?? [],
+    tags: wpPost.tags?.nodes?.map(adaptTag) ?? [],
     seo: adaptSeo(wpPost.seo, {
       title: wpPost.title,
       description: excerpt,
