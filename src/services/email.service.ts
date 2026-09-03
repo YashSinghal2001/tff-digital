@@ -1,5 +1,5 @@
 import "server-only";
-import { getResendClient } from "@/lib/email/resend-client";
+import { getSmtpTransporter } from "@/lib/email/smtp-client";
 import { emailConfig } from "@/config/email.config";
 import { EmailError } from "@/lib/email/errors";
 import { buildLeadNotificationEmail } from "@/lib/email/templates/lead-notification";
@@ -36,20 +36,23 @@ async function sendLeadNotificationEmail(lead: Lead): Promise<void> {
     );
   }
 
-  const resend = getResendClient();
+  const transporter = getSmtpTransporter();
   const { subject, html, text, replyTo } = buildLeadNotificationEmail(lead);
 
-  const { error } = await resend.emails.send({
-    from: emailFrom,
-    to: leadNotificationEmail,
-    replyTo,
-    subject,
-    html,
-    text,
-  });
-
-  if (error) {
-    throw new EmailError(error.message ?? "Resend API returned an error", "http");
+  try {
+    await transporter.sendMail({
+      from: emailFrom,
+      to: leadNotificationEmail,
+      replyTo,
+      subject,
+      html,
+      text,
+    });
+  } catch (error) {
+    throw new EmailError(
+      error instanceof Error ? error.message : "SMTP send failed",
+      "smtp",
+    );
   }
 }
 
@@ -59,18 +62,21 @@ async function sendLeadConfirmationEmail(lead: Lead): Promise<void> {
     throw new EmailError("EMAIL_FROM is not configured.", "config");
   }
 
-  const resend = getResendClient();
+  const transporter = getSmtpTransporter();
   const { subject, html, text } = buildLeadConfirmationEmail(lead);
 
-  const { error } = await resend.emails.send({
-    from: emailFrom,
-    to: lead.email,
-    subject,
-    html,
-    text,
-  });
-
-  if (error) {
-    throw new EmailError(error.message ?? "Resend API returned an error", "http");
+  try {
+    await transporter.sendMail({
+      from: emailFrom,
+      to: lead.email,
+      subject,
+      html,
+      text,
+    });
+  } catch (error) {
+    throw new EmailError(
+      error instanceof Error ? error.message : "SMTP send failed",
+      "smtp",
+    );
   }
 }

@@ -29,7 +29,7 @@ export async function submitContactForm(
 
   // Only notify once the lead is durably saved in WordPress. Email delivery
   // is a best-effort side effect from here on — sendLeadEmails never throws,
-  // so a Resend failure can't turn an already-successful submission into an
+  // so an SMTP failure can't turn an already-successful submission into an
   // error response (see src/services/email.service.ts).
   if (success) {
     const lead: Lead = {
