@@ -42,6 +42,15 @@ export async function submitContactFormAction(
             "The contact form isn't connected to WordPress yet. Please email us directly in the meantime.",
         };
       }
+      if (error.kind === "parse") {
+        // Reached-but-garbled (audit FORM-RT-1): "couldn't reach" would
+        // misattribute a malformed WordPress response as a network problem.
+        return {
+          success: false,
+          message:
+            "Our server sent back an unexpected response. Please try again in a moment.",
+        };
+      }
       return {
         success: false,
         message: "We couldn't reach our server just now. Please try again in a moment.",

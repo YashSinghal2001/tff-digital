@@ -8,6 +8,7 @@ import { wpLeadResponseSchema } from "@/schemas/api/lead.schema";
 import type { Lead, LeadSubmissionResult } from "@/types/domain/lead";
 import { sendLeadEmails } from "@/services/email.service";
 import { isHoneypotFilled } from "@/lib/forms/honeypot";
+import { parseWordPressResponse } from "@/lib/wordpress/parse-response";
 
 export async function submitContactForm(
   values: ContactFormValues,
@@ -38,7 +39,17 @@ export async function submitContactForm(
     source: "website",
   });
 
-  const response = wpLeadResponseSchema.parse(rawResponse);
+  // Through the shared boundary helper, not a bare .parse (audit
+  // FORM-RT-1): a raw ZodError here would be misread by the Server
+  // Action's `instanceof ZodError` branch as a form-input failure —
+  // "check the highlighted fields" for a malformed WordPress response.
+  // WordPressError(kind "parse") routes it to the server-error branch,
+  // which also carries the MONITOR-1 log line.
+  const response = parseWordPressResponse(
+    wpLeadResponseSchema,
+    rawResponse,
+    "createLead",
+  );
   const success = response.status === "success";
 
   // Only notify once the lead is durably saved in WordPress. Email delivery

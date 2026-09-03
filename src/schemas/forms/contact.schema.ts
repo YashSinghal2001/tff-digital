@@ -7,7 +7,15 @@ export const contactFormSchema = z.object({
   company: z.string().trim().optional(),
   serviceInterest: z.string().trim().min(1, "Select a service"),
   budget: z.string().trim().min(1, "Select a budget range"),
-  message: z.string().trim().min(10, "Message must be at least 10 characters"),
+  message: z
+    .string()
+    .trim()
+    .min(10, "Message must be at least 10 characters")
+    // Matches the WordPress plugin's TFF_HEADLESS_LEADS_MAX_MESSAGE cap
+    // (audit FORM-RT-1): without this, an oversized message sailed through
+    // to WordPress, got a 400, and surfaced as a misleading generic
+    // server error the user would retry forever.
+    .max(5000, "Message must be 5000 characters or fewer"),
   consent: z.literal(true, "You must consent to be contacted"),
   // Honeypot (audit FORM-2) — hidden from real visitors in ContactForm.tsx,
   // so any value here means a bot. Deliberately permissive at the schema

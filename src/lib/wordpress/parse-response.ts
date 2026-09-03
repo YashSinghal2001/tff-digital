@@ -5,8 +5,9 @@ import { z } from "zod";
 import { WordPressError } from "./errors.ts";
 
 /**
- * Validates a WordPress GraphQL response against its expected shape before
- * it enters the application (audit CQ-1). Until now every response was
+ * Validates a WordPress response (GraphQL or REST) against its expected
+ * shape before it enters the application (audit CQ-1; the REST lead
+ * response joined via audit FORM-RT-1). Until now every response was
  * trusted via a bare `as` cast, so a malformed response — a WPGraphQL
  * schema change, a plugin update, a renamed field — surfaced as `undefined`
  * propagation or a stray TypeError deep in a component. This turns it into
@@ -32,7 +33,7 @@ export function parseWordPressResponse<TSchema extends z.ZodType>(
     .join("; ");
 
   throw new WordPressError(
-    `WPGraphQL response for ${queryLabel} did not match the expected shape (${issues})`,
+    `WordPress response for ${queryLabel} did not match the expected shape (${issues})`,
     "parse",
   );
 }
