@@ -12,7 +12,7 @@ import {
   LinkedInIcon,
   FacebookIcon,
 } from "@/components/icons/social-icons";
-import { fadeInUp } from "@/styles/animations";
+import { fadeInUpOnMount } from "@/styles/animations";
 
 const businessInfo: Array<{ icon: typeof Mail; label: string; href?: string }> = [
   { icon: Mail, label: "info@tffdigital.com", href: "mailto:info@tffdigital.com" },
@@ -34,13 +34,17 @@ export function ContactFormSection() {
         {/* Visually hidden: keeps the h1 -> h3 "Business info" heading in valid order without adding a visible section title the design doesn't call for. */}
         <h2 className="sr-only">Contact form and business information</h2>
         <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
-          <motion.div {...fadeInUp}>
+          {/* Mount-triggered, not scroll-triggered: this section is above the
+              fold and holds the site's primary CTA, so it must never depend on
+              an IntersectionObserver callback to become visible and clickable
+              (audit FORM-RT-2). */}
+          <motion.div {...fadeInUpOnMount}>
             <ContactForm />
           </motion.div>
 
           <motion.div
-            {...fadeInUp}
-            transition={{ ...fadeInUp.transition, delay: 0.1 }}
+            {...fadeInUpOnMount}
+            transition={{ ...fadeInUpOnMount.transition, delay: 0.1 }}
             className="flex flex-col gap-6"
           >
             <Card>

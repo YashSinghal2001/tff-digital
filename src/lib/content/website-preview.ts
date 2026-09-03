@@ -1,3 +1,5 @@
+import { isSafeProjectUrl } from "@/lib/content/project-url";
+
 const PREVIEW_WIDTH = 800;
 const PREVIEW_HEIGHT = 600;
 
@@ -37,26 +39,17 @@ function isPrivateOrLocalHostname(hostnameRaw: string): boolean {
 /**
  * True only for a Project URL safe to hand to the preview service: a
  * syntactically valid http(s) URL that isn't localhost or a private/internal
- * address. Rejects everything else, including non-URL strings and other
- * schemes (javascript:, data:, file:, ...) by construction — only http/https
- * ever passes.
+ * address. The scheme half is isSafeProjectUrl — shared with the case-study
+ * page's "Visit project" link so both consumers of this WordPress field
+ * reject javascript:/data:/file: identically; the private-host half is
+ * specific to handing a URL to a third-party fetcher and stays here.
  */
 export function isPreviewableProjectUrl(
   projectUrl: string | null | undefined,
 ): projectUrl is string {
-  if (!projectUrl) return false;
+  if (!isSafeProjectUrl(projectUrl)) return false;
 
-  let parsed: URL;
-  try {
-    parsed = new URL(projectUrl);
-  } catch {
-    return false;
-  }
-
-  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return false;
-  if (isPrivateOrLocalHostname(parsed.hostname)) return false;
-
-  return true;
+  return !isPrivateOrLocalHostname(new URL(projectUrl).hostname);
 }
 
 /**

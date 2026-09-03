@@ -27,6 +27,7 @@ import { buildCaseStudyJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo/json-ld";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { getCanonicalUrl } from "@/lib/seo/canonical";
 import { htmlToPlainText } from "@/lib/content/post-content";
+import { isSafeProjectUrl } from "@/lib/content/project-url";
 import { ROUTES } from "@/constants/routes";
 
 interface CaseStudyPageProps {
@@ -96,6 +97,12 @@ export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
 
   const canonicalUrl = getCanonicalUrl(ROUTES.caseStudy(slug));
 
+  // WordPress stores Project URL as unvalidated free text, so a javascript:
+  // value would otherwise reach an href and run in this site's own origin
+  // (audit SEC3-1). Anything but http/https drops the link entirely, matching
+  // how the homepage's preview pipeline already falls back on the same field.
+  const projectUrl = isSafeProjectUrl(caseStudy.projectUrl) ? caseStudy.projectUrl : null;
+
   return (
     <>
       <JsonLd
@@ -136,12 +143,12 @@ export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
 
             <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 font-body text-sm text-muted">
               {caseStudy.clientName ? <span>{caseStudy.clientName}</span> : null}
-              {caseStudy.clientName && caseStudy.projectUrl ? (
+              {caseStudy.clientName && projectUrl ? (
                 <span aria-hidden="true">·</span>
               ) : null}
-              {caseStudy.projectUrl ? (
+              {projectUrl ? (
                 <Link
-                  href={caseStudy.projectUrl}
+                  href={projectUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 text-primary hover:underline"

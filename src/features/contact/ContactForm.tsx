@@ -98,6 +98,22 @@ export function ContactForm() {
         error={errors.message?.message}
       />
 
+      {/* Honeypot (audit FORM-2): off-screen, out of the tab order and hidden
+          from assistive tech, so no real visitor can reach or fill it — bots
+          that fill every input in the DOM do. The value is judged on the
+          server (contact.service.ts), so removing this field in devtools
+          doesn't get a spam submission through. */}
+      <div aria-hidden="true" className="absolute left-[-9999px] h-0 w-0 overflow-hidden">
+        <label htmlFor="website">Website</label>
+        <input
+          id="website"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          {...register("website")}
+        />
+      </div>
+
       {submitError ? (
         <p role="alert" className="text-center font-body text-sm text-red-400">
           {submitError}
