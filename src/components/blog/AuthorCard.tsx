@@ -1,6 +1,5 @@
-import Image from "next/image";
-import { UserRound } from "lucide-react";
 import type { Author } from "@/types/domain/author";
+import { AuthorAvatar } from "@/components/blog/AuthorAvatar";
 import { cn } from "@/lib/utils";
 
 export interface AuthorCardProps {
@@ -17,17 +16,14 @@ export function AuthorCard({ author, className }: AuthorCardProps) {
       )}
     >
       <span className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border-strong bg-white/5 text-primary">
-        {author.avatar ? (
-          <Image
-            src={author.avatar.url}
-            alt={author.avatar.altText || author.name}
-            fill
-            sizes="56px"
-            className="object-cover"
-          />
-        ) : (
-          <UserRound className="h-6 w-6" aria-hidden="true" />
-        )}
+        {/* Keyed by URL so an error latched on one author's avatar can't
+            survive a client-side navigation to another author (mirrors
+            SelectedWork's per-card key). */}
+        <AuthorAvatar
+          key={author.avatar?.url ?? "none"}
+          src={author.avatar?.url ?? null}
+          alt={author.avatar?.altText || author.name}
+        />
       </span>
 
       <div>
