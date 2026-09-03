@@ -29,6 +29,16 @@ import { ROUTES } from "@/constants/routes";
 export async function GET(request: NextRequest) {
   const secret = request.nextUrl.searchParams.get("secret");
   if (!isValidPreviewSecret(secret)) {
+    // A probing attempt previously left zero server-side trace (audit
+    // LOG-1). Deliberately never logs the attempted value or any
+    // derivative — it could be a near-miss of the real secret — and never
+    // request.url/nextUrl, whose query string contains it. The response
+    // body stays the same generic 401 either way (fingerprinting note
+    // above).
+    console.warn(
+      "[preview/case-study] Rejected preview request: invalid or missing secret",
+      { hadSecret: secret !== null },
+    );
     return new NextResponse("Invalid preview secret", { status: 401 });
   }
 

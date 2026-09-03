@@ -26,6 +26,15 @@ export async function submitContactFormAction(
     }
 
     if (isWordPressError(error)) {
+      // The lead was NOT saved. Without this line a WordPress-save failure
+      // left zero server-side trace (audit MONITOR-1); the prefix keeps it
+      // distinguishable from [email.service]'s delivery-failure logs. Never
+      // log the submitted form values — kind + message carry no PII.
+      console.error("submitContactFormAction: lead not saved to WordPress", {
+        kind: error.kind,
+        message: error.message,
+      });
+
       if (error.kind === "config") {
         return {
           success: false,

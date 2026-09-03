@@ -19,6 +19,12 @@ import { ROUTES } from "@/constants/routes";
 export async function GET(request: NextRequest) {
   const secret = request.nextUrl.searchParams.get("secret");
   if (!isValidPreviewSecret(secret)) {
+    // Mirrors case-study/route.ts: log the rejection (audit LOG-1), never
+    // the attempted value; response body unchanged.
+    console.warn(
+      "[preview/service] Rejected preview request: invalid or missing secret",
+      { hadSecret: secret !== null },
+    );
     return new NextResponse("Invalid preview secret", { status: 401 });
   }
 
