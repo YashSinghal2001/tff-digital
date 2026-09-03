@@ -43,7 +43,7 @@ export async function findCaseStudyBySlug(
 /**
  * Authenticated draft/preview lookup — never called from a public request
  * path (see src/services/case-study.service.ts). `cache: "no-store"`
- * deliberately bypasses the public queries' 60s ISR window: draft content
+ * deliberately bypasses the public queries' 30s ISR window: draft content
  * must never be cached, and must never risk mixing into the shared data
  * cache that public requests read from.
  */

@@ -31,7 +31,7 @@ interface BlogPostPageProps {
 }
 
 // Prerender every known post at build time. The static copies revalidate via
-// the fetch-level 60s ISR window, and when a revalidation fails Next keeps
+// the fetch-level 30s ISR window, and when a revalidation fails Next keeps
 // serving the last good HTML — so a CMS outage can no longer 500 an existing
 // article (observed live 2026-09 on the only real post). Soft getPosts: a
 // build-time outage yields [] and the build still succeeds; slugs then render

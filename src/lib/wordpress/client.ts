@@ -39,15 +39,22 @@ export async function fetchGraphQL<TData>(
     );
   }
 
-  // No caller currently passes `cache` or `next`, so this default applies
-  // globally: uncached WordPress fetches become ISR (revalidate every 60s)
+  // No caller passes `next`; only the preview fetches pass `cache`. So this
+  // default applies globally: WordPress fetches become ISR (revalidate every 30s)
   // instead of Next.js's implicit permanent static cache. An explicit
   // `cache` always wins and is never combined with `next.revalidate`,
   // since fetch() rejects requests that set both.
+  //
+  // 30s, down from the original 60s (audit CACHE-1): halves how long a
+  // deleted/unpublished CMS entry can keep serving in normal operation.
+  // Deliberately a mitigation, not a cure — during a CMS outage no
+  // revalidation succeeds at any interval and Next keeps serving the last
+  // good HTML (proven, desired resilience); the audit's webhook option was
+  // evaluated and declined 2026-09-03 to avoid new attack surface.
   const cacheOption = options?.cache;
   const nextOption = cacheOption
     ? undefined
-    : (options?.next ?? { revalidate: 60 });
+    : (options?.next ?? { revalidate: 30 });
 
   let response: Response;
   try {
