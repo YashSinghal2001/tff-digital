@@ -7,6 +7,7 @@ import { buildLeadConfirmationEmail } from "@/lib/email/templates/lead-confirmat
 import type { Lead } from "@/types/domain/lead";
 
 const SEND_LABELS = ["notification", "confirmation"] as const;
+const SENDER_NAME = "TFF Digital";
 
 /**
  * Sends the client/agency notification and the lead's confirmation email
@@ -67,7 +68,7 @@ async function sendLeadNotificationEmail(lead: Lead): Promise<void> {
 
   try {
     await transporter.sendMail({
-      from: emailFrom,
+      from: { name: SENDER_NAME, address: emailFrom },
       to: leadNotificationEmail,
       replyTo,
       subject,
@@ -94,7 +95,7 @@ async function sendLeadConfirmationEmail(lead: Lead): Promise<void> {
 
   try {
     await transporter.sendMail({
-      from: emailFrom,
+      from: { name: SENDER_NAME, address: emailFrom },
       to: lead.email,
       subject,
       html,
