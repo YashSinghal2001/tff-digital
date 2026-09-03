@@ -13,6 +13,10 @@ import { Container } from "@/components/ui/Container";
 import { JsonLd } from "@/components/common/JsonLd";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/json-ld";
 import { getCanonicalUrl } from "@/lib/seo/canonical";
+import {
+  firstSearchParam,
+  type SearchParamValue,
+} from "@/lib/routing/search-params";
 import { ROUTES } from "@/constants/routes";
 
 export const metadata: Metadata = {
@@ -23,12 +27,15 @@ export const metadata: Metadata = {
 };
 
 interface BlogPageProps {
-  searchParams: Promise<{ q?: string; after?: string }>;
+  searchParams: Promise<{ q?: SearchParamValue; after?: SearchParamValue }>;
 }
 
 export default async function BlogPage({ searchParams }: BlogPageProps) {
-  const { q, after } = await searchParams;
-  const query = q?.trim() || undefined;
+  // Both keys are normalized: a repeated `?q=a&q=b` or `?after=x&after=y`
+  // arrives as an array and used to crash the render (SMOKE-2).
+  const params = await searchParams;
+  const query = firstSearchParam(params.q)?.trim() || undefined;
+  const after = firstSearchParam(params.after);
 
   // Primary results are strict: a CMS failure surfaces as the route's error
   // boundary (5xx) instead of a 200 claiming "No articles yet" — that false

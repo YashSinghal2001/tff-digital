@@ -16,11 +16,15 @@ import { BlogSidebar } from "@/components/blog/BlogSidebar";
 import { JsonLd } from "@/components/common/JsonLd";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/json-ld";
 import { getCanonicalUrl } from "@/lib/seo/canonical";
+import {
+  firstSearchParam,
+  type SearchParamValue,
+} from "@/lib/routing/search-params";
 import { ROUTES } from "@/constants/routes";
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ after?: string }>;
+  searchParams: Promise<{ after?: SearchParamValue }>;
 }
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
@@ -37,7 +41,9 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 
 export default async function BlogCategoryPage({ params, searchParams }: CategoryPageProps) {
   const { slug } = await params;
-  const { after } = await searchParams;
+  // Same array-valued key guard as the blog listing (SMOKE-2): this route
+  // didn't 500 on it, but it did forward the array into a GraphQL String.
+  const after = firstSearchParam((await searchParams).after);
 
   // Strict: the category list doubles as the existence check for notFound()
   // below. The soft variant swallows a CMS outage into [], which turned every

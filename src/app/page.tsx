@@ -50,9 +50,14 @@ export default async function Home() {
   // state — never invented content — while none are published.
   const caseStudies = await getCaseStudies({ first: 20 });
 
+  // `seo` is dropped here, not just excluded from SelectedWork's prop type:
+  // types are erased at runtime, so the field has to actually leave the object
+  // to stay out of the serialized client payload (SEO-2). The homepage's own
+  // crawlable JSON-LD is built separately and is unaffected.
   const featuredCaseStudies = filterPlaceholderCaseStudies(caseStudies.items)
     .filter((caseStudy) => caseStudy.featuredOnHomepage)
-    .slice(0, 4);
+    .slice(0, 4)
+    .map(({ seo: _seo, ...caseStudy }) => caseStudy);
 
   return (
     <>

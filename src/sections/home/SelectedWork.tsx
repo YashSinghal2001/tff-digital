@@ -16,8 +16,18 @@ import { fadeInUp } from "@/styles/animations";
 import { getWebsitePreviewUrl } from "@/lib/content/website-preview";
 import type { CaseStudy } from "@/types/domain/case-study";
 
+/**
+ * Every prop of a Client Component is serialized into the RSC hydration
+ * payload, so passing a whole `CaseStudy` also shipped its unread `seo` field
+ * — including the raw Yoast graph, which embeds `cms.tffdigital.com` URLs in
+ * the homepage's page source (SEO-2). This component never reads `.seo`, so
+ * excluding it from the prop type keeps the CMS hostname out of the payload
+ * and makes a future accidental re-introduction a type error.
+ */
+export type SelectedWorkCaseStudy = Omit<CaseStudy, "seo">;
+
 export interface SelectedWorkProps {
-  caseStudies: CaseStudy[];
+  caseStudies: SelectedWorkCaseStudy[];
 }
 
 export function SelectedWork({ caseStudies }: SelectedWorkProps) {
@@ -61,7 +71,7 @@ export function SelectedWork({ caseStudies }: SelectedWorkProps) {
 }
 
 interface SelectedWorkCardProps {
-  caseStudy: CaseStudy;
+  caseStudy: SelectedWorkCaseStudy;
   index: number;
 }
 

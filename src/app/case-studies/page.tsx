@@ -9,6 +9,10 @@ import { CaseStudyCard } from "@/sections/case-studies/CaseStudyCard";
 import { JsonLd } from "@/components/common/JsonLd";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/json-ld";
 import { getCanonicalUrl } from "@/lib/seo/canonical";
+import {
+  firstSearchParam,
+  type SearchParamValue,
+} from "@/lib/routing/search-params";
 import { ROUTES } from "@/constants/routes";
 
 export const metadata: Metadata = {
@@ -18,11 +22,13 @@ export const metadata: Metadata = {
 };
 
 interface CaseStudiesPageProps {
-  searchParams: Promise<{ after?: string }>;
+  searchParams: Promise<{ after?: SearchParamValue }>;
 }
 
 export default async function CaseStudiesPage({ searchParams }: CaseStudiesPageProps) {
-  const { after } = await searchParams;
+  // A repeated `?after=x&after=y` used to reach the GraphQL String variable as
+  // an array, failing the strict fetch below into a 500 (SMOKE-2).
+  const after = firstSearchParam((await searchParams).after);
   // Strict: case studies are this page's PRIMARY content, so a CMS failure
   // surfaces as the route's error boundary (5xx) instead of a 200 claiming
   // "No case studies yet" — the same strict/soft split as the blog listing.
