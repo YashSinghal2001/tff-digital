@@ -111,7 +111,7 @@ export function TermsBody() {
 
             <h2>12. Governing Law / Jurisdiction</h2>
             <p>
-              These Terms shall be governed by the laws of [GOVERNING JURISDICTION], without
+              These Terms shall be governed by the laws of India, without
               regard to its conflict of law principles.
             </p>
 

@@ -118,7 +118,7 @@ export function PrivacyPolicyBody() {
               information, such as the right to access, correct, or request deletion of the
               information we hold about you. To exercise any of these rights, contact us using the
               details in the &ldquo;Contact Us&rdquo; section below. Additional rights may apply
-              to you under [GOVERNING JURISDICTION] privacy law.
+              to you under Indian privacy law.
             </p>
 
             <h2>11. Children&rsquo;s Privacy</h2>
