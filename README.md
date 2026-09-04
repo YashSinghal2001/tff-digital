@@ -20,6 +20,22 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Testing
+
+```bash
+npm test
+```
+
+Runs every `src/**/*.test.ts` file with Node's built-in test runner — no
+Jest/Vitest. Requires Node 22.18 or newer (native TypeScript type stripping
+plus module mocks); the suite is verified on Node 22 and 26. `test/register.mjs` installs the resolution hooks in
+`test/hooks.mjs` so tests import the real production modules (the `@/`
+alias, `server-only` modules, and `next/*` entries all resolve), and the
+`--experimental-test-module-mocks` flag enables `mock.module()` for the
+few request-scoped or network-facing dependencies a test has to stub.
+Components and pages (`.tsx`) are outside this runner's reach — Node does
+not transform JSX — so those stay covered by typecheck, lint and the build.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
