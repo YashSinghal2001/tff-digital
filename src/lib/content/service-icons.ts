@@ -10,6 +10,8 @@ import {
   FileText,
   UserRound,
   Sparkles,
+  BrainCircuit,
+  Workflow,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -30,10 +32,21 @@ const SERVICE_ICONS: Record<string, LucideIcon> = {
   "graphic-design": PenTool,
   "content-marketing": FileText,
   "personal-branding": UserRound,
+  // Slugs of the services currently published in WordPress (PARITY-1)
+  "ai-consulting": BrainCircuit,
+  "ai-automation": Workflow,
+  "digital-marketing": Megaphone,
+  "wordpress-development": CodeXml,
+  "seo-optimization": Search,
+  "ui-ux-design": Palette,
 };
 
 const DEFAULT_SERVICE_ICON: LucideIcon = Sparkles;
 
 export function getServiceIcon(slug: string): LucideIcon {
-  return SERVICE_ICONS[slug] ?? DEFAULT_SERVICE_ICON;
+  // Own-property check: a slug like "constructor" or "__proto__" must fall
+  // back instead of returning an inherited Object.prototype member.
+  return Object.hasOwn(SERVICE_ICONS, slug)
+    ? SERVICE_ICONS[slug]
+    : DEFAULT_SERVICE_ICON;
 }
