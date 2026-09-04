@@ -77,6 +77,7 @@ export function Footer() {
               <form onSubmit={onSubscribe} className="mt-3 flex max-w-xs gap-2">
                 <Input
                   type="email"
+                  aria-label="Email address"
                   placeholder="you@company.com"
                   required
                   value={email}

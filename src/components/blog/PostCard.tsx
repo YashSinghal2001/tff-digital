@@ -20,6 +20,9 @@ export function PostCard({ post, className, priority = false }: PostCardProps) {
   return (
     <Link
       href={ROUTES.blogPost(post.slug)}
+      // The whole card is one link, so its computed name would concatenate
+      // badge, title, excerpt, author, date, and reading time (CARDA11Y-1).
+      aria-label={post.title}
       className={cn(
         "group flex h-full flex-col overflow-hidden rounded-[25px] border border-border-strong bg-glass transition-colors hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
         className,

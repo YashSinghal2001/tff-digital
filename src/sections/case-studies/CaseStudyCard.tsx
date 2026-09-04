@@ -17,6 +17,9 @@ export function CaseStudyCard({ caseStudy, className, priority = false }: CaseSt
   return (
     <Link
       href={ROUTES.caseStudy(caseStudy.slug)}
+      // The whole card is one link, so its computed name would concatenate
+      // badge, title, summary, client, and result stat (CARDA11Y-1).
+      aria-label={caseStudy.title}
       className={cn(
         "group flex h-full flex-col overflow-hidden rounded-[25px] border border-border-strong bg-glass transition-colors hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
         className,

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 export interface AutoRotatingImageProps {
@@ -23,15 +24,18 @@ export function AutoRotatingImage({
   imageClassName,
 }: AutoRotatingImageProps) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const reducedMotion = useReducedMotion();
 
   useEffect(() => {
-    if (images.length < 2) return;
+    // Continuous decorative motion pauses under prefers-reduced-motion
+    // (A11Y-5) — same autoplay guard as the testimonial/team carousels.
+    if (images.length < 2 || reducedMotion) return;
     const id = setInterval(
       () => setActiveIndex((index) => (index + 1) % images.length),
       intervalMs,
     );
     return () => clearInterval(id);
-  }, [images.length, intervalMs]);
+  }, [images.length, intervalMs, reducedMotion]);
 
   return (
     <>

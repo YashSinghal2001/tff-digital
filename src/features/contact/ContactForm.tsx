@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { contactFormSchema, type ContactFormValues } from "@/schemas/forms/contact.schema";
@@ -14,6 +14,25 @@ import { serviceOptions, budgetOptions } from "@/constants/contact-form";
 export function ContactForm() {
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const successRef = useRef<HTMLDivElement>(null);
+  const wasSubmitted = useRef(false);
+
+  // On success the whole form unmounts — including the submit button that
+  // held focus, which would silently strand focus on <body>. Moving focus to
+  // the success panel gives keyboard users a cue and makes screen readers
+  // read the confirmation; role="status" on the panel backs that up
+  // (FORMA11Y-1, matching the Footer newsletter's existing pattern). The
+  // reverse path has the same problem — "Send another message" unmounts the
+  // focused button — so focus moves to the first field when the form returns.
+  useEffect(() => {
+    if (submitted) {
+      wasSubmitted.current = true;
+      successRef.current?.focus();
+    } else if (wasSubmitted.current) {
+      wasSubmitted.current = false;
+      document.getElementById("name")?.focus();
+    }
+  }, [submitted]);
   const {
     register,
     handleSubmit,
@@ -41,7 +60,12 @@ export function ContactForm() {
 
   if (submitted) {
     return (
-      <div className="flex flex-col items-center justify-center gap-3 rounded-[25px] border border-border-strong bg-glass p-10 text-center">
+      <div
+        ref={successRef}
+        tabIndex={-1}
+        role="status"
+        className="flex flex-col items-center justify-center gap-3 rounded-[25px] border border-border-strong bg-glass p-10 text-center outline-none"
+      >
         <p className="font-heading text-lg font-bold text-white">Message sent</p>
         <p className="font-body text-sm text-muted">
           Thanks for reaching out — we&apos;ll get back to you within 24 hours.

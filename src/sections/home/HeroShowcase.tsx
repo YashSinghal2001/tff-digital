@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useReducedMotion } from "framer-motion";
 import {
   BarChart3,
   ChartLine,
@@ -108,14 +109,18 @@ const cornerClasses = [
  */
 export function HeroShowcase() {
   const [activeIndex, setActiveIndex] = useState(0);
+  const reducedMotion = useReducedMotion();
 
   useEffect(() => {
+    // Continuous decorative motion pauses under prefers-reduced-motion
+    // (A11Y-5) — same autoplay guard as the testimonial/team carousels.
+    if (reducedMotion) return;
     const id = setInterval(
       () => setActiveIndex((index) => (index + 1) % slides.length),
       4000,
     );
     return () => clearInterval(id);
-  }, []);
+  }, [reducedMotion]);
 
   return (
     <div className="relative mx-auto flex h-[320px] w-[320px] items-center justify-center rounded-full bg-white/5 sm:h-[400px] sm:w-[400px] lg:h-[min(400px,52vh)] lg:w-[min(400px,52vh)]">
