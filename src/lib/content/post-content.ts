@@ -1,7 +1,71 @@
 const WORDS_PER_MINUTE = 200;
 
+// WordPress's common named entities (CONTENT-1). Deliberately not a full
+// HTML5 table: rendered WP content uses this handful plus numeric forms, and
+// an unknown name passes through unchanged rather than guessing.
+const NAMED_ENTITIES: Record<string, string> = {
+  amp: "&",
+  lt: "<",
+  gt: ">",
+  quot: '"',
+  apos: "'",
+  nbsp: " ",
+  hellip: "…",
+  ndash: "–",
+  mdash: "—",
+  lsquo: "‘",
+  rsquo: "’",
+  ldquo: "“",
+  rdquo: "”",
+  copy: "©",
+  reg: "®",
+  trade: "™",
+};
+
+// Single scan over named, decimal, and hex forms — one pass means a decoded
+// "&" can never combine with following text and be decoded again within the
+// same call. Never throws: out-of-range/surrogate/NUL code points and unknown
+// names are left verbatim (a throwing decoder would turn a degraded CMS
+// payload into a 5xx on soft-fetch routes). The `i` flag deliberately folds
+// case on names (&AMP; works; the exotic case-distinct pair &Lt;/&Gt; = ≪/≫
+// collapses to </> — accepted, they don't occur in WP marketing copy).
+function decodeHtmlEntities(text: string): string {
+  return text.replace(
+    /&(?:#x([0-9a-f]+)|#(\d+)|([a-z]+));/gi,
+    (
+      match,
+      hex: string | undefined,
+      dec: string | undefined,
+      name: string | undefined,
+    ) => {
+      if (hex || dec) {
+        const code = hex ? parseInt(hex, 16) : Number(dec);
+        if (
+          code === 0 ||
+          code > 0x10ffff ||
+          (code >= 0xd800 && code <= 0xdfff)
+        ) {
+          return match;
+        }
+        return String.fromCodePoint(code);
+      }
+      return NAMED_ENTITIES[(name as string).toLowerCase()] ?? match;
+    },
+  );
+}
+
+/**
+ * Tags stripped, then entities decoded — in that order: decoding first would
+ * turn author-escaped markup (`&lt;b&gt;`) into real tags the stripper then
+ * eats. The output is plain TEXT that may legitimately contain <, > and &,
+ * so it must only ever reach escaping sinks (React text nodes, metadata
+ * attributes, JsonLd's <-escaped script) — never dangerouslySetInnerHTML.
+ * Known limit: applying stripHtml twice to the same value decodes
+ * double-encoded sequences twice ("&amp;hellip;" → "…"); acceptable per the
+ * audit ("purely additive text-quality fix", CONTENT-1).
+ */
 export function stripHtml(html: string): string {
-  return html.replace(/<[^>]*>/g, " ");
+  return decodeHtmlEntities(html.replace(/<[^>]*>/g, " "));
 }
 
 /** Plain-text version of a WP HTML fragment: tags stripped, whitespace collapsed. */
