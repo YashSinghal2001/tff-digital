@@ -104,16 +104,23 @@ export function FAQ({ items = faqs }: FAQProps) {
                       aria-hidden="true"
                     />
                   </button>
-                  {isOpen ? (
-                    <p
-                      id={`faq-answer-${index}`}
-                      role="region"
-                      aria-labelledby={`faq-question-${index}`}
-                      className="px-5 pb-4 font-body text-sm text-muted"
-                    >
-                      {faq.answer}
-                    </p>
-                  ) : null}
+                  {/* Always in the DOM, collapsed via the hidden attribute
+                      (display:none) rather than omitted — a conditional mount
+                      left every answer but the default-open one out of the
+                      server HTML entirely, invisible to any non-clicking
+                      consumer, and left aria-controls pointing at IDs that
+                      didn't exist (CONTENT-Q4). Tailwind preflight enforces
+                      [hidden]{display:none!important}, so keep collapse on
+                      this attribute — don't swap it for a display utility. */}
+                  <p
+                    id={`faq-answer-${index}`}
+                    role="region"
+                    aria-labelledby={`faq-question-${index}`}
+                    hidden={!isOpen}
+                    className="px-5 pb-4 font-body text-sm text-muted"
+                  >
+                    {faq.answer}
+                  </p>
                 </motion.div>
               );
             })}
