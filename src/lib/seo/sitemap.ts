@@ -3,6 +3,10 @@ import { getCanonicalUrl } from "@/lib/seo/canonical";
 import { ROUTES } from "@/constants/routes";
 import { getPosts } from "@/services/post.service";
 import { getCaseStudies } from "@/services/case-study.service";
+import {
+  getCategoriesStrict,
+  getTagsStrict,
+} from "@/services/taxonomy.service";
 // TEMPORARY: WP service entries removed from the sitemap while the CMS holds
 // placeholder services — see src/data/temporary-services.ts.
 // TODO: RESTORE WORDPRESS DATA
@@ -70,6 +74,38 @@ async function getCaseStudyEntries(): Promise<SitemapEntry[]> {
   }
 }
 
+// Category/tag archive pages are live, indexable routes linked from the blog
+// sidebar, so they belong here too (SITEMAP-1). Strict fetchers inside this
+// catch — one swallowing layer with a sitemap-specific message. The GraphQL
+// queries use hideEmpty, so termless categories/tags never reach this code;
+// the slug guard keeps a malformed empty-slug term from emitting a bare
+// /blog/category/ URL. Neither Category nor Tag carries a modified date in
+// the domain model, so these entries have no lastModified.
+async function getTaxonomyEntries(): Promise<SitemapEntry[]> {
+  try {
+    const [categories, tags] = await Promise.all([
+      getCategoriesStrict(),
+      getTagsStrict(),
+    ]);
+    return [
+      ...categories
+        .filter((category) => category.slug)
+        .map((category) => ({
+          url: getCanonicalUrl(ROUTES.blogCategory(category.slug)),
+        })),
+      ...tags
+        .filter((tag) => tag.slug)
+        .map((tag) => ({ url: getCanonicalUrl(ROUTES.blogTag(tag.slug)) })),
+    ];
+  } catch (error) {
+    console.error(
+      "[getAllSitemapEntries] WPGraphQL request failed; sitemap will omit blog categories/tags for this build.",
+      error,
+    );
+    return [];
+  }
+}
+
 // TEMPORARY: WP service entries removed while the CMS holds placeholder
 // services. TODO: RESTORE WORDPRESS DATA — restore this alongside the grids:
 // async function getServiceOfferingEntries(): Promise<SitemapEntry[]> {
@@ -93,10 +129,16 @@ export async function getAllSitemapEntries(): Promise<SitemapEntry[]> {
     url: getCanonicalUrl(route),
   }));
 
-  const [postEntries, caseStudyEntries] = await Promise.all([
+  const [postEntries, taxonomyEntries, caseStudyEntries] = await Promise.all([
     getBlogPostEntries(),
+    getTaxonomyEntries(),
     getCaseStudyEntries(),
   ]);
 
-  return [...staticEntries, ...postEntries, ...caseStudyEntries];
+  return [
+    ...staticEntries,
+    ...postEntries,
+    ...taxonomyEntries,
+    ...caseStudyEntries,
+  ];
 }
