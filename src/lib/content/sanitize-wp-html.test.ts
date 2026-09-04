@@ -179,6 +179,73 @@ describe("sanitizeWpHtml — adversarial payloads", () => {
     );
   });
 
+  test("ids that could clobber a window global are dropped; slug-shaped ids survive", () => {
+    for (const id of [
+      "__next_f",
+      "webpackChunk_N_E",
+      "__NEXT_DATA__",
+      "Intro Section",
+      "x_y",
+      "-lead",
+      "__proto__",
+    ]) {
+      assert.equal(sanitizeWpHtml(`<h2 id="${id}">t</h2>`), "<h2>t</h2>", id);
+      assert.equal(sanitizeWpHtml(`<li id="${id}">t</li>`), "<li>t</li>", id);
+      assert.equal(
+        sanitizeWpHtml(`<a id="${id}" href="#x">t</a>`),
+        '<a href="#x">t</a>',
+        id,
+      );
+    }
+    assert.equal(
+      sanitizeWpHtml('<h2 id="what-is-seo-2">t</h2>'),
+      '<h2 id="what-is-seo-2">t</h2>',
+    );
+    assert.equal(
+      sanitizeWpHtml('<h2 id="Intro">t</h2>'),
+      "<h2>t</h2>",
+      "uppercase is rejected",
+    );
+  });
+
+  test("iframe hosts outside the CSP frame-src list lose their src", () => {
+    assert.equal(
+      sanitizeWpHtml('<iframe src="https://evil.test/phish"></iframe>'),
+      "<iframe></iframe>",
+    );
+    assert.equal(
+      sanitizeWpHtml(
+        '<iframe src="https://www.youtube-nocookie.com/embed/x"></iframe>',
+      ),
+      '<iframe src="https://www.youtube-nocookie.com/embed/x"></iframe>',
+    );
+    assert.equal(
+      sanitizeWpHtml(
+        '<iframe src="https://www.google.com/maps/embed?pb=1"></iframe>',
+      ),
+      '<iframe src="https://www.google.com/maps/embed?pb=1"></iframe>',
+    );
+  });
+
+  test("target=_blank links get noopener and can't opt back in with rel=opener", () => {
+    assert.equal(
+      sanitizeWpHtml(
+        '<a href="https://x.test" target="_blank" rel="opener">x</a>',
+      ),
+      '<a href="https://x.test" target="_blank" rel="noopener">x</a>',
+    );
+    assert.equal(
+      sanitizeWpHtml(
+        '<a href="https://x.test" target="_blank" rel="noreferrer noopener nofollow">x</a>',
+      ),
+      '<a href="https://x.test" target="_blank" rel="noreferrer noopener nofollow">x</a>',
+    );
+    assert.equal(
+      sanitizeWpHtml('<a href="https://x.test" rel="me bogus">x</a>'),
+      '<a href="https://x.test">x</a>',
+    );
+  });
+
   test("a corpus of known bypass shapes all come out inert and idempotent", () => {
     const corpus = [
       '<p title="</p><img src=x onerror=alert(1)>">',
@@ -215,7 +282,7 @@ describe("sanitizeWpHtml — legitimate WordPress formatting survives", () => {
   test("the live post's exact markup shapes pass through", () => {
     const wp =
       '<h2 class="wp-block-heading" id="what-is-seo-for-small-businesses">What is SEO?</h2>' +
-      '<p class="wp-block-paragraph">Body &amp; text</p>' +
+      '<p class="wp-block-paragraph" data-start="0" data-end="10">Body &amp; text</p>' +
       '<ul class="wp-block-list"><li>item</li></ul>' +
       '<figure class="wp-block-image size-large">' +
       '<img loading="lazy" decoding="async" width="1024" height="576" ' +
@@ -233,6 +300,8 @@ describe("sanitizeWpHtml — legitimate WordPress formatting survives", () => {
     );
     assert.equal(out.includes('href="https://www.tffdigital.com/"'), true);
     assert.equal(out.includes("&amp;"), true);
+    // the ChatGPT-paste artifacts live case studies carry are dropped
+    assert.equal(out.includes("data-start"), false);
   });
 
   test("CSS-anticipated tags survive: code/pre with language class, table, blockquote, ol", () => {
@@ -278,7 +347,9 @@ describe("sanitizeWpHtml — legitimate WordPress formatting survives", () => {
       "<p><kbd>Ctrl</kbd> <mark>hi</mark> <s>old</s> <del>d</del> <ins>i</ins> <sub>2</sub><sup>3</sup></p>" +
       '<p><a href="tel:+917206809816">call</a> <a href="mailto:info@tffdigital.com">mail</a></p>' +
       '<figure class="wp-block-video"><video controls src="https://cms.tffdigital.com/a.mp4" poster="https://cms.tffdigital.com/a.jpg"></video></figure>' +
-      '<sup class="fn"><a href="#fn-1">1</a></sup>';
+      '<ol start="5" reversed type="a"><li>five</li></ol>' +
+      '<sup data-fn="a1b2" class="fn"><a href="#a1b2" id="a1b2-link">1</a></sup>' +
+      '<ol class="wp-block-footnotes"><li id="a1b2">note <a href="#a1b2-link">↩︎</a></li></ol>';
     const out = sanitizeWpHtml(wp);
     for (const marker of [
       "<h5",
@@ -294,7 +365,9 @@ describe("sanitizeWpHtml — legitimate WordPress formatting survives", () => {
       'href="mailto:info@tffdigital.com"',
       'src="https://cms.tffdigital.com/a.mp4"',
       'poster="https://cms.tffdigital.com/a.jpg"',
-      'href="#fn-1"',
+      '<ol start="5" reversed type="a">',
+      '<a href="#a1b2" id="a1b2-link">',
+      '<li id="a1b2">',
     ]) {
       assert.equal(out.includes(marker), true, `expected ${marker}`);
     }

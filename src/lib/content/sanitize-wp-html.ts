@@ -13,15 +13,53 @@ import sanitizeHtml from "sanitize-html";
  * ArticleContent's tag-selector styling anticipates (including <iframe>
  * embeds, the audit's one named must-preserve, https src only), and the
  * remaining inert Gutenberg core blocks/formats (h5/h6, details, kbd/mark,
- * video/audio, table caption/tfoot). `id` stays on headings because WP emits
- * them and the ToC/share anchors depend on them; `class` stays everywhere
- * because styling is tag-based (inert) and highlight.js reads `language-*`
- * from <code>. Everything not listed is dropped: event handlers, `style`,
- * `srcdoc`, and scriptable/embedding elements (script, style, svg, math,
- * object, embed, form controls, meta/base/link). Disallowed tags lose only
- * their tags — text content survives — except <script>/<style>, which are
- * dropped with their contents.
+ * video/audio, table caption/tfoot, footnotes). Iframe hosts mirror
+ * next.config.ts's `frame-src` so the two allowlists can't drift apart.
+ *
+ * `id` survives on headings (WP "HTML anchor", ToC/share links) and on
+ * footnote <li>/<a>, but only when it matches SAFE_ID — the lowercase,
+ * hyphen-separated shape withHeadingIds itself produces. Any element id
+ * becomes a named property on `window`, so an unrestricted id could clobber
+ * a script global (`__next_f`, `webpackChunk_N_E`) and break hydration;
+ * none of those can be spelled without underscores or uppercase.
+ * `class` stays everywhere: styling is tag-based and highlight.js reads
+ * `language-*` from <code>. A class can't execute script, though it can
+ * reach Tailwind utilities already in the bundle — defacement within the
+ * trusted-author model, not a trust-boundary crossing. Everything not
+ * listed is dropped: event handlers, `style`, `srcdoc`, and scriptable or
+ * embedding elements (script, style, svg, math, object, embed, form
+ * controls, meta/base/link). Disallowed tags lose only their tags — text
+ * content survives — except <script>/<style>, which are dropped with their
+ * contents.
  */
+const SAFE_ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+// rel tokens WordPress emits (new-tab links, nofollow/sponsored settings).
+const ALLOWED_REL = new Set([
+  "noopener",
+  "noreferrer",
+  "nofollow",
+  "sponsored",
+  "ugc",
+]);
+
+const dropUnsafeId: sanitizeHtml.Transformer = (tagName, attribs) => {
+  if (attribs.id !== undefined && !SAFE_ID.test(attribs.id)) {
+    delete attribs.id;
+  }
+  return { tagName, attribs };
+};
+
+// A target="_blank" link must not re-enable window.opener via rel="opener".
+const normalizeLink: sanitizeHtml.Transformer = (tagName, attribs) => {
+  const rel = new Set(
+    (attribs.rel ?? "").split(/\s+/).filter((token) => ALLOWED_REL.has(token)),
+  );
+  if (attribs.target !== undefined) rel.add("noopener");
+  if (rel.size > 0) attribs.rel = [...rel].join(" ");
+  else delete attribs.rel;
+  return dropUnsafeId(tagName, attribs);
+};
 const WP_HTML_POLICY: sanitizeHtml.IOptions = {
   allowedTags: [
     "p",
@@ -85,7 +123,9 @@ const WP_HTML_POLICY: sanitizeHtml.IOptions = {
     h4: ["id"],
     h5: ["id"],
     h6: ["id"],
-    a: ["href", "title", "target", "rel"],
+    a: ["id", "href", "title", "target", "rel"],
+    li: ["id"],
+    ol: ["start", "reversed", "type"],
     abbr: ["title"],
     details: ["open"],
     img: [
@@ -142,6 +182,23 @@ const WP_HTML_POLICY: sanitizeHtml.IOptions = {
   // URL-bearing attribute this policy allows.
   allowedSchemesAppliedToAttributes: ["href", "src", "cite", "poster"],
   allowProtocolRelative: false,
+  // Keep in sync with `frame-src` in next.config.ts (CSP blocks the rest
+  // anyway; this makes the sanitizer's own guarantee explicit).
+  allowedIframeHostnames: [
+    "www.youtube.com",
+    "youtube.com",
+    "www.youtube-nocookie.com",
+    "www.google.com",
+  ],
+  transformTags: {
+    h2: dropUnsafeId,
+    h3: dropUnsafeId,
+    h4: dropUnsafeId,
+    h5: dropUnsafeId,
+    h6: dropUnsafeId,
+    li: dropUnsafeId,
+    a: normalizeLink,
+  },
   // Void elements in this allowlist (sanitize-html's default list also
   // carries tags this policy never allows, e.g. <base>/<link>/<meta>).
   selfClosing: ["img", "br", "hr", "source"],
