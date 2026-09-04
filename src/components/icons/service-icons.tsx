@@ -4,7 +4,7 @@ export type ServiceIconProps = SVGProps<SVGSVGElement>;
 
 /**
  * Custom neon line-art icons for the What We Do service cards.
- * All five share one visual language: 80x80 viewBox, rounded stroke
+ * All six share one visual language: 80x80 viewBox, rounded stroke
  * line-work, a cyan → brand blue → brand violet gradient, and a soft
  * bloom filter. Stroke weights: 3 primary shapes, 2.5 secondary, 2 micro.
  */
@@ -150,6 +150,27 @@ export function VideoEditingServiceIcon(props: ServiceIconProps) {
   );
 }
 
+export function ZohoOneServiceIcon(props: ServiceIconProps) {
+  const id = "tff-svc-zoho";
+  return (
+    <svg viewBox="0 0 80 80" fill="none" aria-hidden="true" {...props}>
+      <NeonIconDefs id={id} />
+      <g {...neonGroupProps(id)}>
+        <rect x="8" y="8" width="24" height="24" rx="6" strokeWidth="3" />
+        <rect x="48" y="8" width="24" height="24" rx="6" strokeWidth="3" />
+        <rect x="8" y="48" width="24" height="24" rx="6" strokeWidth="3" />
+        <rect x="48" y="48" width="24" height="24" rx="6" strokeWidth="3" />
+        <circle cx="20" cy="17.5" r="3.5" strokeWidth="2.5" />
+        <path d="M14 26.5a6 6 0 0 1 12 0" strokeWidth="2" />
+        <path d="M55 26v-5M60 26v-9M65 26v-13" strokeWidth="2.5" />
+        <path d="M14 57h12M14 62h12M14 67h7" strokeWidth="2.5" />
+        <path d="m54 60 4.5 4.5L67 55.5" strokeWidth="2.5" />
+        <path d="M36 40h8M40 36v8" strokeWidth="2" />
+      </g>
+    </svg>
+  );
+}
+
 const SERVICE_CARD_ICONS: Record<string, ComponentType<ServiceIconProps>> = {
   seo: SeoServiceIcon,
   smm: SmmServiceIcon,
@@ -160,6 +181,7 @@ const SERVICE_CARD_ICONS: Record<string, ComponentType<ServiceIconProps>> = {
   "web-development": WebDevelopmentServiceIcon,
   "website-design-development": WebDevelopmentServiceIcon,
   "video-editing": VideoEditingServiceIcon,
+  "zoho-one": ZohoOneServiceIcon,
 };
 
 export function getServiceCardIcon(slug: string): ComponentType<ServiceIconProps> {

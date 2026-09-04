@@ -68,4 +68,16 @@ export const temporaryServices: TemporaryService[] = [
     features: ["Engaging Visuals", "Social Ready Videos", "Brand Storytelling"],
     href: null,
   },
+  {
+    id: "temp-zoho-one",
+    slug: "zoho-one",
+    title: "ZOHO One",
+    summary: "One platform. Every business tool you need to grow.",
+    features: [
+      "Unified Business Suite",
+      "CRM & Workflow Automation",
+      "Setup, Migration & Support",
+    ],
+    href: null,
+  },
 ];

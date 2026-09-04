@@ -10,6 +10,7 @@ import {
   FileText,
   UserRound,
   Sparkles,
+  LayoutGrid,
   BrainCircuit,
   Workflow,
 } from "lucide-react";
@@ -32,6 +33,7 @@ const SERVICE_ICONS: Record<string, LucideIcon> = {
   "graphic-design": PenTool,
   "content-marketing": FileText,
   "personal-branding": UserRound,
+  "zoho-one": LayoutGrid,
   // Slugs of the services currently published in WordPress (PARITY-1)
   "ai-consulting": BrainCircuit,
   "ai-automation": Workflow,
