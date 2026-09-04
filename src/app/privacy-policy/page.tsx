@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getCanonicalUrl } from "@/lib/seo/canonical";
+import { buildPageOpenGraph } from "@/lib/seo/metadata";
 import { ROUTES } from "@/constants/routes";
 import { LegalHero } from "@/sections/legal/LegalHero";
 import { PrivacyPolicyBody } from "@/sections/legal/PrivacyPolicyBody";
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
   description:
     "How TFF Digital collects, uses, and protects information when you visit tffdigital.com.",
   alternates: { canonical: getCanonicalUrl(ROUTES.privacyPolicy) },
+  openGraph: buildPageOpenGraph(getCanonicalUrl(ROUTES.privacyPolicy)),
 };
 
 export default function PrivacyPolicyPage() {

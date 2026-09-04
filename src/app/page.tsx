@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getCanonicalUrl } from "@/lib/seo/canonical";
+import { buildPageOpenGraph } from "@/lib/seo/metadata";
 import { seoConfig } from "@/config/seo.config";
 import { ROUTES } from "@/constants/routes";
 // TEMPORARY: WordPress What We Do content disabled for UI development.
@@ -31,6 +32,7 @@ export const metadata: Metadata = {
   description:
     "TFF Digital is a strategy-led digital growth agency driving measurable growth through SEO, digital marketing, web development, and performance marketing.",
   alternates: { canonical: getCanonicalUrl(ROUTES.home) },
+  openGraph: buildPageOpenGraph(getCanonicalUrl(ROUTES.home)),
 };
 
 export default async function Home() {

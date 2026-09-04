@@ -9,6 +9,7 @@ import { CaseStudyCard } from "@/sections/case-studies/CaseStudyCard";
 import { JsonLd } from "@/components/common/JsonLd";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/json-ld";
 import { getCanonicalUrl } from "@/lib/seo/canonical";
+import { buildPageOpenGraph } from "@/lib/seo/metadata";
 import {
   firstSearchParam,
   type SearchParamValue,
@@ -19,6 +20,7 @@ export const metadata: Metadata = {
   title: "Case Studies",
   description: "Real client results — the growth systems we've built and the numbers they earned.",
   alternates: { canonical: getCanonicalUrl(ROUTES.caseStudies) },
+  openGraph: buildPageOpenGraph(getCanonicalUrl(ROUTES.caseStudies)),
 };
 
 interface CaseStudiesPageProps {

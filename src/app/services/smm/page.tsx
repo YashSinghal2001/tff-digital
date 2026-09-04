@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getCanonicalUrl } from "@/lib/seo/canonical";
+import { buildPageOpenGraph } from "@/lib/seo/metadata";
 import { ROUTES } from "@/constants/routes";
 import { SMMHero } from "@/sections/smm/SMMHero";
 import { WhyYouNeedSMM } from "@/sections/smm/WhyYouNeedSMM";
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
   description:
     "Social media that builds brands, drives growth, and delivers results — strategy-led SMM across every platform that matters.",
   alternates: { canonical: getCanonicalUrl(ROUTES.service("smm")) },
+  openGraph: buildPageOpenGraph(getCanonicalUrl(ROUTES.service("smm"))),
 };
 
 export default function SMMPage() {

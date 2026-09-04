@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getCanonicalUrl } from "@/lib/seo/canonical";
+import { buildPageOpenGraph } from "@/lib/seo/metadata";
 import { ROUTES } from "@/constants/routes";
 import { LegalHero } from "@/sections/legal/LegalHero";
 import { TermsBody } from "@/sections/legal/TermsBody";
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
   description:
     "The terms and conditions governing your use of the TFF Digital website at tffdigital.com.",
   alternates: { canonical: getCanonicalUrl(ROUTES.termsAndConditions) },
+  openGraph: buildPageOpenGraph(getCanonicalUrl(ROUTES.termsAndConditions)),
 };
 
 export default function TermsAndConditionsPage() {

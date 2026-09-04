@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getCanonicalUrl } from "@/lib/seo/canonical";
+import { buildPageOpenGraph } from "@/lib/seo/metadata";
 import { ROUTES } from "@/constants/routes";
 import { SEOHero } from "@/sections/seo/SEOHero";
 import { WhyYouNeedSEO } from "@/sections/seo/WhyYouNeedSEO";
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
   description:
     "SEO that compounds — technical foundations, content, and authority built to turn search into your most durable growth channel.",
   alternates: { canonical: getCanonicalUrl(ROUTES.service("seo")) },
+  openGraph: buildPageOpenGraph(getCanonicalUrl(ROUTES.service("seo"))),
 };
 
 export default function SEOPage() {

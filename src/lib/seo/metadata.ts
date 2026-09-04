@@ -1,6 +1,34 @@
 import type { Metadata } from "next";
 import type { Seo } from "@/types/domain/seo";
 import { seoConfig } from "@/config/seo.config";
+import { siteConfig } from "@/config/site.config";
+
+/** Sitewide OpenGraph defaults — single source for the root layout and
+ *  buildPageOpenGraph, so the share card can't drift between them. */
+export const SITE_OPEN_GRAPH_DEFAULTS = {
+  siteName: siteConfig.name,
+  type: "website",
+  locale: siteConfig.defaultLocale,
+  images: [
+    {
+      url: "/og-image.png",
+      width: 1200,
+      height: 630,
+      alt: `${siteConfig.name} — Digital Growth Agency`,
+    },
+  ],
+} satisfies Metadata["openGraph"];
+
+/** OpenGraph block for pages without WordPress SEO data (OG-1). A page-level
+ *  `openGraph` replaces the root layout's wholesale, so this re-supplies the
+ *  sitewide defaults alongside the page's own URL; og:title/og:description
+ *  still fall back to the page's resolved title/description. Pass the same
+ *  value as `alternates.canonical` so og:url can never diverge from it. */
+export function buildPageOpenGraph(
+  canonicalUrl: string,
+): Metadata["openGraph"] {
+  return { ...SITE_OPEN_GRAPH_DEFAULTS, url: canonicalUrl };
+}
 
 export interface ContentMetadataFallback {
   /** The content item's own title (post/case study/service), used when the

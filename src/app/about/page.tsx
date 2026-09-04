@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getCanonicalUrl } from "@/lib/seo/canonical";
+import { buildPageOpenGraph } from "@/lib/seo/metadata";
 import { ROUTES } from "@/constants/routes";
 import { AboutHero } from "@/sections/about/AboutHero";
 import { OurStory } from "@/sections/about/OurStory";
@@ -15,6 +16,7 @@ export const metadata: Metadata = {
   description:
     "We're operators disguised as an agency — meet the team building TFF Digital.",
   alternates: { canonical: getCanonicalUrl(ROUTES.about) },
+  openGraph: buildPageOpenGraph(getCanonicalUrl(ROUTES.about)),
 };
 
 export default function AboutPage() {

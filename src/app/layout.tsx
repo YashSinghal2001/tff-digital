@@ -7,6 +7,7 @@ import { Footer } from "@/components/layout/Footer";
 import { JsonLd } from "@/components/common/JsonLd";
 import { HashScrollHandler } from "@/components/common/HashScrollHandler";
 import { buildOrganizationJsonLd, buildWebsiteJsonLd } from "@/lib/seo/json-ld";
+import { SITE_OPEN_GRAPH_DEFAULTS } from "@/lib/seo/metadata";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -33,19 +34,7 @@ export const metadata: Metadata = {
   // falls the title/description back to the page's own resolved metadata.
   // The image is the sitewide default share card — WP-sourced pages with a
   // Yoast OG image override the whole openGraph object via buildMetadata.
-  openGraph: {
-    siteName: siteConfig.name,
-    type: "website",
-    locale: siteConfig.defaultLocale,
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: `${siteConfig.name} — Digital Growth Agency`,
-      },
-    ],
-  },
+  openGraph: SITE_OPEN_GRAPH_DEFAULTS,
   twitter: {
     card: "summary_large_image",
   },

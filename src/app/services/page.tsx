@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getCanonicalUrl } from "@/lib/seo/canonical";
+import { buildPageOpenGraph } from "@/lib/seo/metadata";
 import { ROUTES } from "@/constants/routes";
 // TEMPORARY: WordPress services grid disabled — the CMS still holds
 // placeholder entries ("AI Consulting Updated", "Web Development 2", …).
@@ -61,6 +62,7 @@ export const metadata: Metadata = {
   description:
     "Nine disciplines, one growth engine — SEO, paid media, social, brand, and web, built to compound.",
   alternates: { canonical: getCanonicalUrl(ROUTES.services) },
+  openGraph: buildPageOpenGraph(getCanonicalUrl(ROUTES.services)),
 };
 
 export default function ServicesPage() {

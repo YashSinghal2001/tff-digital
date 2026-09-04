@@ -13,6 +13,7 @@ import { Container } from "@/components/ui/Container";
 import { JsonLd } from "@/components/common/JsonLd";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/json-ld";
 import { getCanonicalUrl } from "@/lib/seo/canonical";
+import { buildPageOpenGraph } from "@/lib/seo/metadata";
 import {
   firstSearchParam,
   type SearchParamValue,
@@ -24,6 +25,7 @@ export const metadata: Metadata = {
   description:
     "Strategy, SEO, and performance marketing insights from the team building TFF Digital.",
   alternates: { canonical: getCanonicalUrl(ROUTES.blog) },
+  openGraph: buildPageOpenGraph(getCanonicalUrl(ROUTES.blog)),
 };
 
 interface BlogPageProps {

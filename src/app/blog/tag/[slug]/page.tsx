@@ -16,6 +16,7 @@ import { BlogSidebar } from "@/components/blog/BlogSidebar";
 import { JsonLd } from "@/components/common/JsonLd";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/json-ld";
 import { getCanonicalUrl } from "@/lib/seo/canonical";
+import { buildPageOpenGraph } from "@/lib/seo/metadata";
 import {
   firstSearchParam,
   type SearchParamValue,
@@ -36,6 +37,7 @@ export async function generateMetadata({ params }: TagPageProps): Promise<Metada
     title: `#${tag.name} articles`,
     description: `Browse all articles tagged ${tag.name}.`,
     alternates: { canonical: getCanonicalUrl(ROUTES.blogTag(slug)) },
+    openGraph: buildPageOpenGraph(getCanonicalUrl(ROUTES.blogTag(slug))),
   };
 }
 
