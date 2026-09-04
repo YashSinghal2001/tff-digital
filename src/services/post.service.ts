@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { wordpressConfig } from "@/config/wordpress.config";
 import {
   findAllPosts,
@@ -78,14 +79,21 @@ export async function getPosts(params?: {
   }
 }
 
-export async function getPostBySlug(slug: string): Promise<Post | null> {
-  if (wordpressConfig.useMockData) {
-    return getMockPostBySlug(slug);
-  }
+// React cache(): generateMetadata and the page body both look up the same
+// slug in the same request, and Next's fetch memoization never dedupes these
+// calls (POST + AbortSignal both opt out) — so without this each render
+// invoked the WPGraphQL fetch twice (PERF-4). Scope is one server request;
+// nothing persists across requests or leaks between slugs.
+export const getPostBySlug = cache(
+  async (slug: string): Promise<Post | null> => {
+    if (wordpressConfig.useMockData) {
+      return getMockPostBySlug(slug);
+    }
 
-  const { post } = await findPostBySlug(slug);
-  return post ? adaptPost(post) : null;
-}
+    const { post } = await findPostBySlug(slug);
+    return post ? adaptPost(post) : null;
+  },
+);
 
 export async function getPostsByCategory(
   categorySlug: string,

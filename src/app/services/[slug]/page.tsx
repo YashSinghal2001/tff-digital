@@ -5,6 +5,7 @@ import Image from "next/image";
 import {
   getServiceOfferingBySlug,
   getServiceOfferingPreviewBySlug,
+  getServiceOfferings,
 } from "@/services/service-offering.service";
 import type { ServiceOffering } from "@/types/domain/service-offering";
 import { Container } from "@/components/ui/Container";
@@ -23,6 +24,21 @@ import { ROUTES } from "@/constants/routes";
 
 interface ServiceDetailPageProps {
   params: Promise<{ slug: string }>;
+}
+
+// Prerender every known WordPress service at build time (PERF-1) — the
+// static copies revalidate via the fetch-level 30s ISR window, matching the
+// blog and case-study detail routes; previously every visit was a fully
+// dynamic live WordPress round-trip. Soft getServiceOfferings: a build-time
+// outage yields [] and the build still succeeds; slugs then render on demand
+// exactly as before (dynamicParams stays on for services published between
+// deploys). The truthy-slug filter keeps a malformed CMS entry from emitting
+// an empty path segment.
+export async function generateStaticParams() {
+  const services = await getServiceOfferings({ first: 100 });
+  return services.items
+    .filter((service) => service.slug)
+    .map((service) => ({ slug: service.slug }));
 }
 
 export async function generateMetadata({ params }: ServiceDetailPageProps): Promise<Metadata> {

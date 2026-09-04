@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { wordpressConfig } from "@/config/wordpress.config";
 import {
   findAllCaseStudies,
@@ -67,34 +68,43 @@ export async function getCaseStudies(params?: {
   }
 }
 
-export async function getCaseStudyBySlug(
-  slug: string,
-): Promise<CaseStudy | null> {
-  if (wordpressConfig.useMockData) {
-    return getMockCaseStudyBySlug(slug);
-  }
+// React cache() on the by-slug getters: generateMetadata and the page body
+// look up the same slug in the same request, and Next's fetch memoization
+// never dedupes these calls (POST + AbortSignal both opt out) — without this
+// each render invoked the WPGraphQL fetch twice (PERF-4). Scope is one
+// server request; nothing persists across requests or leaks between slugs.
+export const getCaseStudyBySlug = cache(
+  async (slug: string): Promise<CaseStudy | null> => {
+    if (wordpressConfig.useMockData) {
+      return getMockCaseStudyBySlug(slug);
+    }
 
-  const { caseStudy } = await findCaseStudyBySlug(slug);
-  return caseStudy ? adaptCaseStudy(caseStudy) : null;
-}
+    const { caseStudy } = await findCaseStudyBySlug(slug);
+    return caseStudy ? adaptCaseStudy(caseStudy) : null;
+  },
+);
 
 /**
  * Authenticated draft/latest-revision lookup for the preview flow only —
  * never called from a public route. See findCaseStudyPreview for the
  * security/caching rationale.
  */
-export async function getCaseStudyPreviewBySlug(
-  slug: string,
-): Promise<CaseStudy | null> {
-  if (wordpressConfig.useMockData) {
-    // Mock mode has no draft/published distinction — reuse the public mock
-    // fixture so the preview code path is exercisable in local dev.
-    return getMockCaseStudyBySlug(slug);
-  }
+export const getCaseStudyPreviewBySlug = cache(
+  // cache() here dedupes the one place the duplicate costs a REAL second
+  // WordPress round-trip: preview fetches are no-store, so the Data Cache
+  // never absorbs the metadata+body pair (PERF-4). Per-request only —
+  // successive preview loads still fetch the latest draft.
+  async (slug: string): Promise<CaseStudy | null> => {
+    if (wordpressConfig.useMockData) {
+      // Mock mode has no draft/published distinction — reuse the public mock
+      // fixture so the preview code path is exercisable in local dev.
+      return getMockCaseStudyBySlug(slug);
+    }
 
-  const { caseStudy } = await findCaseStudyPreview(slug, "SLUG");
-  return caseStudy ? adaptCaseStudy(caseStudy) : null;
-}
+    const { caseStudy } = await findCaseStudyPreview(slug, "SLUG");
+    return caseStudy ? adaptCaseStudy(caseStudy) : null;
+  },
+);
 
 /**
  * Resolves WordPress's numeric post ID (what the preview_post_link filter
