@@ -2,6 +2,7 @@ import type { WPServiceOffering } from "@/types/api/wp-service-offering";
 import type { ServiceOffering } from "@/types/domain/service-offering";
 import { adaptMedia } from "@/adapters/media.adapter";
 import { adaptSeo } from "@/adapters/seo.adapter";
+import { sanitizeWpHtml } from "@/lib/content/sanitize-wp-html";
 
 export function adaptServiceOffering(
   wpService: WPServiceOffering,
@@ -13,7 +14,11 @@ export function adaptServiceOffering(
     slug: wpService.slug,
     title: wpService.title,
     summary,
-    content: wpService.content || wpService.serviceFields?.description || "",
+    // Reaches ArticleContent's dangerouslySetInnerHTML — sanitize at the
+    // boundary (ARCH-5); the fallback is an ACF free-text field.
+    content: sanitizeWpHtml(
+      wpService.content || wpService.serviceFields?.description || "",
+    ),
     publishedAt: wpService.date,
     updatedAt: wpService.modified,
     icon: wpService.serviceFields?.icon

@@ -5,6 +5,7 @@ import { adaptSeo } from "@/adapters/seo.adapter";
 import { adaptAuthor } from "@/adapters/author.adapter";
 import { adaptCategory, adaptTag } from "@/adapters/taxonomy.adapter";
 import { stripHtml } from "@/lib/content/post-content";
+import { sanitizeWpHtml } from "@/lib/content/sanitize-wp-html";
 
 export function adaptPost(wpPost: WPPost): Post {
   // WPGraphQL returns null (not "") for excerpt/content on posts with no
@@ -12,7 +13,9 @@ export function adaptPost(wpPost: WPPost): Post {
   // The raw excerpt also carries markup (e.g. "<p>...</p>") — strip it so
   // post cards render plain text instead of literal tags.
   const excerpt = stripHtml(wpPost.excerpt ?? "").replace(/\s+/g, " ").trim();
-  const content = wpPost.content ?? "";
+  // Body HTML reaches ArticleContent's dangerouslySetInnerHTML — sanitize at
+  // the boundary (ARCH-5) so a compromised wp-admin can't become stored XSS.
+  const content = sanitizeWpHtml(wpPost.content ?? "");
 
   return {
     id: wpPost.id,

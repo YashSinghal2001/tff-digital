@@ -10,8 +10,10 @@ export interface ArticleContentProps {
 }
 
 /**
- * Styles raw WP post HTML (rendered via dangerouslySetInnerHTML — content
- * comes from the CMS, not user input, same trust boundary as JsonLd).
+ * Styles WP rich-text HTML (rendered via dangerouslySetInnerHTML). Every
+ * `html` value is sanitized upstream, server-side in the adapters, against
+ * the allowlist in src/lib/content/sanitize-wp-html.ts (ARCH-5) — never
+ * pass this component HTML that hasn't been through sanitizeWpHtml.
  * No typography plugin is installed, so nested-element selectors carry the
  * design tokens instead of a `prose` class.
  */

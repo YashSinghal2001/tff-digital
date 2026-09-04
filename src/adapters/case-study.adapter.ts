@@ -1,6 +1,7 @@
 import type { WPCaseStudy, WPCaseStudyFields } from "@/types/api/wp-case-study";
 import type { CaseStudy, CaseStudyResult } from "@/types/domain/case-study";
 import { adaptMedia } from "@/adapters/media.adapter";
+import { sanitizeWpHtml } from "@/lib/content/sanitize-wp-html";
 import { adaptSeo } from "@/adapters/seo.adapter";
 import { adaptServiceOffering } from "@/adapters/service-offering.adapter";
 
@@ -32,15 +33,18 @@ export function adaptCaseStudy(wpCaseStudy: WPCaseStudy): CaseStudy {
     slug: wpCaseStudy.slug,
     title: wpCaseStudy.title,
     excerpt: wpCaseStudy.excerpt ?? "",
-    content: wpCaseStudy.content ?? "",
+    // Rich-text fields reach ArticleContent's dangerouslySetInnerHTML —
+    // sanitize at the boundary (ARCH-5); challenge/solution are ACF free
+    // text, the same enforce-nothing field class as projectUrl (SEC3-1).
+    content: sanitizeWpHtml(wpCaseStudy.content ?? ""),
     publishedAt: wpCaseStudy.date,
     updatedAt: wpCaseStudy.modified,
     clientName: fields?.clientName ?? "",
     industry: fields?.industry ?? "",
     projectUrl: fields?.projectUrl ?? null,
     summary,
-    challenge: fields?.challenge ?? "",
-    solution: fields?.solution ?? "",
+    challenge: sanitizeWpHtml(fields?.challenge ?? ""),
+    solution: sanitizeWpHtml(fields?.solution ?? ""),
     results: adaptCaseStudyResults(fields),
     featuredOnHomepage: fields?.featuredOnHomepage ?? false,
     featuredImage: wpCaseStudy.featuredImage
