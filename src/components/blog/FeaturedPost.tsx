@@ -18,6 +18,11 @@ export function FeaturedPost({ post }: FeaturedPostProps) {
   return (
     <Link
       href={ROUTES.blogPost(post.slug)}
+      // The whole card is one link, so its computed name would concatenate the
+      // Featured badge, category, title, excerpt, author, date, reading time
+      // and the "Read article" affordance — 533 characters as measured on the
+      // live blog listing (CARDA11Y-1). Same title-only name as PostCard.
+      aria-label={post.title}
       className="group border-border-strong bg-glass focus-visible:ring-primary/50 grid gap-8 overflow-hidden rounded-[25px] border outline-none focus-visible:ring-2 lg:grid-cols-2"
     >
       <div className="relative aspect-[16/9] w-full overflow-hidden bg-white/5 lg:aspect-auto">
@@ -60,9 +65,11 @@ export function FeaturedPost({ post }: FeaturedPostProps) {
           <span>{readingTime} min read</span>
         </div>
 
+        {/* The link's aria-label already names the card with the post title,
+            so this affordance no longer carries a screen-reader-only copy of
+            it (that suffix could never be reached through the label). */}
         <span className="font-body text-primary mt-2 flex items-center gap-1 text-sm font-semibold">
           Read article
-          <span className="sr-only"> {post.title}</span>
           <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </span>
       </div>

@@ -26,6 +26,10 @@ function SidebarPostRow({ post }: { post: Post }) {
   return (
     <Link
       href={ROUTES.blogPost(post.slug)}
+      // Row-as-link: without this the name runs the title straight into the
+      // date ("...Found on GoogleAug 12, 2026"). The date stays readable as
+      // page text; the title is what identifies the destination (CARDA11Y-1).
+      aria-label={post.title}
       className="group flex items-center gap-3"
     >
       <span className="border-border-strong relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border bg-white/5">
