@@ -6,6 +6,7 @@
 import type { WPCaseStudy } from "@/types/api/wp-case-study";
 import type { WPPost } from "@/types/api/wp-post";
 import type { WPServiceOffering } from "@/types/api/wp-service-offering";
+import type { WPCategory, WPTag } from "@/types/api/wp-taxonomy";
 
 export const wpServiceOfferingFixture: WPServiceOffering = {
   id: "c2VydmljZTox",
@@ -78,4 +79,17 @@ export const wpPostFixture: WPPost = {
   categories: null,
   tags: null,
   seo: null,
+};
+
+export const wpCategoryFixture: WPCategory = {
+  id: "dGVybTox",
+  name: "SEO",
+  slug: "seo",
+  count: 1,
+};
+
+export const wpTagFixture: WPTag = {
+  id: "dGVybToy",
+  name: "Local SEO",
+  slug: "local-seo",
 };

@@ -70,13 +70,25 @@ async function getCaseStudyEntries(): Promise<SitemapEntry[]> {
   }
 }
 
+// A taxonomy slug only makes a usable archive URL when it is exactly one
+// non-empty path segment: the [slug] routes never match a slug carrying a
+// "/" (or whitespace), and getCanonicalUrl's percent-encoding leaves XML
+// delimiters like "&" untouched, which would break the sitemap document
+// (Next.js does not escape <loc>). WordPress sanitizes slugs to plain or
+// percent-encoded characters, so nothing legitimate is lost here.
+function isRoutableTermSlug(slug: string): boolean {
+  return /^[^\s/?#&<>"']+$/.test(slug);
+}
+
 // Category/tag archive pages are live, indexable routes linked from the blog
 // sidebar, so they belong here too (SITEMAP-1). Strict fetchers inside this
 // catch — one swallowing layer with a sitemap-specific message. The GraphQL
 // queries use hideEmpty, so termless categories/tags never reach this code;
-// the slug guard keeps a malformed empty-slug term from emitting a bare
-// /blog/category/ URL. Neither Category nor Tag carries a modified date in
-// the domain model, so these entries have no lastModified.
+// the count guard repeats that intent locally for categories (the only term
+// type whose count the fragment selects) and the slug guard keeps a
+// malformed term from emitting a bare or unroutable URL. Neither Category
+// nor Tag carries a modified date in the domain model, so these entries
+// have no lastModified.
 async function getTaxonomyEntries(): Promise<SitemapEntry[]> {
   try {
     const [categories, tags] = await Promise.all([
@@ -85,12 +97,14 @@ async function getTaxonomyEntries(): Promise<SitemapEntry[]> {
     ]);
     return [
       ...categories
-        .filter((category) => category.slug)
+        .filter(
+          (category) => category.count > 0 && isRoutableTermSlug(category.slug),
+        )
         .map((category) => ({
           url: getCanonicalUrl(ROUTES.blogCategory(category.slug)),
         })),
       ...tags
-        .filter((tag) => tag.slug)
+        .filter((tag) => isRoutableTermSlug(tag.slug))
         .map((tag) => ({ url: getCanonicalUrl(ROUTES.blogTag(tag.slug)) })),
     ];
   } catch (error) {
