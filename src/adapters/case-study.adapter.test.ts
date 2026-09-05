@@ -35,6 +35,28 @@ describe("adaptCaseStudy", () => {
     assert.match(caseStudy.solution, /<p>Fixed\.<\/p>/);
   });
 
+  test("keeps rich-text entities browser-decodable in challenge, solution and body (CONTENT-1)", () => {
+    const caseStudy = adaptCaseStudy({
+      ...wpCaseStudyFixture,
+      content: "<p>Traffic &gt; before &amp; after</p>",
+      caseStudyFields: {
+        ...wpCaseStudyFixture.caseStudyFields!,
+        challenge: "<p>Rankings didn&#8217;t move &amp; CTR fell.</p>",
+        solution: "<p>Fixed &quot;core&quot; issues &ndash; fast.</p>",
+      },
+    });
+    assert.equal(caseStudy.content, "<p>Traffic &gt; before &amp; after</p>");
+    assert.equal(
+      caseStudy.challenge,
+      "<p>Rankings didn’t move &amp; CTR fell.</p>",
+    );
+    assert.equal(caseStudy.solution, '<p>Fixed "core" issues – fast.</p>');
+    assert.doesNotMatch(
+      caseStudy.challenge + caseStudy.solution + caseStudy.content,
+      /&amp;amp;|&amp;#/,
+    );
+  });
+
   test("maps the field group, media and related services into the domain shape", () => {
     const caseStudy = adaptCaseStudy(wpCaseStudyFixture);
     assert.equal(caseStudy.clientName, "ChicaBebo");

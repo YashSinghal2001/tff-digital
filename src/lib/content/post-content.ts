@@ -121,7 +121,9 @@ export function stripDuplicateFeaturedImage(
   const srcMatch = block.match(/<img[^>]*\ssrc=["']([^"']+)["']/i);
   if (!srcMatch) return html;
 
-  if (getImageFilenameStem(srcMatch[1]) !== getImageFilenameStem(featuredImageUrl)) {
+  if (
+    getImageFilenameStem(srcMatch[1]) !== getImageFilenameStem(featuredImageUrl)
+  ) {
     return html;
   }
 
@@ -146,8 +148,18 @@ function slugifyHeading(text: string): string {
  * Injects id="..." into every h2/h3 in the post content so ToC anchor links
  * and share-to-section links resolve, then returns both the augmented HTML
  * and the flat list of headings used to render the ToC itself.
+ *
+ * `text` is plain text for a React text node (CONTENT-1): the input is
+ * sanitized HTML, whose text is entity-escaped (`Q&amp;A`), so it is decoded
+ * after the inline tags are removed — same order and decoder as stripHtml.
+ * The `id` is still slugified from the UNdecoded text so existing anchors
+ * and share links stay byte-stable (`seo-amp-sem`), and the HTML itself is
+ * returned untouched apart from the injected ids.
  */
-export function withHeadingIds(html: string): { html: string; headings: HeadingEntry[] } {
+export function withHeadingIds(html: string): {
+  html: string;
+  headings: HeadingEntry[];
+} {
   const headings: HeadingEntry[] = [];
   const seen = new Map<string, number>();
 
@@ -155,15 +167,15 @@ export function withHeadingIds(html: string): { html: string; headings: HeadingE
     /<h([23])([^>]*)>(.*?)<\/h\1>/gi,
     (match, levelStr: string, attrs: string, inner: string) => {
       const level = Number(levelStr) as 2 | 3;
-      const text = inner.replace(/<[^>]*>/g, "").trim();
-      if (!text) return match;
+      const rawText = inner.replace(/<[^>]*>/g, "").trim();
+      if (!rawText) return match;
 
-      const base = slugifyHeading(text) || `section-${headings.length + 1}`;
+      const base = slugifyHeading(rawText) || `section-${headings.length + 1}`;
       const count = seen.get(base) ?? 0;
       seen.set(base, count + 1);
       const id = count === 0 ? base : `${base}-${count}`;
 
-      headings.push({ id, text, level });
+      headings.push({ id, text: decodeHtmlEntities(rawText), level });
 
       const hasId = /\sid=/.test(attrs);
       const newAttrs = hasId ? attrs : `${attrs} id="${id}"`;

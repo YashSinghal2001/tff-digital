@@ -3,6 +3,7 @@ import test, { describe } from "node:test";
 
 import { wpPostFixture } from "../../test/fixtures/wp-content.ts";
 import { adaptPost } from "./post.adapter.ts";
+import { withHeadingIds } from "@/lib/content/post-content";
 import type { WPPost } from "@/types/api/wp-post";
 
 // The WordPress → domain boundary for posts (audit DEP-2's "WordPress
@@ -22,6 +23,17 @@ describe("adaptPost", () => {
     assert.doesNotMatch(content, /<script|onerror/);
     assert.match(content, /<h2 class="wp-block-heading">Intro<\/h2>/);
     assert.match(content, /<img src="https:\/\/cms\.example\.test\/a\.png"/);
+  });
+
+  test("keeps body entities browser-decodable and the ToC label plain (CONTENT-1)", () => {
+    const { content } = adaptPost({
+      ...wpPostFixture,
+      content: "<h2>Q&amp;A</h2><p>Don&#8217;t &amp; can&rsquo;t</p>",
+    });
+    // Sanitized HTML: characters the browser will render, nothing
+    // double-escaped, so the article shows Q&A / Don’t & can’t.
+    assert.equal(content, "<h2>Q&amp;A</h2><p>Don’t &amp; can’t</p>");
+    assert.equal(withHeadingIds(content).headings[0].text, "Q&A");
   });
 
   test("tolerates WPGraphQL nulls: no body, no excerpt, no image/author/taxonomies", () => {

@@ -10,6 +10,7 @@ import {
   stripHtml,
   withHeadingIds,
 } from "./post-content.ts";
+import { sanitizeWpHtml } from "./sanitize-wp-html.ts";
 
 // CONTENT-1: stripHtml must decode WordPress's common HTML entities after
 // stripping tags, so "plain text" consumers (excerpts, JSON-LD descriptions,
@@ -105,7 +106,10 @@ describe("HTML-emitting helpers untouched by entity decoding", () => {
       html,
       '<h2 id="seo-amp-sem">SEO &amp; SEM</h2><p>&hellip;</p>',
     );
+    // The anchor id is slugified from the undecoded text (byte-stable for
+    // existing share links); only the ToC label is decoded.
     assert.equal(headings[0].id, "seo-amp-sem");
+    assert.equal(headings[0].text, "SEO & SEM");
   });
 
   test("stripDuplicateFeaturedImage returns HTML with entities intact", () => {
@@ -114,5 +118,55 @@ describe("HTML-emitting helpers untouched by entity decoding", () => {
       stripDuplicateFeaturedImage(body, "https://x.test/photo.jpg"),
       body,
     );
+  });
+});
+
+// CONTENT-1, table of contents: HeadingEntry.text is rendered as a React
+// text node, but it is cut from SANITIZED HTML, whose text is entity-escaped
+// by sanitize-html (&, <, >, " become &amp; &lt; &gt; &quot;). Without
+// decoding, a heading like "Q&A" showed up in the ToC as the literal string
+// "Q&amp;A".
+describe("withHeadingIds — ToC text is decoded plain text (CONTENT-1)", () => {
+  test("decodes named and numeric entities in the heading label", () => {
+    const { headings } = withHeadingIds(
+      "<h2>Q&amp;A</h2><h3>Don&#8217;t &quot;guess&quot; &gt; hope</h3>",
+    );
+    assert.deepEqual(
+      headings.map((heading) => heading.text),
+      ["Q&A", 'Don’t "guess" > hope'],
+    );
+  });
+
+  test("strips inline tags before decoding, so author-escaped markup stays text", () => {
+    const { headings } = withHeadingIds(
+      "<h2>Use <code>&lt;strong&gt;</code> for <em>bold</em></h2>",
+    );
+    assert.equal(headings[0].text, "Use <strong> for bold");
+    assert.equal(headings[0].id, "use-lt-strong-gt-for-bold");
+  });
+
+  test("the real pipeline: WordPress body → sanitizeWpHtml → ToC", () => {
+    // What WP emits for a heading typed as: Keyword & Search Intent — Don't
+    const wpBody =
+      '<h2 class="wp-block-heading">Keyword &amp; Search Intent &#8212; Don&#8217;t</h2>' +
+      '<h2 onclick="alert(1)">Q&amp;A <script>alert(1)</script></h2>' +
+      "<p>Body &amp; text.</p>";
+    const { html, headings } = withHeadingIds(sanitizeWpHtml(wpBody));
+
+    assert.deepEqual(
+      headings.map(({ id, text }) => ({ id, text })),
+      [
+        {
+          id: "keyword-amp-search-intent-don-t",
+          text: "Keyword & Search Intent — Don’t",
+        },
+        { id: "q-amp-a", text: "Q&A" },
+      ],
+    );
+    // The HTML keeps entities browser-decodable and the sanitizer's
+    // guarantees intact: markup renders, script/handlers are gone, and
+    // nothing has been double-escaped.
+    assert.match(html, /Keyword &amp; Search Intent — Don’t<\/h2>/);
+    assert.doesNotMatch(html, /onclick|<script|&amp;amp;/);
   });
 });

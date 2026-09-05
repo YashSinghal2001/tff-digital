@@ -52,6 +52,26 @@ describe("adaptServiceOffering", () => {
     assert.equal(service.summary, "");
   });
 
+  test("keeps entities browser-decodable on both rich-text sources (CONTENT-1)", () => {
+    const entities =
+      "<p>Facebook &amp; Instagram Ads don&#8217;t &quot;guess&quot;</p>";
+    const expected = '<p>Facebook &amp; Instagram Ads don’t "guess"</p>';
+    const fromContent = adaptServiceOffering({
+      ...wpServiceOfferingFixture,
+      content: entities,
+    });
+    const fromAcf = adaptServiceOffering({
+      ...wpServiceOfferingFixture,
+      content: null,
+      serviceFields: {
+        ...wpServiceOfferingFixture.serviceFields!,
+        description: entities,
+      },
+    });
+    assert.equal(fromContent.content, expected);
+    assert.equal(fromAcf.content, expected);
+  });
+
   test("sanitizes the rich-text body on both sources: post content and the ACF description fallback (ARCH-5)", () => {
     const hostile =
       '<h2 onmouseover="alert(1)">Plan</h2><p>Keep <strong>this</strong>.</p>' +
