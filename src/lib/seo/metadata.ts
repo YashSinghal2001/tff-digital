@@ -93,6 +93,12 @@ export function buildMetadata(
       description: seo.twitter.description,
       images: seo.twitter.image ? [seo.twitter.image.url] : undefined,
     };
+  } else if (resolvedCanonical) {
+    // og:url is the one OpenGraph field the root layout can never supply
+    // (it is per-page), so an item without SEO data would otherwise inherit
+    // the sitewide card with no URL at all (OG-1). Re-supply the identical
+    // defaults plus the page's canonical so the two can never diverge.
+    metadata.openGraph = buildPageOpenGraph(resolvedCanonical);
   }
 
   return { ...metadata, ...overrides };
