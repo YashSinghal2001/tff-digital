@@ -1,21 +1,15 @@
 import "server-only";
-import { timingSafeEqual } from "node:crypto";
 import { previewConfig } from "@/config/preview.config";
+import { secretsMatch } from "@/lib/wordpress/secret-compare";
 
 /**
  * Shared by every /api/preview/<type> route (see case-study/route.ts,
- * service/route.ts) so the security-critical secret comparison exists in
- * exactly one place rather than one per-content-type copy. Constant-time:
- * returns false immediately on a length mismatch rather than letting
- * timingSafeEqual throw, so a wrong-length guess can't be distinguished
- * from a wrong-value one by timing either.
+ * service/route.ts). The constant-time compare itself lives in
+ * secret-compare.ts, shared with the revalidation webhook (audit CACHE-1),
+ * so the security-critical comparison exists in exactly one place.
  */
 export function isValidPreviewSecret(secret: string | null): boolean {
-  if (!previewConfig.secret || !secret) return false;
-  const expected = Buffer.from(previewConfig.secret);
-  const actual = Buffer.from(secret);
-  if (expected.length !== actual.length) return false;
-  return timingSafeEqual(expected, actual);
+  return secretsMatch(previewConfig.secret, secret);
 }
 
 /** Parses the `id` query param every preview route receives from WordPress

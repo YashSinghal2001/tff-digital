@@ -45,12 +45,14 @@ export async function fetchGraphQL<TData>(
   // `cache` always wins and is never combined with `next.revalidate`,
   // since fetch() rejects requests that set both.
   //
-  // 30s, down from the original 60s (audit CACHE-1): halves how long a
-  // deleted/unpublished CMS entry can keep serving in normal operation.
-  // Deliberately a mitigation, not a cure — during a CMS outage no
-  // revalidation succeeds at any interval and Next keeps serving the last
-  // good HTML (proven, desired resilience); the audit's webhook option was
-  // evaluated and declined 2026-09-03 to avoid new attack surface.
+  // 30s (audit CACHE-1): the time-based safety net. Editorial changes to
+  // Services, Case Studies and Blog Posts normally arrive sooner through
+  // the WordPress → /api/revalidate webhook (src/app/api/revalidate), which
+  // invalidates only the affected paths; this window covers a missed or
+  // refused webhook. During a CMS outage no refresh succeeds at any
+  // interval and Next keeps serving the last good HTML (proven, desired
+  // resilience) — the webhook refuses to invalidate anything while the CMS
+  // is unreachable precisely so that property survives.
   const cacheOption = options?.cache;
   const nextOption = cacheOption
     ? undefined

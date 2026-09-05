@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name:       TFF Headless Leads API
- * Description:       Public REST endpoint (POST /wp-json/headless/v1/leads) that accepts contact-form submissions from the Next.js frontend, headless hardening that keeps this CMS domain (noindex) out of search engines, and View + Preview redirects to the Next.js frontend for Case Studies, Services, and Blog Posts (View only). See docs/contact-form-wordpress-endpoint.md and docs/wordpress-contact-form-installation.md in the tff-digital repository for the full contract.
- * Version:           1.5.0
+ * Description:       Public REST endpoint (POST /wp-json/headless/v1/leads) that accepts contact-form submissions from the Next.js frontend, headless hardening that keeps this CMS domain (noindex) out of search engines, and View + Preview redirects to the Next.js frontend for Case Studies, Services, and Blog Posts (View only), plus an on-demand revalidation webhook that refreshes the frontend's cached pages when one of those is published, updated, unpublished, trashed or deleted. See docs/contact-form-wordpress-endpoint.md and docs/wordpress-contact-form-installation.md in the tff-digital repository for the full contract.
+ * Version:           1.6.0
  * Requires at least: 5.9
  * Requires PHP:      7.4
  * Author:            TFF Digital
@@ -45,6 +45,22 @@
  * Studies, Services, Blog Posts) do not depend on this secret at all — see
  * tff_headless_route_map() vs. tff_headless_preview_route_map() below for
  * exactly which post types get which behavior, and why.
+ * -----------------------------------------------------------------------
+ *
+ * -----------------------------------------------------------------------
+ * ON-DEMAND REVALIDATION REQUIRES ONE SHARED SECRET (optional feature)
+ * -----------------------------------------------------------------------
+ * Add this to wp-config.php, matching the Next.js app's
+ * WORDPRESS_REVALIDATE_SECRET environment variable exactly:
+ *
+ *   define( 'TFF_HEADLESS_REVALIDATE_SECRET', 'another-long-random-string' );
+ *
+ * With it defined, publishing, updating, unpublishing, trashing or deleting
+ * a Case Study, Service or Blog Post POSTs to <frontend>/api/revalidate so
+ * the cached frontend pages refresh at once instead of at the next 30s ISR
+ * window (tff-digital audit CACHE-1). Until it is defined nothing is sent
+ * and the frontend keeps its time-based refresh — see
+ * tff_headless_revalidate() below.
  * -----------------------------------------------------------------------
  */
 
@@ -642,3 +658,112 @@ function tff_headless_permalink_filter( $post_link, $post ) {
 }
 add_filter( 'post_type_link', 'tff_headless_permalink_filter', 10, 2 );
 add_filter( 'post_link', 'tff_headless_permalink_filter', 10, 2 );
+
+// ---------------------------------------------------------------------
+// On-demand revalidation webhook → Next.js (tff-digital audit CACHE-1)
+// ---------------------------------------------------------------------
+
+/**
+ * Tells the Next.js frontend that one entry of a post type with a live
+ * route (tff_headless_route_map()) changed publicly, so it can refresh the
+ * cached pages that render it (the entry's own page, its listing, the
+ * homepage surfaces, the sitemap) without waiting for the 30s ISR window.
+ *
+ * Only the post type, the public slug and the event name cross this
+ * boundary — no content, no credentials. The frontend authenticates the
+ * call with the shared secret (constant-time compare), validates the
+ * payload, and refuses to invalidate anything while WordPress itself is
+ * unreachable from its side, so a save during an outage can never turn a
+ * healthy cached page into an error page. A failed or rejected call is
+ * logged and otherwise ignored: the frontend's time-based refresh remains
+ * the safety net, exactly as before this hook existed.
+ *
+ * Blocking with a short timeout rather than a non-blocking request so a
+ * failure is visible in the PHP error log; the editor's save waits at most
+ * TFF_HEADLESS_REVALIDATE_TIMEOUT seconds.
+ */
+define( 'TFF_HEADLESS_REVALIDATE_TIMEOUT', 5 );
+
+function tff_headless_revalidate( WP_Post $post, $event ) {
+	if ( ! defined( 'TFF_HEADLESS_REVALIDATE_SECRET' ) || '' === TFF_HEADLESS_REVALIDATE_SECRET ) {
+		return; // Feature not configured — keep time-based ISR only.
+	}
+
+	$route_map = tff_headless_route_map();
+	if ( ! isset( $route_map[ $post->post_type ] ) ) {
+		return; // No live frontend route for this post type.
+	}
+
+	// Trashing appends "__trashed" to post_name; the public URL never had it.
+	$slug = preg_replace( '/__trashed$/', '', (string) $post->post_name );
+	if ( '' === $slug ) {
+		return; // auto-draft / not yet slugged: nothing public to refresh.
+	}
+
+	$response = wp_remote_post(
+		tff_headless_frontend_url() . '/api/revalidate',
+		array(
+			'timeout' => TFF_HEADLESS_REVALIDATE_TIMEOUT,
+			'headers' => array(
+				'Authorization' => 'Bearer ' . TFF_HEADLESS_REVALIDATE_SECRET,
+				'Content-Type'  => 'application/json',
+			),
+			'body'    => wp_json_encode(
+				array(
+					'type'  => $post->post_type,
+					'slug'  => $slug,
+					'event' => $event,
+				)
+			),
+		)
+	);
+
+	if ( is_wp_error( $response ) ) {
+		error_log( sprintf( '[tff-headless] revalidate %s/%s (%s) failed: %s', $post->post_type, $slug, $event, $response->get_error_message() ) );
+		return;
+	}
+
+	$code = (int) wp_remote_retrieve_response_code( $response );
+	if ( 200 !== $code ) {
+		// 401 = secret mismatch, 503 = frontend not configured or CMS
+		// unreachable from the frontend (it deliberately refreshed nothing).
+		error_log( sprintf( '[tff-headless] revalidate %s/%s (%s) returned HTTP %d', $post->post_type, $slug, $event, $code ) );
+	}
+}
+
+/**
+ * Every transition that changes what the public sees: into or out of
+ * "publish" (publish, unpublish, trash, restore) and a save of an already
+ * published entry (publish → publish). Draft-to-draft edits are ignored —
+ * nothing public changed. Revisions/autosaves never carry a mapped post
+ * type, so they fall out at the route-map check.
+ */
+add_action( 'transition_post_status', function ( $new_status, $old_status, $post ) {
+	if ( ! $post instanceof WP_Post ) {
+		return;
+	}
+	if ( 'publish' !== $new_status && 'publish' !== $old_status ) {
+		return;
+	}
+	if ( 'publish' === $new_status && 'publish' === $old_status ) {
+		$event = 'update';
+	} elseif ( 'publish' === $new_status ) {
+		$event = 'publish';
+	} elseif ( 'trash' === $new_status ) {
+		$event = 'trash';
+	} else {
+		$event = 'unpublish';
+	}
+	tff_headless_revalidate( $post, $event );
+}, 10, 3 );
+
+/**
+ * Permanent deletion (emptying the trash, or deleting outright). The entry
+ * was already refreshed away when it was trashed/unpublished; this covers
+ * a direct delete of a published entry.
+ */
+add_action( 'deleted_post', function ( $post_id, $post ) {
+	if ( $post instanceof WP_Post ) {
+		tff_headless_revalidate( $post, 'delete' );
+	}
+}, 10, 2 );
