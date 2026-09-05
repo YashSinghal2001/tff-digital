@@ -8,7 +8,9 @@ import {
 } from "./service-offering.adapter.ts";
 
 // The WordPress → domain boundary for services: the ACF `features` textarea
-// becomes the bullet list the homepage and /services cards render (ARCH-1).
+// becomes the bullet list the homepage and /services cards render (ARCH-1),
+// and the rich-text body reaches ArticleContent only after sanitization
+// (ARCH-5) — on both of its sources, the post body and the ACF description.
 
 describe("parseServiceFeatures", () => {
   test("splits CRLF and LF lines, trims, and drops empty lines", () => {
@@ -48,5 +50,51 @@ describe("adaptServiceOffering", () => {
     assert.deepEqual(service.features, []);
     assert.equal(service.order, null);
     assert.equal(service.summary, "");
+  });
+
+  test("sanitizes the rich-text body on both sources: post content and the ACF description fallback (ARCH-5)", () => {
+    const hostile =
+      '<h2 onmouseover="alert(1)">Plan</h2><p>Keep <strong>this</strong>.</p>' +
+      '<script>alert(1)</script><a href="javascript:alert(1)">x</a>' +
+      '<div><p><img src="x" onerror="alert(1)"><iframe src="https://evil.example/">' +
+      "</iframe></p></div><p>unclosed <em>tag";
+    const fromContent = adaptServiceOffering({
+      ...wpServiceOfferingFixture,
+      content: hostile,
+    });
+    // Wiring only — the policy itself is pinned in sanitize-wp-html.test.ts.
+    assert.doesNotMatch(
+      fromContent.content,
+      /<script|onmouseover|onerror|javascript:|evil\.example/,
+    );
+    assert.match(
+      fromContent.content,
+      /<h2>Plan<\/h2><p>Keep <strong>this<\/strong>\.<\/p>/,
+    );
+    assert.match(fromContent.content, /<p>unclosed <em>tag<\/em><\/p>$/);
+
+    const fromDescription = adaptServiceOffering({
+      ...wpServiceOfferingFixture,
+      content: null,
+      serviceFields: {
+        ...wpServiceOfferingFixture.serviceFields!,
+        description: hostile,
+      },
+    });
+    assert.doesNotMatch(
+      fromDescription.content,
+      /<script|onmouseover|onerror|javascript:|evil\.example/,
+    );
+    assert.match(fromDescription.content, /<h2>Plan<\/h2>/);
+
+    const empty = adaptServiceOffering({
+      ...wpServiceOfferingFixture,
+      content: null,
+      serviceFields: {
+        ...wpServiceOfferingFixture.serviceFields!,
+        description: null,
+      },
+    });
+    assert.equal(empty.content, "");
   });
 });
