@@ -1,4 +1,5 @@
 import { ROUTES } from "@/constants/routes";
+import { isReservedPageSlug } from "@/lib/content/reserved-page-slugs";
 import type { RevalidateContentType } from "@/schemas/api/revalidate-webhook.schema";
 
 /**
@@ -55,5 +56,15 @@ export function resolveRevalidationTargets(payload: {
         { path: "/blog/tag/[slug]", kind: "page" },
         { path: SITEMAP },
       ];
+    case "page":
+      // A generic WordPress Page has no listing/homepage surface of its
+      // own (CLIENT-1) — only its own detail path and the sitemap. A
+      // reserved slug can never have reached this route in the first
+      // place (its own webhook payload would never carry one, since
+      // WordPress never routes a reserved-slug Page to a live URL), but
+      // this still guards against ever revalidating an app route by the
+      // same name as a defensive no-op rather than trusting that alone.
+      if (isReservedPageSlug(payload.slug)) return [];
+      return [{ path: ROUTES.page(payload.slug) }, { path: SITEMAP }];
   }
 }

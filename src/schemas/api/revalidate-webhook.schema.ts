@@ -7,11 +7,15 @@ import { z } from "zod";
 // its slug (post_name). Anything else is stripped (Zod default).
 
 /** WordPress post types with a live Next.js route (mirrors the plugin's
- *  tff_headless_route_map()). */
+ *  tff_headless_route_map()). `page` (CLIENT-1) has a working Next.js
+ *  route and this endpoint accepts it, but the WordPress plugin's own
+ *  route map does not send it yet — see revalidate-targets.ts's "page"
+ *  case for the residual this leaves. */
 export const REVALIDATE_CONTENT_TYPES = [
   "service",
   "case-study",
   "post",
+  "page",
 ] as const;
 export type RevalidateContentType = (typeof REVALIDATE_CONTENT_TYPES)[number];
 

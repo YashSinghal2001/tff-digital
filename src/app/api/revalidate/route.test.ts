@@ -182,6 +182,37 @@ describe("POST /api/revalidate", () => {
     ]);
   });
 
+  test("a page webhook revalidates only its own path and the sitemap (CLIENT-1)", async () => {
+    cmsUp();
+    const response = await POST(
+      request({ type: "page", slug: "our-story", event: "publish" }),
+    );
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), {
+      revalidated: true,
+      type: "page",
+      slug: "our-story",
+      paths: ["/our-story", "/sitemap.xml"],
+    });
+    assert.deepEqual(calls(), [
+      ["/our-story", undefined],
+      ["/sitemap.xml", undefined],
+    ]);
+  });
+
+  test("a page webhook naming a reserved slug is accepted but revalidates nothing", async () => {
+    cmsUp();
+    const response = await POST(request({ type: "page", slug: "about" }));
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), {
+      revalidated: true,
+      type: "page",
+      slug: "about",
+      paths: [],
+    });
+    assert.equal(revalidatePath.mock.callCount(), 0);
+  });
+
   test("never issues a layout-wide purge, and strips unknown fields from the body", async () => {
     cmsUp();
     const response = await POST(

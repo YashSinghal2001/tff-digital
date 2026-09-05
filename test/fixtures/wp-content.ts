@@ -7,6 +7,7 @@ import type { WPCaseStudy } from "@/types/api/wp-case-study";
 import type { WPPost } from "@/types/api/wp-post";
 import type { WPServiceOffering } from "@/types/api/wp-service-offering";
 import type { WPCategory, WPTag } from "@/types/api/wp-taxonomy";
+import type { WPPage } from "@/types/api/wp-page";
 
 export const wpServiceOfferingFixture: WPServiceOffering = {
   id: "c2VydmljZTox",
@@ -92,4 +93,13 @@ export const wpTagFixture: WPTag = {
   id: "dGVybToy",
   name: "Local SEO",
   slug: "local-seo",
+};
+
+export const wpPageFixture: WPPage = {
+  id: "cGFnZTox",
+  slug: "about",
+  title: "About",
+  content: "<p>About us.</p>",
+  featuredImage: null,
+  seo: null,
 };

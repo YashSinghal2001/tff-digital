@@ -9,9 +9,11 @@ export function adaptContentPage(wpPage: WPPage): ContentPage {
     id: wpPage.id,
     slug: wpPage.slug,
     title: wpPage.title,
-    // Dormant type (no consumers today), but rich text must arrive
-    // sanitized wherever it's eventually rendered (ARCH-5).
-    content: sanitizeWpHtml(wpPage.content),
+    // WPGraphQL returns null (not "") for content on a Page with no body
+    // text — confirmed live (CLIENT-1) — same nullable-free-text pattern
+    // as post/case-study/service. Rich text always arrives sanitized
+    // before it can reach dangerouslySetInnerHTML (ARCH-5).
+    content: sanitizeWpHtml(wpPage.content ?? ""),
     featuredImage: wpPage.featuredImage
       ? adaptMedia(wpPage.featuredImage.node)
       : null,

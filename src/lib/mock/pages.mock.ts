@@ -31,3 +31,7 @@ export const mockPages: ContentPage[] = [
 export function getMockPageBySlug(slug: string): ContentPage | null {
   return mockPages.find((page) => page.slug === slug) ?? null;
 }
+
+export function getMockPages(): ContentPage[] {
+  return mockPages;
+}

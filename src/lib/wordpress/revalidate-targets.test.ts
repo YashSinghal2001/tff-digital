@@ -49,6 +49,25 @@ describe("resolveRevalidationTargets", () => {
     );
   });
 
+  test("a page refreshes only its own detail path and the sitemap", () => {
+    // No listing/homepage surface of its own (CLIENT-1) — unlike the other
+    // three content types, a generic WordPress Page renders nowhere else.
+    assert.deepEqual(
+      resolveRevalidationTargets({ type: "page", slug: "our-story" }),
+      [{ path: "/our-story" }, { path: "/sitemap.xml" }],
+    );
+  });
+
+  test("a page webhook naming a reserved slug revalidates nothing", () => {
+    // Defensive: an app route (or the ARCH-2 portfolio/projects/work
+    // reservation) must never be revalidated by a Page payload, even
+    // though such a Page could never have reached a live URL to begin
+    // with (the [slug] route itself refuses to render one).
+    for (const slug of ["about", "services", "portfolio"]) {
+      assert.deepEqual(resolveRevalidationTargets({ type: "page", slug }), []);
+    }
+  });
+
   test("never targets a layout-wide or root-pattern purge for any type", () => {
     for (const type of REVALIDATE_CONTENT_TYPES) {
       for (const target of resolveRevalidationTargets({ type, slug: "x" })) {

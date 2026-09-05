@@ -18,6 +18,7 @@ process.env.WORDPRESS_USE_MOCK_DATA = "";
 
 const caseStudies = await import("./case-study.service.ts");
 const posts = await import("./post.service.ts");
+const contentPages = await import("./content-page.service.ts");
 const taxonomy = await import("./taxonomy.service.ts");
 const services = await import("./service-offering.service.ts");
 const { WordPressError } = await import("../lib/wordpress/errors.ts");
@@ -61,8 +62,9 @@ describe("WordPress outage handling in the service layer", () => {
     assert.deepEqual(await taxonomy.getCategories(), []);
     assert.deepEqual(await taxonomy.getTags(), []);
     assert.deepEqual(await services.getServiceOfferings(), EMPTY_PAGE);
+    assert.deepEqual(await contentPages.getPages(), EMPTY_PAGE);
 
-    assert.equal(error.mock.callCount(), 8);
+    assert.equal(error.mock.callCount(), 9);
   });
 
   test("strict listing getters rethrow the typed error for the error boundary", async () => {
@@ -86,6 +88,7 @@ describe("WordPress outage handling in the service layer", () => {
       () => caseStudies.getCaseStudyBySlug("stabilizing-and-scaling-seo"),
       () => posts.getPostBySlug("seo-for-small-businesses"),
       () => services.getServiceOfferingBySlug("search-engine-optimization"),
+      () => contentPages.getPageBySlug("about"),
     ]) {
       await assert.rejects(run, rejectsWithNetworkError);
     }

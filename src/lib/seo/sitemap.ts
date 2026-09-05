@@ -8,7 +8,9 @@ import {
   getTagsStrict,
 } from "@/services/taxonomy.service";
 import { getServiceOfferings } from "@/services/service-offering.service";
+import { getPages } from "@/services/content-page.service";
 import { filterPlaceholderCaseStudies } from "@/lib/content/case-study-placeholders";
+import { filterReservedPageSlugs } from "@/lib/content/reserved-page-slugs";
 
 export interface SitemapEntry {
   url: string;
@@ -138,6 +140,26 @@ async function getServiceOfferingEntries(): Promise<SitemapEntry[]> {
   }
 }
 
+// Generic WordPress Pages (CLIENT-1) — same source of truth as the
+// [slug] route's own generateStaticParams: reserved slugs (every existing
+// static route, plus portfolio/projects/work per ARCH-2) are filtered out
+// here too, so the sitemap can never advertise a URL that route would
+// refuse to render.
+async function getContentPageEntries(): Promise<SitemapEntry[]> {
+  try {
+    const pages = await getPages();
+    return filterReservedPageSlugs(pages.items).map((page) => ({
+      url: getCanonicalUrl(ROUTES.page(page.slug)),
+    }));
+  } catch (error) {
+    console.error(
+      "[getAllSitemapEntries] WPGraphQL request failed; sitemap will omit WordPress pages for this build.",
+      error,
+    );
+    return [];
+  }
+}
+
 // A sitemap must not list the same <loc> twice. Sources are disjoint by
 // construction, but a CMS entry whose slug collides with another source (or
 // a duplicated node in a paginated reply) would otherwise slip through; the
@@ -156,13 +178,19 @@ export async function getAllSitemapEntries(): Promise<SitemapEntry[]> {
     url: getCanonicalUrl(route),
   }));
 
-  const [serviceEntries, postEntries, taxonomyEntries, caseStudyEntries] =
-    await Promise.all([
-      getServiceOfferingEntries(),
-      getBlogPostEntries(),
-      getTaxonomyEntries(),
-      getCaseStudyEntries(),
-    ]);
+  const [
+    serviceEntries,
+    postEntries,
+    taxonomyEntries,
+    caseStudyEntries,
+    contentPageEntries,
+  ] = await Promise.all([
+    getServiceOfferingEntries(),
+    getBlogPostEntries(),
+    getTaxonomyEntries(),
+    getCaseStudyEntries(),
+    getContentPageEntries(),
+  ]);
 
   return dedupeByUrl([
     ...staticEntries,
@@ -170,5 +198,6 @@ export async function getAllSitemapEntries(): Promise<SitemapEntry[]> {
     ...postEntries,
     ...taxonomyEntries,
     ...caseStudyEntries,
+    ...contentPageEntries,
   ]);
 }

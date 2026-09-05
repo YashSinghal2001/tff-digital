@@ -72,12 +72,11 @@ describe("wpPageQueryResultSchema", () => {
     assert.deepEqual(result.error?.issues[0]?.path, ["page", "title"]);
   });
 
-  test("rejects content as null: WPPage declares it non-null and the schema mirrors that", () => {
-    const result = wpPageQueryResultSchema.safeParse({
+  test("accepts content as null (an empty-body Page, confirmed against the live CMS — CLIENT-1)", () => {
+    const empty: WPPageQueryResult = {
       page: { ...validPage, content: null },
-    });
-    assert.equal(result.success, false);
-    assert.deepEqual(result.error?.issues[0]?.path, ["page", "content"]);
+    };
+    assert.deepEqual(wpPageQueryResultSchema.parse(empty), empty);
   });
 
   test("rejects featuredImage as a string instead of { node }", () => {

@@ -4,6 +4,7 @@ import test, { afterEach, beforeEach, describe, mock } from "node:test";
 import {
   wpCaseStudyFixture,
   wpCategoryFixture,
+  wpPageFixture,
   wpPostFixture,
   wpServiceOfferingFixture,
   wpTagFixture,
@@ -158,6 +159,9 @@ const categoriesReply = (nodes: unknown[]) => ({
 const tagsReply = (nodes: unknown[]) => ({
   tags: { nodes, pageInfo: PAGE_INFO },
 });
+const pagesReply = (nodes: unknown[]) => ({
+  pages: { nodes, pageInfo: PAGE_INFO },
+});
 
 const taxonomyPaths = (entries: { url: string }[]) =>
   entries
@@ -298,6 +302,7 @@ describe("getAllSitemapEntries — blog categories and tags", () => {
       },
       GetCategories: categoriesReply([wpCategoryFixture]),
       GetTags: tagsReply([wpTagFixture]),
+      GetPages: pagesReply([{ ...wpPageFixture, slug: "our-story" }]),
     });
 
     const entries = await getAllSitemapEntries();
@@ -316,11 +321,77 @@ describe("getAllSitemapEntries — blog categories and tags", () => {
       "/blog/category/seo",
       "/blog/tag/local-seo",
       `/case-studies/${wpCaseStudyFixture.slug}`,
+      "/our-story",
     ]);
     assert.ok(
       entries.every((entry) =>
         entry.url.startsWith("https://www.tffdigital.com/"),
       ),
     );
+  });
+});
+
+// Generic WordPress Pages (CLIENT-1): one URL per published, non-reserved
+// Page, no lastModified (the domain type carries none), and never a Page
+// that would shadow an existing static route.
+describe("getAllSitemapEntries — WordPress pages", () => {
+  beforeEach(() => {
+    mock.method(console, "error", () => {});
+  });
+  afterEach(() => mock.restoreAll());
+
+  test("lists one URL per published, non-reserved page", async () => {
+    cmsServes({
+      GetPages: pagesReply([
+        { ...wpPageFixture, id: "p1", slug: "our-story" },
+        { ...wpPageFixture, id: "p2", slug: "careers", title: "Careers" },
+      ]),
+    });
+
+    const entries = await getAllSitemapEntries();
+    assert.deepEqual(
+      entries
+        .map((entry) => pathOf(entry.url))
+        .filter((path) => path === "/our-story" || path === "/careers"),
+      ["/our-story", "/careers"],
+    );
+    assert.ok(entries.every((entry) => entry.lastModified === undefined));
+  });
+
+  test("filters out every reserved slug, including ones that collide with existing routes", async () => {
+    cmsServes({
+      GetPages: pagesReply([
+        { ...wpPageFixture, id: "p1", slug: "about" },
+        { ...wpPageFixture, id: "p2", slug: "our-story" },
+        { ...wpPageFixture, id: "p3", slug: "portfolio" },
+        { ...wpPageFixture, id: "p4", slug: "careers" },
+      ]),
+    });
+
+    const entries = await getAllSitemapEntries();
+    const pagePaths = entries
+      .map((entry) => pathOf(entry.url))
+      .filter((path) => path === "/our-story" || path === "/careers");
+    assert.deepEqual(pagePaths.sort(), ["/careers", "/our-story"]);
+    assert.ok(!entries.some((entry) => pathOf(entry.url) === "/portfolio"));
+  });
+
+  test("emits no page URLs when WordPress reports none", async () => {
+    cmsServes({ GetPages: pagesReply([]) });
+    const entries = await getAllSitemapEntries();
+    assert.ok(entries.some((entry) => pathOf(entry.url) === "/about"));
+    const before = entries.length;
+    assert.equal(before, 8); // only the static routes, nothing dynamic mocked
+  });
+
+  test("omits page URLs (only) when the pages query fails, everything else unaffected", async () => {
+    cmsServes({
+      GetServices: {
+        services: { nodes: [serviceNode("smm", 2)], pageInfo: PAGE_INFO },
+      },
+    });
+    const entries = await getAllSitemapEntries();
+    assert.ok(entries.some((entry) => pathOf(entry.url) === "/services/smm"));
+    assert.ok(!entries.some((entry) => pathOf(entry.url) === "/our-story"));
   });
 });
