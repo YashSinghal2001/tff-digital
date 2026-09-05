@@ -26,13 +26,6 @@ export const mockPrimaryNavigation: NavigationMenu = {
       children: [],
     },
     {
-      id: "nav-portfolio",
-      label: "Portfolio",
-      url: ROUTES.portfolio,
-      target: "_self",
-      children: [],
-    },
-    {
       id: "nav-case-studies",
       label: "Case Studies",
       url: ROUTES.caseStudies,

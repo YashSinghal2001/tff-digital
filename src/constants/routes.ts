@@ -3,8 +3,6 @@ export const ROUTES = {
   about: "/about",
   services: "/services",
   service: (slug: string) => `/services/${slug}`,
-  portfolio: "/portfolio",
-  portfolioItem: (slug: string) => `/portfolio/${slug}`,
   caseStudies: "/case-studies",
   caseStudy: (slug: string) => `/case-studies/${slug}`,
   blog: "/blog",
