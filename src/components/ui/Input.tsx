@@ -5,16 +5,27 @@ import { cn } from "@/lib/utils";
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
+  /**
+   * Renders the label for assistive technology only (A11Y-FOOTER-1). Where
+   * the surrounding copy already names a field visually, a visible label
+   * would duplicate it and change the layout — but the control still needs a
+   * real, associated name. `sr-only` is absolutely positioned, so the label
+   * is not a flex item and the layout is untouched.
+   */
+  hideLabel?: boolean;
   error?: string;
 }
 
-export function Input({ label, error, id, className, ...props }: InputProps) {
+export function Input({ label, hideLabel, error, id, className, ...props }: InputProps) {
   const inputId = id ?? props.name;
   const errorId = error && inputId ? `${inputId}-error` : undefined;
   return (
     <div className="flex flex-col gap-2">
       {label ? (
-        <label htmlFor={inputId} className="font-body text-sm text-muted">
+        <label
+          htmlFor={inputId}
+          className={cn("font-body text-sm text-muted", hideLabel && "sr-only")}
+        >
           {label}
         </label>
       ) : null}

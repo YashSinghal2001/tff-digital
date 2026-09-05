@@ -34,6 +34,10 @@ const socialLinks = [
   { label: "Pinterest", href: SOCIAL_LINKS.pinterest, icon: PinterestIcon },
 ];
 
+// Unique on every page: the contact form's email field derives its id from
+// its `name` ("email") and the blog newsletter uses "newsletter-email".
+const NEWSLETTER_INPUT_ID = "footer-newsletter-email";
+
 export function Footer() {
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
@@ -67,7 +71,9 @@ export function Footer() {
               <form onSubmit={onSubscribe} className="mt-3 flex max-w-xs gap-2">
                 <Input
                   type="email"
-                  aria-label="Email address"
+                  id={NEWSLETTER_INPUT_ID}
+                  label="Email address"
+                  hideLabel
                   placeholder="you@company.com"
                   required
                   value={email}
