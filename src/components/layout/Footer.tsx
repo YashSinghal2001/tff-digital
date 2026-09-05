@@ -149,7 +149,7 @@ export function Footer() {
               row of equal thirds so the copyright is centered across the full
               footer width, legal links sit left, tagline sits right. */}
           <div className="flex flex-col items-center gap-3 text-center lg:grid lg:grid-cols-3 lg:items-center lg:gap-4">
-            <div className="order-2 flex items-center gap-x-3 font-body text-xs text-muted lg:order-1 lg:justify-self-start">
+            <div className="order-2 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 font-body text-xs text-muted lg:order-1 lg:flex-nowrap lg:justify-self-start">
               <Link
                 href={ROUTES.privacyPolicy}
                 className="transition-colors duration-150 hover:text-white"
@@ -164,6 +164,15 @@ export function Footer() {
                 className="transition-colors duration-150 hover:text-white"
               >
                 Terms &amp; Conditions
+              </Link>
+              <span aria-hidden="true" className="text-border-strong">
+                |
+              </span>
+              <Link
+                href={ROUTES.cookiePolicy}
+                className="transition-colors duration-150 hover:text-white"
+              >
+                Cookie Policy
               </Link>
             </div>
 
