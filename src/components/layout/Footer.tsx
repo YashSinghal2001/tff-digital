@@ -7,6 +7,10 @@ import { Container } from "@/components/ui/Container";
 import { Input } from "@/components/ui/Input";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { Logo } from "@/components/layout/Logo";
+import {
+  FOOTER_QUICK_LINKS,
+  FOOTER_SERVICE_LINKS,
+} from "@/components/layout/footer-links";
 import { ROUTES } from "@/constants/routes";
 import { SOCIAL_LINKS } from "@/constants/social";
 import {
@@ -18,22 +22,8 @@ import {
 } from "@/components/icons/social-icons";
 
 const footerLinks = {
-  Services: [
-    { label: "CRO", href: ROUTES.services },
-    { label: "SEO", href: ROUTES.service("seo") },
-    { label: "PPC", href: ROUTES.services },
-    { label: "Branding", href: ROUTES.services },
-    { label: "Web Design & Dev", href: ROUTES.services },
-    { label: "Social Media Marketing", href: ROUTES.service("smm") },
-  ],
-  "Quick Links": [
-    { label: "Home", href: ROUTES.home },
-    { label: "About us", href: ROUTES.about },
-    { label: "Services", href: ROUTES.services },
-    { label: "Testimonials", href: `${ROUTES.home}#testimonials` },
-    { label: "Blog", href: ROUTES.blog },
-    { label: "Contact us", href: ROUTES.contact },
-  ],
+  Services: FOOTER_SERVICE_LINKS,
+  "Quick Links": FOOTER_QUICK_LINKS,
 };
 
 const socialLinks = [

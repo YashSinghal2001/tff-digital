@@ -8,7 +8,7 @@ export function ServicesHero() {
       eyebrow="SERVICES"
       heading={
         <>
-          Nine disciplines. <GradientText>One growth engine.</GradientText>
+          Six disciplines. <GradientText>One growth engine.</GradientText>
         </>
       }
       description={[

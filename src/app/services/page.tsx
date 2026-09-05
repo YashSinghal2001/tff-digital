@@ -57,7 +57,7 @@ const servicesFaqs: FAQItem[] = [
 export const metadata: Metadata = {
   title: "Services",
   description:
-    "Nine disciplines, one growth engine — SEO, paid media, social, brand, and web, built to compound.",
+    "Six disciplines, one growth engine — SEO, paid media, social, brand, and web, built to compound.",
   alternates: { canonical: getCanonicalUrl(ROUTES.services) },
   openGraph: buildPageOpenGraph(getCanonicalUrl(ROUTES.services)),
 };
@@ -76,7 +76,7 @@ export default async function ServicesPage() {
       <WhoThisIsFor
         eyebrow="WHO WE WORK WITH"
         heading="Great work starts with the right fit."
-        description="Nine disciplines, one filter: whether we can genuinely move your revenue."
+        description="Six disciplines, one filter: whether we can genuinely move your revenue."
         fitItems={servicesFitItems}
         notFitItems={servicesNotFitItems}
       />

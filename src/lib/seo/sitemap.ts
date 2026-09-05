@@ -7,10 +7,7 @@ import {
   getCategoriesStrict,
   getTagsStrict,
 } from "@/services/taxonomy.service";
-// TEMPORARY: WP service entries are not emitted here yet — the grids are
-// WordPress-driven (ARCH-1) but the sitemap step is a separate follow-up.
-// TODO: RESTORE WORDPRESS DATA
-// import { getServiceOfferings } from "@/services/service-offering.service";
+import { getServiceOfferings } from "@/services/service-offering.service";
 import { filterPlaceholderCaseStudies } from "@/lib/content/case-study-placeholders";
 
 export interface SitemapEntry {
@@ -19,16 +16,15 @@ export interface SitemapEntry {
 }
 
 // Portfolio still has no route under src/app. Case Studies (src/app/case-studies)
-// and generic per-slug Service pages (src/app/services/[slug]) do — both included
-// below. /services/seo and /services/smm are bespoke pages with no matching
-// WordPress service slug (confirmed live), so they stay listed here as statics
-// rather than being derivable from the service repository.
+// and per-slug Service pages (src/app/services/[slug]) do — both derived from
+// WordPress below. No service URL is listed statically: the former bespoke
+// /services/smm page is retired (the WordPress `smm` service now serves that
+// URL) and /services/seo is a permanent redirect to /services/aeo-seo (see
+// src/constants/redirects.ts), so neither is a canonical location.
 const STATIC_ROUTES = [
   ROUTES.home,
   ROUTES.about,
   ROUTES.services,
-  ROUTES.service("seo"),
-  ROUTES.service("smm"),
   ROUTES.blog,
   ROUTES.caseStudies,
   ROUTES.contact,
@@ -106,39 +102,59 @@ async function getTaxonomyEntries(): Promise<SitemapEntry[]> {
   }
 }
 
-// TEMPORARY: WP service entries removed while the CMS holds placeholder
-// services. TODO: RESTORE WORDPRESS DATA — restore this alongside the grids:
-// async function getServiceOfferingEntries(): Promise<SitemapEntry[]> {
-//   try {
-//     const services = await getServiceOfferings({ first: 1000 });
-//     return services.items.map((service) => ({
-//       url: getCanonicalUrl(ROUTES.service(service.slug)),
-//       lastModified: service.updatedAt,
-//     }));
-//   } catch (error) {
-//     console.error(
-//       "[getAllSitemapEntries] WPGraphQL request failed; sitemap will omit services for this build.",
-//       error,
-//     );
-//     return [];
-//   }
-// }
+// Same source of truth as the /services grid and the detail route's
+// generateStaticParams (ARCH-1): every published WordPress service, in
+// display_order. getServiceOfferings is already a soft getter, but the catch
+// keeps this source's failure mode explicit and independent like the others.
+async function getServiceOfferingEntries(): Promise<SitemapEntry[]> {
+  try {
+    const services = await getServiceOfferings({ first: 100 });
+    return services.items
+      .filter((service) => service.slug)
+      .map((service) => ({
+        url: getCanonicalUrl(ROUTES.service(service.slug)),
+        lastModified: service.updatedAt,
+      }));
+  } catch (error) {
+    console.error(
+      "[getAllSitemapEntries] WPGraphQL request failed; sitemap will omit services for this build.",
+      error,
+    );
+    return [];
+  }
+}
+
+// A sitemap must not list the same <loc> twice. Sources are disjoint by
+// construction, but a CMS entry whose slug collides with another source (or
+// a duplicated node in a paginated reply) would otherwise slip through; the
+// first occurrence wins so static routes keep precedence.
+function dedupeByUrl(entries: SitemapEntry[]): SitemapEntry[] {
+  const seen = new Set<string>();
+  return entries.filter((entry) => {
+    if (seen.has(entry.url)) return false;
+    seen.add(entry.url);
+    return true;
+  });
+}
 
 export async function getAllSitemapEntries(): Promise<SitemapEntry[]> {
   const staticEntries: SitemapEntry[] = STATIC_ROUTES.map((route) => ({
     url: getCanonicalUrl(route),
   }));
 
-  const [postEntries, taxonomyEntries, caseStudyEntries] = await Promise.all([
-    getBlogPostEntries(),
-    getTaxonomyEntries(),
-    getCaseStudyEntries(),
-  ]);
+  const [serviceEntries, postEntries, taxonomyEntries, caseStudyEntries] =
+    await Promise.all([
+      getServiceOfferingEntries(),
+      getBlogPostEntries(),
+      getTaxonomyEntries(),
+      getCaseStudyEntries(),
+    ]);
 
-  return [
+  return dedupeByUrl([
     ...staticEntries,
+    ...serviceEntries,
     ...postEntries,
     ...taxonomyEntries,
     ...caseStudyEntries,
-  ];
+  ]);
 }

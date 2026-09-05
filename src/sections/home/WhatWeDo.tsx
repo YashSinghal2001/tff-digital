@@ -37,7 +37,7 @@ export function WhatWeDo({ services }: WhatWeDoProps) {
             <GradientText>under one roof.</GradientText>
           </Heading>
           <p className="mx-auto mt-4 max-w-md font-body text-sm text-muted">
-            Sixteen disciplines, one integrated system — engineered to move a single
+            Six disciplines, one integrated system — engineered to move a single
             metric: your growth.
           </p>
         </motion.div>

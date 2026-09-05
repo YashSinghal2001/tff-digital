@@ -1,5 +1,6 @@
 import path from "path";
 import type { NextConfig } from "next";
+import { SERVICE_REDIRECTS } from "./src/constants/redirects";
 
 const wordpressMediaHostname = process.env.WORDPRESS_MEDIA_HOSTNAME;
 
@@ -65,6 +66,9 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     optimizePackageImports: ["lucide-react", "framer-motion"],
+  },
+  async redirects() {
+    return [...SERVICE_REDIRECTS];
   },
   async headers() {
     return [
