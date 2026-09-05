@@ -11,7 +11,11 @@ export interface CaseStudyCardProps {
   priority?: boolean;
 }
 
-export function CaseStudyCard({ caseStudy, className, priority = false }: CaseStudyCardProps) {
+export function CaseStudyCard({
+  caseStudy,
+  className,
+  priority = false,
+}: CaseStudyCardProps) {
   const headlineResult = caseStudy.results[0];
 
   return (
@@ -21,7 +25,7 @@ export function CaseStudyCard({ caseStudy, className, priority = false }: CaseSt
       // badge, title, summary, client, and result stat (CARDA11Y-1).
       aria-label={caseStudy.title}
       className={cn(
-        "group flex h-full flex-col overflow-hidden rounded-[25px] border border-border-strong bg-glass transition-colors hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
+        "group border-border-strong bg-glass hover:border-primary/50 focus-visible:ring-primary/50 flex h-full flex-col overflow-hidden rounded-[25px] border transition-colors focus-visible:ring-2 focus-visible:outline-none",
         className,
       )}
     >
@@ -33,7 +37,7 @@ export function CaseStudyCard({ caseStudy, className, priority = false }: CaseSt
             fill
             priority={priority}
             sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 400px"
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            className="object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
           />
         ) : null}
       </div>
@@ -45,23 +49,27 @@ export function CaseStudyCard({ caseStudy, className, priority = false }: CaseSt
           </Badge>
         ) : null}
 
-        <h3 className="line-clamp-2 font-heading text-lg font-bold text-white">
+        <h3 className="font-heading line-clamp-2 text-lg font-bold text-white">
           {caseStudy.title}
         </h3>
         {caseStudy.summary ? (
-          <p className="line-clamp-2 font-body text-sm text-muted">{caseStudy.summary}</p>
+          <p className="font-body text-muted line-clamp-2 text-sm">
+            {caseStudy.summary}
+          </p>
         ) : null}
 
         {headlineResult ? (
-          <div className="mt-auto flex items-center gap-2 pt-2 font-body text-xs text-muted">
+          <div className="font-body text-muted mt-auto flex items-center gap-2 pt-2 text-xs">
             {caseStudy.clientName ? <span>{caseStudy.clientName}</span> : null}
             {caseStudy.clientName ? <span aria-hidden="true">·</span> : null}
-            <span className="font-semibold text-primary">
+            <span className="text-primary font-semibold">
               {headlineResult.value} {headlineResult.label}
             </span>
           </div>
         ) : caseStudy.clientName ? (
-          <p className="mt-auto pt-2 font-body text-xs text-muted">{caseStudy.clientName}</p>
+          <p className="font-body text-muted mt-auto pt-2 text-xs">
+            {caseStudy.clientName}
+          </p>
         ) : null}
       </div>
     </Link>

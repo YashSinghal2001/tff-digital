@@ -18,7 +18,7 @@ const stats: Array<{ value: string; label: string; highlight?: boolean }> = [
 
 export function TrustedBrands() {
   return (
-    <section className="pb-8 pt-0 sm:pb-10">
+    <section className="pt-0 pb-8 sm:pb-10">
       <Container size="full" className="max-w-[1280px]">
         <motion.div
           {...fadeInUp}
@@ -109,7 +109,7 @@ export function TrustedBrands() {
               >
                 View Upwork Profile
                 <ArrowUpRight
-                  className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                  className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0 motion-reduce:group-hover:translate-y-0"
                   aria-hidden="true"
                 />
               </motion.a>

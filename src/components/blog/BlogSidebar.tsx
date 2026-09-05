@@ -19,27 +19,34 @@ export interface BlogSidebarProps {
 }
 
 const cardClass = "rounded-[25px] border border-border-strong bg-glass p-6";
-const cardTitleClass = "mb-4 font-heading text-xs font-bold uppercase tracking-wide text-white";
+const cardTitleClass =
+  "mb-4 font-heading text-xs font-bold uppercase tracking-wide text-white";
 
 function SidebarPostRow({ post }: { post: Post }) {
   return (
-    <Link href={ROUTES.blogPost(post.slug)} className="group flex items-center gap-3">
-      <span className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-border-strong bg-white/5">
+    <Link
+      href={ROUTES.blogPost(post.slug)}
+      className="group flex items-center gap-3"
+    >
+      <span className="border-border-strong relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border bg-white/5">
         {post.featuredImage ? (
           <Image
             src={post.featuredImage.url}
             alt={post.featuredImage.altText || post.title}
             fill
             sizes="56px"
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            className="object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
           />
         ) : null}
       </span>
       <span className="flex flex-col gap-0.5">
-        <span className="line-clamp-2 font-body text-sm font-medium text-white transition-colors group-hover:text-primary">
+        <span className="font-body group-hover:text-primary line-clamp-2 text-sm font-medium text-white transition-colors">
           {post.title}
         </span>
-        <time dateTime={post.publishedAt} className="font-body text-xs text-muted">
+        <time
+          dateTime={post.publishedAt}
+          className="font-body text-muted text-xs"
+        >
           {formatPostDate(post.publishedAt)}
         </time>
       </span>
@@ -79,10 +86,10 @@ export function BlogSidebar({
               <li key={category.id}>
                 <Link
                   href={ROUTES.blogCategory(category.slug)}
-                  className="flex items-center justify-between font-body text-sm text-muted transition-colors hover:text-white"
+                  className="font-body text-muted flex items-center justify-between text-sm transition-colors hover:text-white"
                 >
                   <span>{category.name}</span>
-                  <span className="text-xs text-muted">{category.count}</span>
+                  <span className="text-muted text-xs">{category.count}</span>
                 </Link>
               </li>
             ))}
@@ -104,8 +111,9 @@ export function BlogSidebar({
       {popularPosts.length > 0 ? (
         <div className={cardClass}>
           <p className={cardTitleClass}>Popular posts</p>
-          <p className="mb-4 -mt-2 font-body text-xs text-muted">
-            Ranked by reader activity once analytics is connected — showing recent picks for now.
+          <p className="font-body text-muted -mt-2 mb-4 text-xs">
+            Ranked by reader activity once analytics is connected — showing
+            recent picks for now.
           </p>
           <div className="flex flex-col gap-4">
             {popularPosts.map((post) => (
@@ -121,7 +129,7 @@ export function BlogSidebar({
           <div className="flex flex-wrap gap-2">
             {tags.map((tag) => (
               <Link key={tag.id} href={ROUTES.blogTag(tag.slug)}>
-                <Badge className="transition-colors hover:border-primary/50 hover:text-primary">
+                <Badge className="hover:border-primary/50 hover:text-primary transition-colors">
                   #{tag.name}
                 </Badge>
               </Link>

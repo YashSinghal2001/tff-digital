@@ -33,6 +33,21 @@ html {
   scroll-padding-top: 112px;
 }
 
+/*
+ * Reduced motion (A11Y-5). Deliberately narrow: this block suppresses only
+ * page-level scrolling movement, which no component class controls.
+ * Per-component movement is neutralised at the call site with Tailwind's
+ * `motion-reduce:` variant, and colour/opacity/shadow transitions are kept
+ * on purpose — they communicate state (focus, hover, validity) and are not
+ * vestibular triggers, so blanket-disabling every transition would cost
+ * usability without an accessibility gain.
+ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 body {
   background: var(--color-background);
   color: var(--color-foreground);

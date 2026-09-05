@@ -8,7 +8,9 @@ export function PostCardSkeleton({ className }: PostCardSkeletonProps) {
   return (
     <div
       className={cn(
-        "flex h-full animate-pulse flex-col overflow-hidden rounded-[25px] border border-border-strong bg-glass",
+        // The skeleton's shape already reads as "loading"; the pulse is purely
+        // decorative, so it stops entirely under reduced motion.
+        "border-border-strong bg-glass flex h-full animate-pulse flex-col overflow-hidden rounded-[25px] border motion-reduce:animate-none",
         className,
       )}
     >

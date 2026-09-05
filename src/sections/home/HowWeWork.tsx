@@ -22,6 +22,7 @@ import { buttonVariants } from "@/components/ui/button-variants";
 import { SectionEyebrow } from "@/components/common/SectionEyebrow";
 import { ROUTES } from "@/constants/routes";
 import { fadeInUp } from "@/styles/animations";
+import { useEntranceDelay } from "@/lib/a11y/use-entrance-delay";
 
 interface Step {
   step: string;
@@ -83,7 +84,7 @@ const iconGradientStroke = { stroke: "url(#hww-icon-gradient)" } as const;
 function TimelineNode({ className }: { className?: string }) {
   return (
     <span
-      className={`absolute h-4 w-4 rounded-full ring-4 ring-background ${gradientLine} ${className ?? ""}`}
+      className={`ring-background absolute h-4 w-4 rounded-full ring-4 ${gradientLine} ${className ?? ""}`}
     />
   );
 }
@@ -95,21 +96,21 @@ function StepContent({ step }: { step: Step }) {
       <div className="flex items-center gap-3 lg:gap-4">
         <span
           aria-hidden="true"
-          className="select-none font-heading text-[56px] font-bold leading-none text-primary/[0.16] lg:text-[64px]"
+          className="font-heading text-primary/[0.16] text-[56px] leading-none font-bold select-none lg:text-[64px]"
         >
           {step.step}
         </span>
         {/* The icon sits beside the numeral at every breakpoint — the circle is
             translucent and blurred, so overlapping it onto the digits reads as
             a clipped number rather than as one integrated mark. */}
-        <span className="relative inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-border-strong bg-glass backdrop-blur-sm">
+        <span className="border-border-strong bg-glass relative inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-full border backdrop-blur-sm">
           <Icon className="h-6 w-6" style={iconGradientStroke} />
         </span>
       </div>
-      <h3 className="mt-4 font-heading text-lg font-bold text-white">
+      <h3 className="font-heading mt-4 text-lg font-bold text-white">
         {step.title}
       </h3>
-      <p className="mt-2 max-w-[280px] font-body text-sm leading-relaxed text-muted lg:max-w-none">
+      <p className="font-body text-muted mt-2 max-w-[280px] text-sm leading-relaxed lg:max-w-none">
         {step.description}
       </p>
     </div>
@@ -129,20 +130,20 @@ function TimelineRow({
 }) {
   return (
     <>
-      <div className={`relative col-start-1 col-span-3 h-4 ${stripRow}`}>
+      <div className={`relative col-span-3 col-start-1 h-4 ${stripRow}`}>
         {/* The rail runs from the first node to the right edge of the grid so
             both rows terminate flush with the container. */}
         <span
-          className={`absolute left-2 right-0 top-1/2 h-px -translate-y-1/2 ${gradientLine}`}
+          className={`absolute top-1/2 right-0 left-2 h-px -translate-y-1/2 ${gradientLine}`}
         />
-        <TimelineNode className="left-0 top-1/2 -translate-y-1/2" />
-        <TimelineNode className="left-1/3 top-1/2 -translate-y-1/2" />
-        <TimelineNode className="left-2/3 top-1/2 -translate-y-1/2" />
+        <TimelineNode className="top-1/2 left-0 -translate-y-1/2" />
+        <TimelineNode className="top-1/2 left-1/3 -translate-y-1/2" />
+        <TimelineNode className="top-1/2 left-2/3 -translate-y-1/2" />
       </div>
       {rowSteps.map((step, index) => (
         <div
           key={step.step}
-          className={`${colStart[index]} pr-10 pt-4 ${contentRow}`}
+          className={`${colStart[index]} pt-4 pr-10 ${contentRow}`}
         >
           <StepContent step={step} />
         </div>
@@ -152,10 +153,12 @@ function TimelineRow({
 }
 
 export function HowWeWork() {
+  const entranceDelay = useEntranceDelay();
+
   return (
     <section id="process" className="relative overflow-hidden py-12 lg:py-16">
       <Glow
-        className="left-1/2 top-0 h-[560px] w-[560px] -translate-x-1/2 opacity-10"
+        className="top-0 left-1/2 h-[560px] w-[560px] -translate-x-1/2 opacity-10"
         color="var(--color-secondary)"
       />
 
@@ -175,7 +178,7 @@ export function HowWeWork() {
           <Heading as="h2">
             A proven <GradientText>six-step</GradientText> growth engine.
           </Heading>
-          <p className="mt-4 max-w-md font-body text-sm leading-relaxed text-muted">
+          <p className="font-body text-muted mt-4 max-w-md text-sm leading-relaxed">
             From insight to execution, every step has a purpose and every action
             drives measurable results.
           </p>
@@ -199,18 +202,19 @@ export function HowWeWork() {
 
         {/* Mobile / tablet: vertical timeline */}
         <div className="relative lg:hidden">
-          <span
-            className="absolute bottom-2 left-2 top-2 w-px bg-[linear-gradient(180deg,var(--color-primary)_0%,var(--color-secondary)_100%)]"
-          />
+          <span className="absolute top-2 bottom-2 left-2 w-px bg-[linear-gradient(180deg,var(--color-primary)_0%,var(--color-secondary)_100%)]" />
           <div className="flex flex-col gap-10">
             {steps.map((step, index) => (
               <motion.div
                 key={step.step}
                 {...fadeInUp}
-                transition={{ ...fadeInUp.transition, delay: index * 0.05 }}
+                transition={{
+                  ...fadeInUp.transition,
+                  delay: entranceDelay(index * 0.05),
+                }}
                 className="relative pl-10"
               >
-                <TimelineNode className="left-0 top-1" />
+                <TimelineNode className="top-1 left-0" />
                 <StepContent step={step} />
               </motion.div>
             ))}
@@ -222,7 +226,7 @@ export function HowWeWork() {
           <Card className="mt-8 sm:p-8 lg:mt-10">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:gap-8">
               <div className="flex flex-1 flex-col gap-5 sm:flex-row sm:items-center">
-                <span className="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-border-strong bg-glass">
+                <span className="border-border-strong bg-glass inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-full border">
                   <ChartNoAxesCombined
                     className="h-6 w-6"
                     style={iconGradientStroke}
@@ -232,13 +236,13 @@ export function HowWeWork() {
                   <h3 className="font-heading text-xl font-bold text-white sm:text-2xl">
                     Built for growth. Backed by data.
                   </h3>
-                  <p className="mt-1.5 max-w-lg font-body text-sm leading-relaxed text-muted">
+                  <p className="font-body text-muted mt-1.5 max-w-lg text-sm leading-relaxed">
                     Strategy, creativity and performance working together as one
                     growth engine for your business.
                   </p>
                 </div>
               </div>
-              <span className="hidden h-14 w-px shrink-0 bg-border-subtle lg:block" />
+              <span className="bg-border-subtle hidden h-14 w-px shrink-0 lg:block" />
               <Link
                 href={ROUTES.contact}
                 className={buttonVariants({

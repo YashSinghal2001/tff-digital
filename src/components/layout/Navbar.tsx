@@ -20,9 +20,11 @@ const navLinks = [
   { label: "Contact", href: ROUTES.contact },
 ];
 
-// Tailwind's `xl` breakpoint (80rem): the mobile toggle/panel are hidden at
-// and above it, so an open menu must close if the viewport crosses it.
-const DESKTOP_MEDIA_QUERY = "(min-width: 80rem)";
+// This project moves Tailwind's `xl` breakpoint to 75rem (see
+// --breakpoint-xl in src/app/globals.css); the mobile toggle and panel are
+// `xl:hidden`, so an open menu must close if the viewport crosses it —
+// otherwise the page stays inert with no visible control to release it.
+const DESKTOP_MEDIA_QUERY = "(min-width: 75rem)";
 
 export function Navbar() {
   const [open, setOpen] = useState(false);

@@ -13,6 +13,7 @@ import { SectionEyebrow } from "@/components/common/SectionEyebrow";
 import { EmptyState } from "@/components/common/EmptyState";
 import { ROUTES } from "@/constants/routes";
 import { fadeInUp } from "@/styles/animations";
+import { useEntranceDelay } from "@/lib/a11y/use-entrance-delay";
 import { getWebsitePreviewUrl } from "@/lib/content/website-preview";
 import type { CaseStudy } from "@/types/domain/case-study";
 
@@ -47,8 +48,9 @@ export function SelectedWork({ caseStudies }: SelectedWorkProps) {
               Growth, <GradientText>made visible.</GradientText>
             </Heading>
           </div>
-          <p className="max-w-xs font-body text-sm text-muted">
-            A glimpse at the systems we&apos;ve built and the results they&apos;ve earned.
+          <p className="font-body text-muted max-w-xs text-sm">
+            A glimpse at the systems we&apos;ve built and the results
+            they&apos;ve earned.
           </p>
         </motion.div>
 
@@ -61,7 +63,11 @@ export function SelectedWork({ caseStudies }: SelectedWorkProps) {
         ) : (
           <div className="grid gap-6 sm:grid-cols-2">
             {caseStudies.map((caseStudy, index) => (
-              <SelectedWorkCard key={caseStudy.id} caseStudy={caseStudy} index={index} />
+              <SelectedWorkCard
+                key={caseStudy.id}
+                caseStudy={caseStudy}
+                index={index}
+              />
             ))}
           </div>
         )}
@@ -90,15 +96,20 @@ function SelectedWorkCard({ caseStudy, index }: SelectedWorkCardProps) {
   const headlineResult = caseStudy.results[0];
   const clientLabel = caseStudy.clientName || caseStudy.title;
 
+  const entranceDelay = useEntranceDelay();
+
   return (
     <motion.div
       {...fadeInUp}
-      transition={{ ...fadeInUp.transition, delay: index * 0.05 }}
-      className="group relative flex h-72 flex-col justify-end overflow-hidden rounded-[25px] border border-border-strong bg-white/5 p-6"
+      transition={{
+        ...fadeInUp.transition,
+        delay: entranceDelay(index * 0.05),
+      }}
+      className="group border-border-strong relative flex h-72 flex-col justify-end overflow-hidden rounded-[25px] border bg-white/5 p-6"
     >
       <Link
         href={ROUTES.caseStudy(caseStudy.slug)}
-        className="absolute inset-0 z-10 outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+        className="focus-visible:ring-primary/50 absolute inset-0 z-10 outline-none focus-visible:ring-2"
         aria-label={`View case study: ${clientLabel}`}
       />
       {showPreview ? (
@@ -111,15 +122,18 @@ function SelectedWorkCard({ caseStudy, index }: SelectedWorkCardProps) {
             alt=""
             fill
             sizes="(max-width: 640px) 100vw, 50vw"
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            className="object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
             onError={() => setPreviewFailed(true)}
           />
           {/* Screenshots vary wildly in brightness/contrast — a bottom-up
               gradient keeps the name/badge below readable over any site. */}
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+          <div className="from-background via-background/40 pointer-events-none absolute inset-0 bg-gradient-to-t to-transparent" />
         </>
       ) : (
-        <Building2 className="absolute right-6 top-6 h-10 w-10 text-white/10" strokeWidth={1} />
+        <Building2
+          className="absolute top-6 right-6 h-10 w-10 text-white/10"
+          strokeWidth={1}
+        />
       )}
       {headlineResult ? (
         <Badge className="relative mb-3 w-fit" tone="info">
@@ -127,8 +141,10 @@ function SelectedWorkCard({ caseStudy, index }: SelectedWorkCardProps) {
         </Badge>
       ) : null}
       <div className="relative flex items-center justify-between">
-        <p className="font-heading text-lg font-bold text-white">{clientLabel}</p>
-        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-white transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
+        <p className="font-heading text-lg font-bold text-white">
+          {clientLabel}
+        </p>
+        <span className="bg-primary flex h-9 w-9 items-center justify-center rounded-full text-white transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0 motion-reduce:group-hover:translate-y-0">
           <ArrowUpRight className="h-4 w-4" />
         </span>
       </div>

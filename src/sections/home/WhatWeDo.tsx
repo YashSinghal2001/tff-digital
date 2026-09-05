@@ -29,14 +29,17 @@ export function WhatWeDo({ services }: WhatWeDoProps) {
   return (
     <section id="services" className="py-12 lg:py-16">
       <Container size="full" className="max-w-[1280px]">
-        <motion.div {...fadeInUp} className="mx-auto mb-8 max-w-2xl text-center">
+        <motion.div
+          {...fadeInUp}
+          className="mx-auto mb-8 max-w-2xl text-center"
+        >
           <SectionEyebrow>WHAT WE DO</SectionEyebrow>
           <Heading as="h2">
             A full growth stack,
             <br />
             <GradientText>under one roof.</GradientText>
           </Heading>
-          <p className="mx-auto mt-4 max-w-md font-body text-sm text-muted">
+          <p className="font-body text-muted mx-auto mt-4 max-w-md text-sm">
             Six disciplines, one integrated system — engineered to move a single
             metric: your growth.
           </p>
@@ -48,7 +51,7 @@ export function WhatWeDo({ services }: WhatWeDoProps) {
           ) : (
             <div
               aria-label="Our services"
-              className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:grid sm:grid-cols-2 sm:overflow-visible sm:pb-0 lg:grid-cols-3 xl:grid-cols-5"
+              className="flex snap-x snap-mandatory [scrollbar-width:none] gap-4 overflow-x-auto pb-4 sm:grid sm:grid-cols-2 sm:overflow-visible sm:pb-0 lg:grid-cols-3 xl:grid-cols-5 [&::-webkit-scrollbar]:hidden"
             >
               {services.map((service) => {
                 const Icon = getServiceCardIcon(service.slug);
@@ -63,15 +66,17 @@ export function WhatWeDo({ services }: WhatWeDoProps) {
                         <h3 className="font-heading text-lg font-bold text-white xl:text-base">
                           {service.title}
                         </h3>
-                        <p className="font-body text-sm text-muted">{service.summary}</p>
+                        <p className="font-body text-muted text-sm">
+                          {service.summary}
+                        </p>
                         <ul className="flex flex-col gap-2">
                           {service.features.map((feature) => (
                             <li
                               key={feature}
-                              className="flex items-start gap-2 font-body text-sm text-muted"
+                              className="font-body text-muted flex items-start gap-2 text-sm"
                             >
                               <Check
-                                className="mt-0.5 h-4 w-4 shrink-0 text-primary"
+                                className="text-primary mt-0.5 h-4 w-4 shrink-0"
                                 aria-hidden="true"
                               />
                               {feature}
@@ -80,12 +85,15 @@ export function WhatWeDo({ services }: WhatWeDoProps) {
                         </ul>
                         <Link
                           href={service.href}
-                          className="relative mt-auto flex items-center gap-1 pt-2 font-body text-sm font-semibold text-primary transition-colors hover:text-white"
+                          className="font-body text-primary relative mt-auto flex items-center gap-1 pt-2 text-sm font-semibold transition-colors hover:text-white"
                         >
                           Learn more
-                          <span className="sr-only"> about {service.title}</span>{" "}
+                          <span className="sr-only">
+                            {" "}
+                            about {service.title}
+                          </span>{" "}
                           <ArrowRight
-                            className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-0.5 motion-reduce:transition-none"
+                            className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-0.5 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0"
                             aria-hidden="true"
                           />
                         </Link>
@@ -98,7 +106,10 @@ export function WhatWeDo({ services }: WhatWeDoProps) {
           )}
 
           <div className="mt-8 flex justify-center">
-            <Link href={ROUTES.contact} className={buttonVariants({ size: "lg" })}>
+            <Link
+              href={ROUTES.contact}
+              className={buttonVariants({ size: "lg" })}
+            >
               Let&apos;s Grow Together
               <ArrowRight className="h-5 w-5" aria-hidden="true" />
             </Link>

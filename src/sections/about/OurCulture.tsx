@@ -8,6 +8,7 @@ import { GradientText } from "@/components/ui/GradientText";
 import { SectionEyebrow } from "@/components/common/SectionEyebrow";
 import { teamMembers } from "@/data/team";
 import { fadeInUp } from "@/styles/animations";
+import { useEntranceDelay } from "@/lib/a11y/use-entrance-delay";
 
 const perks = [
   "Remote-first across 12 countries",
@@ -17,6 +18,8 @@ const perks = [
 ];
 
 export function OurCulture() {
+  const entranceDelay = useEntranceDelay();
+
   return (
     <section className="py-12 lg:py-16">
       <Container size="full" className="max-w-[1280px]">
@@ -24,12 +27,14 @@ export function OurCulture() {
           <motion.div {...fadeInUp}>
             <SectionEyebrow>OUR CULTURE</SectionEyebrow>
             <Heading as="h2">
-              <GradientText>Ambitious, kind,</GradientText> and unusually honest.
+              <GradientText>Ambitious, kind,</GradientText> and unusually
+              honest.
             </Heading>
-            <p className="mt-4 font-body text-sm leading-relaxed text-muted">
-              We hire operators who care more about outcomes than optics, and who treat
-              every client engagement like it&apos;s their own company. Remote-first,
-              async by default, in-person a few times a year for the moments that matter.
+            <p className="font-body text-muted mt-4 text-sm leading-relaxed">
+              We hire operators who care more about outcomes than optics, and
+              who treat every client engagement like it&apos;s their own
+              company. Remote-first, async by default, in-person a few times a
+              year for the moments that matter.
             </p>
             <ul className="mt-6 flex flex-col gap-2">
               {perks.map((perk) => (
@@ -45,8 +50,8 @@ export function OurCulture() {
               empty placeholder panel without introducing new imagery. */}
           <motion.div
             {...fadeInUp}
-            transition={{ ...fadeInUp.transition, delay: 0.1 }}
-            className="grid aspect-[4/3] w-full grid-cols-3 grid-rows-2 gap-2 overflow-hidden rounded-[25px] border border-border-strong bg-white/5 p-2"
+            transition={{ ...fadeInUp.transition, delay: entranceDelay(0.1) }}
+            className="border-border-strong grid aspect-[4/3] w-full grid-cols-3 grid-rows-2 gap-2 overflow-hidden rounded-[25px] border bg-white/5 p-2"
           >
             {teamMembers.map((member) => (
               <div

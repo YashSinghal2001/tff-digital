@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/Card";
 import { IconCircle, sizeClass } from "@/components/ui/IconCircle";
 import type { Size } from "@/types/ui/common";
 import { fadeInUp } from "@/styles/animations";
+import { useEntranceDelay } from "@/lib/a11y/use-entrance-delay";
 import { cn } from "@/lib/utils";
 
 const iconPixelSize: Record<Size, string> = {
@@ -54,18 +55,28 @@ export function FeatureGrid({
   staggerStep = 0.05,
   variant = "feature",
 }: FeatureGridProps) {
+  const entranceDelay = useEntranceDelay();
+
   return (
     <div className={cn("grid", gap, gridClassName)}>
       {items.map((item, index) => (
         <motion.div
           key={item.title}
           {...fadeInUp}
-          transition={{ ...fadeInUp.transition, delay: (index % staggerColumns) * staggerStep }}
+          transition={{
+            ...fadeInUp.transition,
+            delay: entranceDelay((index % staggerColumns) * staggerStep),
+          }}
         >
           {variant === "compact" ? (
             <Card className="flex flex-col items-center gap-3 py-8 text-center">
               {item.image ? (
-                <span className={cn("relative shrink-0 overflow-hidden rounded-full", sizeClass[iconSize])}>
+                <span
+                  className={cn(
+                    "relative shrink-0 overflow-hidden rounded-full",
+                    sizeClass[iconSize],
+                  )}
+                >
                   <Image
                     src={item.image.src}
                     alt={item.image.alt}
@@ -77,12 +88,19 @@ export function FeatureGrid({
               ) : (
                 <IconCircle icon={item.icon} size={iconSize} />
               )}
-              <p className="font-heading text-sm font-semibold text-white">{item.title}</p>
+              <p className="font-heading text-sm font-semibold text-white">
+                {item.title}
+              </p>
             </Card>
           ) : (
             <Card className={cn("flex h-full flex-col", cardGap)}>
               {item.image ? (
-                <span className={cn("relative shrink-0 overflow-hidden rounded-full", sizeClass[iconSize])}>
+                <span
+                  className={cn(
+                    "relative shrink-0 overflow-hidden rounded-full",
+                    sizeClass[iconSize],
+                  )}
+                >
                   <Image
                     src={item.image.src}
                     alt={item.image.alt}
@@ -94,21 +112,28 @@ export function FeatureGrid({
               ) : (
                 <IconCircle icon={item.icon} size={iconSize} />
               )}
-              <h3 className={cn("font-heading font-bold text-white", titleClassName)}>
+              <h3
+                className={cn(
+                  "font-heading font-bold text-white",
+                  titleClassName,
+                )}
+              >
                 {item.title}
               </h3>
               {item.description ? (
-                <p className="font-body text-sm text-muted">{item.description}</p>
+                <p className="font-body text-muted text-sm">
+                  {item.description}
+                </p>
               ) : null}
               {item.features && item.features.length > 0 ? (
                 <ul className="flex flex-col gap-2">
                   {item.features.map((feature) => (
                     <li
                       key={feature}
-                      className="flex items-start gap-2 font-body text-sm text-muted"
+                      className="font-body text-muted flex items-start gap-2 text-sm"
                     >
                       <Check
-                        className="mt-0.5 h-4 w-4 shrink-0 text-primary"
+                        className="text-primary mt-0.5 h-4 w-4 shrink-0"
                         aria-hidden="true"
                       />
                       {feature}
@@ -119,7 +144,7 @@ export function FeatureGrid({
               {item.href ? (
                 <Link
                   href={item.href}
-                  className="mt-auto flex items-center gap-1 font-body text-sm font-semibold text-primary"
+                  className="font-body text-primary mt-auto flex items-center gap-1 text-sm font-semibold"
                 >
                   {item.linkLabel ?? "Learn more"}
                   <span className="sr-only"> about {item.title}</span>{" "}

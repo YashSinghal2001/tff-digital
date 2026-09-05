@@ -9,6 +9,7 @@ import { SectionEyebrow } from "@/components/common/SectionEyebrow";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { ROUTES } from "@/constants/routes";
 import { fadeInUp } from "@/styles/animations";
+import { useEntranceDelay } from "@/lib/a11y/use-entrance-delay";
 
 const steps = [
   {
@@ -34,6 +35,8 @@ const steps = [
  * page keeps alternating between panel, narrative, and grid rhythms.
  */
 export function NotSureYet() {
+  const entranceDelay = useEntranceDelay();
+
   return (
     <section className="py-12 lg:py-16">
       <Container size="full" className="max-w-[1280px]">
@@ -44,16 +47,20 @@ export function NotSureYet() {
               Not sure what you need yet?{" "}
               <GradientText>Start with a conversation.</GradientText>
             </Heading>
-            <p className="text-muted mt-4 max-w-md font-body text-sm leading-relaxed">
-              Most growth problems aren&apos;t service problems — they&apos;re clarity
-              problems. You don&apos;t need to arrive with a brief. Bring the
-              situation; we&apos;ll help you find the highest-leverage next step.
+            <p className="text-muted font-body mt-4 max-w-md text-sm leading-relaxed">
+              Most growth problems aren&apos;t service problems — they&apos;re
+              clarity problems. You don&apos;t need to arrive with a brief.
+              Bring the situation; we&apos;ll help you find the highest-leverage
+              next step.
             </p>
             <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-4">
-              <Link href={ROUTES.contact} className={buttonVariants({ size: "md" })}>
+              <Link
+                href={ROUTES.contact}
+                className={buttonVariants({ size: "md" })}
+              >
                 Book Free Consultation
               </Link>
-              <span className="border-border-subtle bg-glass text-muted inline-flex items-center rounded-full border px-4 py-2 font-body text-xs">
+              <span className="border-border-subtle bg-glass text-muted font-body inline-flex items-center rounded-full border px-4 py-2 text-xs">
                 No pressure. No unnecessary upselling.
               </span>
             </div>
@@ -64,7 +71,10 @@ export function NotSureYet() {
               <motion.div
                 key={step.title}
                 {...fadeInUp}
-                transition={{ ...fadeInUp.transition, delay: index * 0.06 }}
+                transition={{
+                  ...fadeInUp.transition,
+                  delay: entranceDelay(index * 0.06),
+                }}
                 className="flex gap-5 pb-8 last:pb-0"
               >
                 <div className="flex flex-col items-center">
@@ -82,7 +92,7 @@ export function NotSureYet() {
                   <h3 className="font-heading text-base font-bold text-white">
                     {step.title}
                   </h3>
-                  <p className="text-muted mt-1 font-body text-sm leading-relaxed">
+                  <p className="text-muted font-body mt-1 text-sm leading-relaxed">
                     {step.description}
                   </p>
                 </div>

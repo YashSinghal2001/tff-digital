@@ -8,6 +8,7 @@ import { Heading } from "@/components/ui/Heading";
 import { GradientText } from "@/components/ui/GradientText";
 import { SectionEyebrow } from "@/components/common/SectionEyebrow";
 import { fadeInUp } from "@/styles/animations";
+import { useEntranceDelay } from "@/lib/a11y/use-entrance-delay";
 
 const typical = [
   "Generic, off-the-shelf marketing",
@@ -26,6 +27,8 @@ const tff = [
 ];
 
 export function WhyTFF() {
+  const entranceDelay = useEntranceDelay();
+
   return (
     <section className="py-12 lg:py-16">
       <Container size="full" className="max-w-[1280px]">
@@ -39,12 +42,15 @@ export function WhyTFF() {
         <div className="grid gap-6 md:grid-cols-2">
           <motion.div {...fadeInUp}>
             <Card>
-              <h3 className="font-heading text-sm font-bold tracking-wide text-muted">
+              <h3 className="font-heading text-muted text-sm font-bold tracking-wide">
                 TYPICAL AGENCIES
               </h3>
               <ul className="mt-5 flex flex-col gap-4">
                 {typical.map((item) => (
-                  <li key={item} className="flex items-start gap-3 font-body text-sm text-muted">
+                  <li
+                    key={item}
+                    className="font-body text-muted flex items-start gap-3 text-sm"
+                  >
                     <CircleX className="mt-0.5 h-4 w-4 shrink-0 text-white/30" />
                     {item}
                   </li>
@@ -53,15 +59,21 @@ export function WhyTFF() {
             </Card>
           </motion.div>
 
-          <motion.div {...fadeInUp} transition={{ ...fadeInUp.transition, delay: 0.1 }}>
+          <motion.div
+            {...fadeInUp}
+            transition={{ ...fadeInUp.transition, delay: entranceDelay(0.1) }}
+          >
             <Card className="border-primary/40">
               <h3 className="font-heading text-sm font-bold tracking-wide text-white">
                 TFF DIGITAL
               </h3>
               <ul className="mt-5 flex flex-col gap-4">
                 {tff.map((item) => (
-                  <li key={item} className="flex items-start gap-3 font-body text-sm text-white">
-                    <CircleCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                  <li
+                    key={item}
+                    className="font-body flex items-start gap-3 text-sm text-white"
+                  >
+                    <CircleCheck className="text-primary mt-0.5 h-4 w-4 shrink-0" />
                     {item}
                   </li>
                 ))}

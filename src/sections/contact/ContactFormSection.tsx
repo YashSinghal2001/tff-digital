@@ -13,12 +13,18 @@ import {
   FacebookIcon,
 } from "@/components/icons/social-icons";
 import { fadeInUpOnMount } from "@/styles/animations";
+import { useEntranceDelay } from "@/lib/a11y/use-entrance-delay";
 
-const businessInfo: Array<{ icon: typeof Mail; label: string; href?: string }> = [
-  { icon: Mail, label: "info@tffdigital.com", href: "mailto:info@tffdigital.com" },
-  { icon: Phone, label: "+91 72068 09816", href: "tel:+917206809816" },
-  { icon: MapPin, label: "Zirakpur, Punjab, India" },
-];
+const businessInfo: Array<{ icon: typeof Mail; label: string; href?: string }> =
+  [
+    {
+      icon: Mail,
+      label: "info@tffdigital.com",
+      href: "mailto:info@tffdigital.com",
+    },
+    { icon: Phone, label: "+91 72068 09816", href: "tel:+917206809816" },
+    { icon: MapPin, label: "Zirakpur, Punjab, India" },
+  ];
 
 const socialLinks = [
   { label: "LinkedIn", href: SOCIAL_LINKS.linkedin, icon: LinkedInIcon },
@@ -28,6 +34,8 @@ const socialLinks = [
 ];
 
 export function ContactFormSection() {
+  const entranceDelay = useEntranceDelay();
+
   return (
     <section className="pt-2 pb-8 lg:pt-4 lg:pb-12">
       <Container size="full" className="max-w-[1280px]">
@@ -44,17 +52,28 @@ export function ContactFormSection() {
 
           <motion.div
             {...fadeInUpOnMount}
-            transition={{ ...fadeInUpOnMount.transition, delay: 0.1 }}
+            transition={{
+              ...fadeInUpOnMount.transition,
+              delay: entranceDelay(0.1),
+            }}
             className="flex flex-col gap-6"
           >
             <Card>
-              <h3 className="font-heading text-base font-bold text-white">Business info</h3>
+              <h3 className="font-heading text-base font-bold text-white">
+                Business info
+              </h3>
               <ul className="mt-4 flex flex-col gap-3">
                 {businessInfo.map(({ icon: Icon, label, href }) => (
-                  <li key={label} className="flex items-center gap-2 font-body text-sm text-muted">
-                    <Icon className="h-4 w-4 shrink-0 text-primary" />
+                  <li
+                    key={label}
+                    className="font-body text-muted flex items-center gap-2 text-sm"
+                  >
+                    <Icon className="text-primary h-4 w-4 shrink-0" />
                     {href ? (
-                      <a href={href} className="transition-colors hover:text-white">
+                      <a
+                        href={href}
+                        className="transition-colors hover:text-white"
+                      >
                         {label}
                       </a>
                     ) : (

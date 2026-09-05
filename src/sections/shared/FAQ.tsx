@@ -9,6 +9,7 @@ import { GradientText } from "@/components/ui/GradientText";
 import { Heading } from "@/components/ui/Heading";
 import { SectionEyebrow } from "@/components/common/SectionEyebrow";
 import { fadeInUp } from "@/styles/animations";
+import { useEntranceDelay } from "@/lib/a11y/use-entrance-delay";
 import { cn } from "@/lib/utils";
 
 export interface FAQItem {
@@ -51,6 +52,8 @@ export interface FAQProps {
 export function FAQ({ items = faqs }: FAQProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
+  const entranceDelay = useEntranceDelay();
+
   return (
     <section className="py-12 lg:py-16">
       <Container size="full" className="max-w-[1280px]">
@@ -82,13 +85,16 @@ export function FAQ({ items = faqs }: FAQProps) {
                 <motion.div
                   key={faq.question}
                   {...fadeInUp}
-                  transition={{ ...fadeInUp.transition, delay: index * 0.04 }}
-                  className="rounded-2xl border border-border-subtle bg-glass"
+                  transition={{
+                    ...fadeInUp.transition,
+                    delay: entranceDelay(index * 0.04),
+                  }}
+                  className="border-border-subtle bg-glass rounded-2xl border"
                 >
                   <button
                     type="button"
                     onClick={() => setOpenIndex(isOpen ? null : index)}
-                    className="flex w-full items-center justify-between gap-4 rounded-2xl px-5 py-4 text-left outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                    className="focus-visible:ring-primary/50 flex w-full items-center justify-between gap-4 rounded-2xl px-5 py-4 text-left outline-none focus-visible:ring-2"
                     aria-expanded={isOpen}
                     aria-controls={`faq-answer-${index}`}
                     id={`faq-question-${index}`}
@@ -98,7 +104,7 @@ export function FAQ({ items = faqs }: FAQProps) {
                     </span>
                     <ChevronDown
                       className={cn(
-                        "h-4 w-4 shrink-0 text-muted transition-transform",
+                        "text-muted h-4 w-4 shrink-0 transition-transform",
                         isOpen && "rotate-180",
                       )}
                       aria-hidden="true"
@@ -117,7 +123,7 @@ export function FAQ({ items = faqs }: FAQProps) {
                     role="region"
                     aria-labelledby={`faq-question-${index}`}
                     hidden={!isOpen}
-                    className="px-5 pb-4 font-body text-sm text-muted"
+                    className="font-body text-muted px-5 pb-4 text-sm"
                   >
                     {faq.answer}
                   </p>

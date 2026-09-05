@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { getScrollBehavior } from "@/lib/a11y/reduced-motion";
 
 /**
  * Next's App Router can render a route's loading.tsx fallback (no target
@@ -18,6 +19,12 @@ export function HashScrollHandler() {
       const hash = window.location.hash;
       if (!hash) return;
 
+      // A long smooth scroll is exactly the sustained movement
+      // prefers-reduced-motion asks us to avoid; the landing position is
+      // identical either way (A11Y-5). Read per invocation so a preference
+      // changed mid-session takes effect on the next hash navigation.
+      const behavior = getScrollBehavior();
+
       const id = decodeURIComponent(hash.slice(1));
       let attempts = 0;
       let lastAbsoluteTop: number | null = null;
@@ -31,11 +38,14 @@ export function HashScrollHandler() {
         const el = document.getElementById(id);
         if (el) {
           const absoluteTop = el.getBoundingClientRect().top + window.scrollY;
-          if (lastAbsoluteTop !== null && Math.abs(absoluteTop - lastAbsoluteTop) < 2) {
+          if (
+            lastAbsoluteTop !== null &&
+            Math.abs(absoluteTop - lastAbsoluteTop) < 2
+          ) {
             stableCount += 1;
           } else {
             stableCount = 0;
-            el.scrollIntoView({ behavior: "smooth", block: "start" });
+            el.scrollIntoView({ behavior, block: "start" });
           }
           lastAbsoluteTop = absoluteTop;
           if (stableCount >= 3) return;

@@ -24,7 +24,7 @@ export function PostCard({ post, className, priority = false }: PostCardProps) {
       // badge, title, excerpt, author, date, and reading time (CARDA11Y-1).
       aria-label={post.title}
       className={cn(
-        "group flex h-full flex-col overflow-hidden rounded-[25px] border border-border-strong bg-glass transition-colors hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
+        "group border-border-strong bg-glass hover:border-primary/50 focus-visible:ring-primary/50 flex h-full flex-col overflow-hidden rounded-[25px] border transition-colors focus-visible:ring-2 focus-visible:outline-none",
         className,
       )}
     >
@@ -36,7 +36,7 @@ export function PostCard({ post, className, priority = false }: PostCardProps) {
             fill
             priority={priority}
             sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 400px"
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            className="object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
           />
         ) : null}
       </div>
@@ -48,13 +48,19 @@ export function PostCard({ post, className, priority = false }: PostCardProps) {
           </Badge>
         ) : null}
 
-        <h3 className="line-clamp-2 font-heading text-lg font-bold text-white">{post.title}</h3>
-        <p className="line-clamp-2 font-body text-sm text-muted">{post.excerpt}</p>
+        <h3 className="font-heading line-clamp-2 text-lg font-bold text-white">
+          {post.title}
+        </h3>
+        <p className="font-body text-muted line-clamp-2 text-sm">
+          {post.excerpt}
+        </p>
 
-        <div className="mt-auto flex flex-wrap items-center gap-x-2 gap-y-1 pt-2 font-body text-xs text-muted">
+        <div className="font-body text-muted mt-auto flex flex-wrap items-center gap-x-2 gap-y-1 pt-2 text-xs">
           {post.author ? <span>{post.author.name}</span> : null}
           {post.author ? <span aria-hidden="true">·</span> : null}
-          <time dateTime={post.publishedAt}>{formatPostDate(post.publishedAt)}</time>
+          <time dateTime={post.publishedAt}>
+            {formatPostDate(post.publishedAt)}
+          </time>
           <span aria-hidden="true">·</span>
           <span>{readingTime} min read</span>
         </div>
