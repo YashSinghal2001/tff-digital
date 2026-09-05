@@ -3,6 +3,7 @@ import test, { describe } from "node:test";
 
 import { wpPostFixture } from "../../test/fixtures/wp-content.ts";
 import { adaptPost } from "./post.adapter.ts";
+import type { WPPost } from "@/types/api/wp-post";
 
 // The WordPress → domain boundary for posts (audit DEP-2's "WordPress
 // adapters" path). Pins the behaviours later remediations attached here:
@@ -66,5 +67,28 @@ describe("adaptPost", () => {
     assert.equal(post.seo?.title, "SEO for Small Businesses");
     assert.equal(post.seo?.description, "Don’t guess & hope.");
     assert.deepEqual(post.seo?.robots, { index: true, follow: true });
+  });
+
+  test("survives taxonomy connections returned without .nodes, or with empty nodes (PARTIAL-1)", () => {
+    // A connection object that exists but carries no `nodes` is valid
+    // GraphQL and distinct from `null`; before the fix `.nodes.map` threw
+    // "Cannot read properties of undefined (reading 'map')" here, on the
+    // highest-traffic adapter. The WPPost type says it cannot happen — the
+    // type is an unvalidated assertion, not a guarantee (audit CQ-1).
+    const shapeless = adaptPost({
+      ...wpPostFixture,
+      categories: {} as WPPost["categories"],
+      tags: {} as WPPost["tags"],
+    });
+    assert.deepEqual(shapeless.categories, []);
+    assert.deepEqual(shapeless.tags, []);
+
+    const empty = adaptPost({
+      ...wpPostFixture,
+      categories: { nodes: [] },
+      tags: { nodes: [] },
+    });
+    assert.deepEqual(empty.categories, []);
+    assert.deepEqual(empty.tags, []);
   });
 });

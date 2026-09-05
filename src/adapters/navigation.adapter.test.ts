@@ -100,4 +100,11 @@ describe("adaptNavigationMenu", () => {
     assert.deepEqual(menu.items[0].children, []);
     assert.equal(menu.items[0].target, "_blank");
   });
+
+  test("adapts an empty menuItems.nodes to no items", () => {
+    const menu = adaptNavigationMenu(
+      asMenu({ name: "Primary", menuItems: { nodes: [] } }),
+    );
+    assert.deepEqual(menu.items, []);
+  });
 });

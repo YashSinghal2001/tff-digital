@@ -1,8 +1,12 @@
 import assert from "node:assert/strict";
 import test, { describe } from "node:test";
 
-import { wpCaseStudyFixture } from "../../test/fixtures/wp-content.ts";
+import {
+  wpCaseStudyFixture,
+  wpServiceOfferingFixture,
+} from "../../test/fixtures/wp-content.ts";
 import { adaptCaseStudy } from "./case-study.adapter.ts";
+import type { WPCaseStudyFields } from "@/types/api/wp-case-study";
 
 // The WordPress → domain boundary for case studies: the fixed four
 // label/value result pairs, the ACF free-text fields that reach
@@ -72,5 +76,27 @@ describe("adaptCaseStudy", () => {
     assert.deepEqual(caseStudy.relatedServices, []);
     assert.equal(caseStudy.featuredImage, null);
     assert.equal(caseStudy.seo?.description, "");
+  });
+
+  test("relatedServices: null, a connection without .nodes, and empty nodes all yield [] (PARTIAL-1)", () => {
+    const withRelated = (relatedServices: unknown) =>
+      adaptCaseStudy({
+        ...wpCaseStudyFixture,
+        caseStudyFields: {
+          ...wpCaseStudyFixture.caseStudyFields!,
+          relatedServices:
+            relatedServices as WPCaseStudyFields["relatedServices"],
+        },
+      }).relatedServices;
+
+    assert.deepEqual(withRelated(null), []);
+    // Present-but-shapeless connection: the case PARTIAL-1 is about.
+    assert.deepEqual(withRelated({}), []);
+    assert.deepEqual(withRelated({ nodes: [] }), []);
+    // Populated nodes still adapt through the service adapter.
+    assert.equal(
+      withRelated({ nodes: [wpServiceOfferingFixture] })[0]?.slug,
+      "search-engine-optimization",
+    );
   });
 });
