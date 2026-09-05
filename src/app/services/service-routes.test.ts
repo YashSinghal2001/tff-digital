@@ -19,6 +19,7 @@ const CANONICAL_SERVICE_SLUGS = [
   "web-development",
   "video-editing",
   "zoho-one",
+  "zoho-crm",
 ];
 
 describe("service routes", () => {

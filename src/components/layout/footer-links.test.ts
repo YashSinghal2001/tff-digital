@@ -3,8 +3,8 @@ import test, { describe } from "node:test";
 
 import { FOOTER_SERVICE_LINKS } from "./footer-links.ts";
 
-// The footer mirrors the six WordPress services by CMS title and slug
-// (ARCH-1); it must never link a retired bespoke route.
+// The footer mirrors the seven WordPress services by CMS title and slug
+// (ARCH-1, CLIENT-6); it must never link a retired bespoke route.
 const CANONICAL_SERVICES = [
   ["AEO & SEO", "/services/aeo-seo"],
   ["SMM", "/services/smm"],
@@ -12,10 +12,11 @@ const CANONICAL_SERVICES = [
   ["Web Development", "/services/web-development"],
   ["Video Editing", "/services/video-editing"],
   ["ZOHO One", "/services/zoho-one"],
+  ["ZOHO CRM", "/services/zoho-crm"],
 ];
 
 describe("FOOTER_SERVICE_LINKS", () => {
-  test("lists exactly the six canonical services, in display order", () => {
+  test("lists exactly the seven canonical services, in display order", () => {
     assert.deepEqual(
       FOOTER_SERVICE_LINKS.map((link) => [link.label, link.href]),
       CANONICAL_SERVICES,

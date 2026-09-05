@@ -13,6 +13,7 @@ import {
   LayoutGrid,
   BrainCircuit,
   Workflow,
+  Users,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -34,8 +35,9 @@ const SERVICE_ICONS: Record<string, LucideIcon> = {
   "content-marketing": FileText,
   "personal-branding": UserRound,
   "zoho-one": LayoutGrid,
-  // The six services published in WordPress (ARCH-1 / PARITY-1): aeo-seo,
-  // smm, meta-ads, web-development, video-editing, zoho-one.
+  "zoho-crm": Users,
+  // The seven services published in WordPress (ARCH-1 / PARITY-1 / CLIENT-6):
+  // aeo-seo, smm, meta-ads, web-development, video-editing, zoho-one, zoho-crm.
   "aeo-seo": Search,
   "meta-ads": Megaphone,
   // Slugs of services previously published in WordPress, kept as aliases.

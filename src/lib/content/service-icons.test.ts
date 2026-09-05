@@ -10,6 +10,7 @@ import {
   Search,
   Share2,
   Sparkles,
+  Users,
   Video,
   Workflow,
 } from "lucide-react";
@@ -21,7 +22,7 @@ import { getServiceIcon } from "./service-icons.ts";
 // PARITY-1: every service slug currently published in WordPress must resolve
 // to a dedicated icon, never the generic Sparkles fallback.
 describe("getServiceIcon — live WordPress slugs (PARITY-1)", () => {
-  // The six services published in WordPress as of 2026-09-04 (ARCH-1).
+  // The seven services published in WordPress as of 2026-09-05 (ARCH-1 + CLIENT-6).
   const liveWordPressSlugs = {
     "aeo-seo": Search,
     smm: Share2,
@@ -29,6 +30,7 @@ describe("getServiceIcon — live WordPress slugs (PARITY-1)", () => {
     "web-development": CodeXml,
     "video-editing": Video,
     "zoho-one": LayoutGrid,
+    "zoho-crm": Users,
   } as const;
 
   for (const [slug, expectedIcon] of Object.entries(liveWordPressSlugs)) {
