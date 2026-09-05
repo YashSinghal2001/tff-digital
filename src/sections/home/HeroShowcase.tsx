@@ -134,6 +134,12 @@ export function HeroShowcase() {
             alt={slide.image.alt}
             fill
             sizes="(min-width: 640px) 400px, 320px"
+            // Only the first slide paints on initial load (activeIndex starts
+            // at 0), so it's the one that matters for LCP — later slides
+            // swap in well after hydration and stay lazy like everywhere
+            // else in the codebase (PostCard/CaseStudyCard's own index===0
+            // priority pattern).
+            priority={index === 0}
             aria-hidden={index !== activeIndex}
             className={cn(
               "object-cover transition-opacity duration-700 ease-out",
