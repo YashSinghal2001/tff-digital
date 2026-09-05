@@ -119,6 +119,9 @@ export function TeamCarousel({ members }: TeamCarouselProps) {
   // the current index.
   useEffect(() => {
     const clamped = Math.min(index, maxIndex);
+    // Re-snapping `index` to a ResizeObserver-driven geometry change, not a
+    // value derivable during render.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (clamped !== index) setIndex(clamped);
     setTrackX(offsetFor(clamped), false);
     // eslint-disable-next-line react-hooks/exhaustive-deps

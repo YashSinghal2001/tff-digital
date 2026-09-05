@@ -39,7 +39,7 @@ describe("cookie consent banner wiring (CLIENT-5)", () => {
   test("reads the stored decision before ever rendering, to avoid a flash or duplicate banner", () => {
     assert.match(
       BANNER,
-      /useEffect\(\(\) => \{\s*setDecision\(getCookieConsent\(\)\);/,
+      /useEffect\(\(\) => \{[\s\S]*?setDecision\(getCookieConsent\(\)\);/,
     );
     assert.match(
       BANNER,

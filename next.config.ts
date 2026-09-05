@@ -36,6 +36,10 @@ const cspDirectives = [
 ].join("; ");
 
 const nextConfig: NextConfig = {
+  // Next.js 16 auto-generates AGENTS.md/CLAUDE.md at the project root on
+  // every dev/build run; this repo doesn't want unrequested files appearing
+  // in the working tree.
+  agentRules: false,
   turbopack: {
     root: path.join(__dirname),
   },

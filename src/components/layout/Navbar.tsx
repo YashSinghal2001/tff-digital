@@ -75,6 +75,9 @@ export function Navbar() {
       if (event.matches) setOpen(false);
     };
     if (media.matches) {
+      // Syncing React state to the external viewport (matchMedia), not
+      // something derivable at render time.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setOpen(false);
       return;
     }

@@ -25,6 +25,9 @@ export function CookieConsentBanner() {
   >(undefined);
 
   useEffect(() => {
+    // Cookie consent is only readable client-side; this mount-only read
+    // (not derivable during render/SSR) is the sync this rule allows for.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setDecision(getCookieConsent());
   }, []);
 
