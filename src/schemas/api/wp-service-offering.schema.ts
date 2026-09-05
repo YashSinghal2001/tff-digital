@@ -26,6 +26,7 @@ export const wpServiceOfferingSchema = z.object({
       shortDescription: z.string().nullable(),
       description: z.string().nullable(),
       displayOrder: z.number().nullable(),
+      features: z.string().nullable(),
       icon: z.object({ node: wpMediaItemSchema }).nullable(),
     })
     .nullable(),

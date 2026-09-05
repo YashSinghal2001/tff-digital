@@ -34,7 +34,11 @@ const SERVICE_ICONS: Record<string, LucideIcon> = {
   "content-marketing": FileText,
   "personal-branding": UserRound,
   "zoho-one": LayoutGrid,
-  // Slugs of the services currently published in WordPress (PARITY-1)
+  // The six services published in WordPress (ARCH-1 / PARITY-1): aeo-seo,
+  // smm, meta-ads, web-development, video-editing, zoho-one.
+  "aeo-seo": Search,
+  "meta-ads": Megaphone,
+  // Slugs of services previously published in WordPress, kept as aliases.
   "ai-consulting": BrainCircuit,
   "ai-automation": Workflow,
   "digital-marketing": Megaphone,

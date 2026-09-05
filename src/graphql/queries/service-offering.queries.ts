@@ -19,6 +19,7 @@ export const SERVICE_FIELDS = gql`
       shortDescription
       description
       displayOrder
+      features
       icon {
         node {
           ...MediaFields

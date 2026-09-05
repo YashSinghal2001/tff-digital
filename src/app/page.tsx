@@ -3,9 +3,9 @@ import { getCanonicalUrl } from "@/lib/seo/canonical";
 import { buildPageOpenGraph } from "@/lib/seo/metadata";
 import { seoConfig } from "@/config/seo.config";
 import { ROUTES } from "@/constants/routes";
-// TEMPORARY: WordPress What We Do content disabled for UI development.
-// import { getServiceOfferings } from "@/services/service-offering.service";
+import { getServiceOfferings } from "@/services/service-offering.service";
 import { getCaseStudies } from "@/services/case-study.service";
+import { toServiceCardItems } from "@/lib/content/service-cards";
 import { filterPlaceholderCaseStudies } from "@/lib/content/case-study-placeholders";
 import { HeroSection } from "@/sections/home/HeroSection";
 import { TrustedBrands } from "@/sections/home/TrustedBrands";
@@ -23,6 +23,10 @@ import { Industries } from "@/sections/home/Industries";
 import { FAQ } from "@/sections/shared/FAQ";
 import { CTABookForm } from "@/sections/shared/CTABookForm";
 
+// The compact five-column What We Do card only has room for a short list;
+// /services renders every feature. Applied before the client boundary.
+const HOMEPAGE_FEATURE_LIMIT = 3;
+
 export const metadata: Metadata = {
   // Next's title.template (root layout) never applies to app/page.tsx, since
   // it's the same route segment as app/layout.tsx that defines the template
@@ -36,21 +40,17 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  // TEMPORARY: WordPress What We Do content disabled for UI development.
-  // TODO: RESTORE WORDPRESS DATA
-  // Remove temporaryWhatWeDoServices usage (in src/sections/home/WhatWeDo.tsx) and
-  // restore the existing WordPress service data source by uncommenting the fetch
-  // below, the getServiceOfferings import above, and <WhatWeDo services={...} />.
-  // WordPress integration has intentionally NOT been deleted.
-  // const [services, caseStudies] = await Promise.all([
-  //   getServiceOfferings({ first: 5 }),
-  //   getCaseStudies({ first: 20 }),
-  // ]);
-  // Soft fetch: the homepage must render even when the CMS is down. Selected
-  // Work shows the WordPress case studies whose "Featured on homepage" field
-  // is ticked (newest first, max 4) and falls back to its designed empty
-  // state — never invented content — while none are published.
-  const caseStudies = await getCaseStudies({ first: 20 });
+  // Both fetches are soft: the homepage must render even when the CMS is
+  // down. Services arrive in display_order (service layer); the cap mirrors
+  // the detail route's generateStaticParams so a newly published service is
+  // never silently dropped. Selected Work shows the WordPress case studies
+  // whose "Featured on homepage" field is ticked (newest first, max 4) and
+  // falls back to its designed empty state — never invented content — while
+  // none are published.
+  const [services, caseStudies] = await Promise.all([
+    getServiceOfferings({ first: 100 }),
+    getCaseStudies({ first: 20 }),
+  ]);
 
   // `seo` is dropped here, not just excluded from SelectedWork's prop type:
   // types are erased at runtime, so the field has to actually leave the object
@@ -70,9 +70,11 @@ export default async function Home() {
         <HeroSection />
         <TrustedBrands />
       </div>
-      {/* TEMPORARY: WordPress What We Do content disabled for UI development. */}
-      {/* <WhatWeDo services={services.items} /> */}
-      <WhatWeDo />
+      <WhatWeDo
+        services={toServiceCardItems(services.items, {
+          featureLimit: HOMEPAGE_FEATURE_LIMIT,
+        })}
+      />
       <WhyTFF />
       <StatementBand support="Every quarter should make the next one easier. That's what a growth system is for.">
         Strategy sets the direction.{" "}

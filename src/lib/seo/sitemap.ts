@@ -7,8 +7,8 @@ import {
   getCategoriesStrict,
   getTagsStrict,
 } from "@/services/taxonomy.service";
-// TEMPORARY: WP service entries removed from the sitemap while the CMS holds
-// placeholder services — see src/data/temporary-services.ts.
+// TEMPORARY: WP service entries are not emitted here yet — the grids are
+// WordPress-driven (ARCH-1) but the sitemap step is a separate follow-up.
 // TODO: RESTORE WORDPRESS DATA
 // import { getServiceOfferings } from "@/services/service-offering.service";
 import { filterPlaceholderCaseStudies } from "@/lib/content/case-study-placeholders";

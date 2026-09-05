@@ -173,8 +173,10 @@ export function ZohoOneServiceIcon(props: ServiceIconProps) {
 
 const SERVICE_CARD_ICONS: Record<string, ComponentType<ServiceIconProps>> = {
   seo: SeoServiceIcon,
+  "aeo-seo": SeoServiceIcon,
   smm: SmmServiceIcon,
   "social-media-marketing": SmmServiceIcon,
+  "meta-ads": MetaAdsServiceIcon,
   "google-meta-ads": MetaAdsServiceIcon,
   "google-ads": MetaAdsServiceIcon,
   ppc: MetaAdsServiceIcon,

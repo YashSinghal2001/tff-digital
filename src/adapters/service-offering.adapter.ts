@@ -4,6 +4,16 @@ import { adaptMedia } from "@/adapters/media.adapter";
 import { adaptSeo } from "@/adapters/seo.adapter";
 import { sanitizeWpHtml } from "@/lib/content/sanitize-wp-html";
 
+// The ACF `features` textarea arrives as one string with CRLF (wp-admin) or
+// LF line endings; each non-empty trimmed line is one feature bullet.
+export function parseServiceFeatures(raw: string | null | undefined): string[] {
+  if (!raw) return [];
+  return raw
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+}
+
 export function adaptServiceOffering(
   wpService: WPServiceOffering,
 ): ServiceOffering {
@@ -28,6 +38,7 @@ export function adaptServiceOffering(
       ? adaptMedia(wpService.featuredImage.node)
       : null,
     order: wpService.serviceFields?.displayOrder ?? null,
+    features: parseServiceFeatures(wpService.serviceFields?.features),
     seo: adaptSeo(wpService.seo, {
       title: wpService.title,
       description: summary,

@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { IconCircle, sizeClass } from "@/components/ui/IconCircle";
@@ -24,6 +24,8 @@ export interface FeatureGridItem {
   description?: string;
   href?: string;
   linkLabel?: string;
+  /** Optional check-list rendered between the description and the link. */
+  features?: string[];
   /** Replaces the icon glyph with a photo in the same circular slot. */
   image?: { src: string; alt: string };
 }
@@ -97,6 +99,22 @@ export function FeatureGrid({
               </h3>
               {item.description ? (
                 <p className="font-body text-sm text-muted">{item.description}</p>
+              ) : null}
+              {item.features && item.features.length > 0 ? (
+                <ul className="flex flex-col gap-2">
+                  {item.features.map((feature) => (
+                    <li
+                      key={feature}
+                      className="flex items-start gap-2 font-body text-sm text-muted"
+                    >
+                      <Check
+                        className="mt-0.5 h-4 w-4 shrink-0 text-primary"
+                        aria-hidden="true"
+                      />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
               ) : null}
               {item.href ? (
                 <Link

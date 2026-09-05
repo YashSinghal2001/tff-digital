@@ -2,11 +2,8 @@ import type { Metadata } from "next";
 import { getCanonicalUrl } from "@/lib/seo/canonical";
 import { buildPageOpenGraph } from "@/lib/seo/metadata";
 import { ROUTES } from "@/constants/routes";
-// TEMPORARY: WordPress services grid disabled — the CMS still holds
-// placeholder entries ("AI Consulting Updated", "Web Development 2", …).
-// TODO: RESTORE WORDPRESS DATA (see src/data/temporary-services.ts)
-// import { getServiceOfferings } from "@/services/service-offering.service";
-import { temporaryServices } from "@/data/temporary-services";
+import { getServiceOfferings } from "@/services/service-offering.service";
+import { toServiceCardItems } from "@/lib/content/service-cards";
 import { ServicesHero } from "@/sections/services/ServicesHero";
 import { TrustedBrands } from "@/sections/home/TrustedBrands";
 import { ServicesGrid } from "@/sections/services/ServicesGrid";
@@ -65,16 +62,16 @@ export const metadata: Metadata = {
   openGraph: buildPageOpenGraph(getCanonicalUrl(ROUTES.services)),
 };
 
-export default function ServicesPage() {
-  // TEMPORARY: WordPress services grid disabled for UI development.
-  // TODO: RESTORE WORDPRESS DATA — uncomment the fetch and the import above:
-  // const services = await getServiceOfferings();
-  // <ServicesGrid services={services.items} />
+export default async function ServicesPage() {
+  // Soft fetch (empty on a CMS outage, never a failed build), already in
+  // display_order; the cap mirrors the detail route's generateStaticParams so
+  // a newly published service is never silently dropped.
+  const services = await getServiceOfferings({ first: 100 });
   return (
     <>
       <ServicesHero />
       <TrustedBrands />
-      <ServicesGrid services={temporaryServices} />
+      <ServicesGrid services={toServiceCardItems(services.items)} />
       <WhySeniorLed />
       <WhoThisIsFor
         eyebrow="WHO WE WORK WITH"

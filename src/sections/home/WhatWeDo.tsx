@@ -8,27 +8,24 @@ import { Card } from "@/components/ui/Card";
 import { Heading } from "@/components/ui/Heading";
 import { GradientText } from "@/components/ui/GradientText";
 import { SectionEyebrow } from "@/components/common/SectionEyebrow";
+import { ServicesEmptyState } from "@/components/common/ServicesEmptyState";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { ROUTES } from "@/constants/routes";
 import { fadeInUp } from "@/styles/animations";
 import { getServiceCardIcon } from "@/components/icons/service-icons";
-import { temporaryServices } from "@/data/temporary-services";
+import type { ServiceCardItem } from "@/lib/content/service-cards";
 
-// TEMPORARY: WordPress What We Do content disabled for UI development — cards
-// come from src/data/temporary-services.ts (shared with /services).
-// Original WordPress-driven signature — restore this and drop the import above:
-// interface WhatWeDoProps {
-//   services: ServiceOffering[];
-// }
-// export function WhatWeDo({ services }: WhatWeDoProps) {
-//
-// TODO: RESTORE WORDPRESS DATA
-// Remove the temporaryServices usage and restore the existing WordPress
-// service data source (the `services` prop passed from src/app/page.tsx).
-// WordPress integration has intentionally NOT been deleted.
-export function WhatWeDo() {
-  const services = temporaryServices;
+interface WhatWeDoProps {
+  /**
+   * Narrow card data mapped on the server (src/lib/content/service-cards.ts)
+   * from the WordPress services, already in display_order and capped to the
+   * features this card shows — never the full domain object, so Yoast/CMS
+   * data stays out of the client payload (SEO-2).
+   */
+  services: ServiceCardItem[];
+}
 
+export function WhatWeDo({ services }: WhatWeDoProps) {
   return (
     <section id="services" className="py-12 lg:py-16">
       <Container size="full" className="max-w-[1280px]">
@@ -46,41 +43,41 @@ export function WhatWeDo() {
         </motion.div>
 
         <motion.div {...fadeInUp}>
-          <div
-            aria-label="Our services"
-            className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:grid sm:grid-cols-2 sm:overflow-visible sm:pb-0 lg:grid-cols-3 xl:grid-cols-5"
-          >
-            {services.map((service) => {
-              const Icon = getServiceCardIcon(service.slug);
-              return (
-                <div
-                  key={service.id}
-                  className="w-[85%] shrink-0 snap-start sm:w-auto"
-                >
-                  <div className="group h-full rounded-[25px] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--color-primary)_40%,transparent),color-mix(in_srgb,var(--color-secondary)_40%,transparent))] p-px transition-transform duration-200 hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:translate-y-0">
-                    <Card className="flex h-full flex-col gap-4 border-0 bg-[color-mix(in_srgb,var(--color-background)_94%,#ffffff)] p-5 transition-shadow duration-200 group-hover:shadow-[0_0_32px_0_rgba(56,130,246,0.18)]">
-                      <Icon className="h-20 w-20 shrink-0" />
-                      <h3 className="font-heading text-lg font-bold text-white xl:text-base">
-                        {service.title}
-                      </h3>
-                      <p className="font-body text-sm text-muted">{service.summary}</p>
-                      <ul className="flex flex-col gap-2">
-                        {service.features.map((feature) => (
-                          <li
-                            key={feature}
-                            className="flex items-start gap-2 font-body text-sm text-muted"
-                          >
-                            <Check
-                              className="mt-0.5 h-4 w-4 shrink-0 text-primary"
-                              aria-hidden="true"
-                            />
-                            {feature}
-                          </li>
-                        ))}
-                      </ul>
-                      {/* Only disciplines with a live detail page get a link —
-                          the other WP slugs don't exist yet and would 404. */}
-                      {service.href ? (
+          {services.length === 0 ? (
+            <ServicesEmptyState />
+          ) : (
+            <div
+              aria-label="Our services"
+              className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:grid sm:grid-cols-2 sm:overflow-visible sm:pb-0 lg:grid-cols-3 xl:grid-cols-5"
+            >
+              {services.map((service) => {
+                const Icon = getServiceCardIcon(service.slug);
+                return (
+                  <div
+                    key={service.id}
+                    className="w-[85%] shrink-0 snap-start sm:w-auto"
+                  >
+                    <div className="group h-full rounded-[25px] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--color-primary)_40%,transparent),color-mix(in_srgb,var(--color-secondary)_40%,transparent))] p-px transition-transform duration-200 hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:translate-y-0">
+                      <Card className="flex h-full flex-col gap-4 border-0 bg-[color-mix(in_srgb,var(--color-background)_94%,#ffffff)] p-5 transition-shadow duration-200 group-hover:shadow-[0_0_32px_0_rgba(56,130,246,0.18)]">
+                        <Icon className="h-20 w-20 shrink-0" />
+                        <h3 className="font-heading text-lg font-bold text-white xl:text-base">
+                          {service.title}
+                        </h3>
+                        <p className="font-body text-sm text-muted">{service.summary}</p>
+                        <ul className="flex flex-col gap-2">
+                          {service.features.map((feature) => (
+                            <li
+                              key={feature}
+                              className="flex items-start gap-2 font-body text-sm text-muted"
+                            >
+                              <Check
+                                className="mt-0.5 h-4 w-4 shrink-0 text-primary"
+                                aria-hidden="true"
+                              />
+                              {feature}
+                            </li>
+                          ))}
+                        </ul>
                         <Link
                           href={service.href}
                           className="relative mt-auto flex items-center gap-1 pt-2 font-body text-sm font-semibold text-primary transition-colors hover:text-white"
@@ -92,13 +89,13 @@ export function WhatWeDo() {
                             aria-hidden="true"
                           />
                         </Link>
-                      ) : null}
-                    </Card>
+                      </Card>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
 
           <div className="mt-8 flex justify-center">
             <Link href={ROUTES.contact} className={buttonVariants({ size: "lg" })}>

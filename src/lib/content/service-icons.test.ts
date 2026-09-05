@@ -4,6 +4,7 @@ import test, { describe } from "node:test";
 import {
   BrainCircuit,
   CodeXml,
+  LayoutGrid,
   Megaphone,
   Palette,
   Search,
@@ -20,14 +21,14 @@ import { getServiceIcon } from "./service-icons.ts";
 // PARITY-1: every service slug currently published in WordPress must resolve
 // to a dedicated icon, never the generic Sparkles fallback.
 describe("getServiceIcon — live WordPress slugs (PARITY-1)", () => {
+  // The six services published in WordPress as of 2026-09-04 (ARCH-1).
   const liveWordPressSlugs = {
-    "ai-consulting": BrainCircuit,
-    "ai-automation": Workflow,
-    "digital-marketing": Megaphone,
-    "wordpress-development": CodeXml,
-    "seo-optimization": Search,
-    "ui-ux-design": Palette,
+    "aeo-seo": Search,
+    smm: Share2,
+    "meta-ads": Megaphone,
     "web-development": CodeXml,
+    "video-editing": Video,
+    "zoho-one": LayoutGrid,
   } as const;
 
   for (const [slug, expectedIcon] of Object.entries(liveWordPressSlugs)) {
@@ -36,6 +37,14 @@ describe("getServiceIcon — live WordPress slugs (PARITY-1)", () => {
       assert.notEqual(getServiceIcon(slug), Sparkles);
     });
   }
+});
+
+describe("getServiceIcon — previously published WordPress slugs", () => {
+  test("keep their dedicated icons as aliases", () => {
+    assert.equal(getServiceIcon("ai-consulting"), BrainCircuit);
+    assert.equal(getServiceIcon("ai-automation"), Workflow);
+    assert.equal(getServiceIcon("ui-ux-design"), Palette);
+  });
 });
 
 describe("getServiceIcon — pre-existing mappings preserved", () => {

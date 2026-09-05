@@ -19,6 +19,7 @@ export const wpServiceOfferingFixture: WPServiceOffering = {
     shortDescription: "Rank higher.",
     description: "<p>Full service description.</p>",
     displayOrder: 1,
+    features: "Technical SEO\r\nOn-Page SEO\r\nLocal SEO",
     icon: null,
   },
   seo: null,

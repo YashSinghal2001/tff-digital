@@ -23,6 +23,7 @@ const relatedService: WPServiceOffering = {
     shortDescription: "Rank higher.",
     description: null,
     displayOrder: 1,
+    features: null,
     icon: null,
   },
   seo: null,

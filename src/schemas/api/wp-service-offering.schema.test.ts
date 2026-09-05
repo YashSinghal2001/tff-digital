@@ -29,6 +29,7 @@ const validService: WPServiceOffering = {
     shortDescription: null,
     description: "Long form.",
     displayOrder: 3,
+    features: null,
     icon: {
       node: {
         id: "m9",
@@ -87,6 +88,32 @@ describe("wpServiceOfferingQueryResultSchema", () => {
       service: {
         ...validService,
         serviceFields: { ...validService.serviceFields, displayOrder: "3" },
+      },
+    });
+    assert.equal(result.success, false);
+  });
+});
+
+describe("wpServiceOfferingSchema — features textarea (ARCH-1)", () => {
+  test("accepts the ACF features textarea as a string", () => {
+    const withFeatures = {
+      ...validService,
+      serviceFields: {
+        ...validService.serviceFields!,
+        features: "Technical SEO\r\nOn-Page SEO",
+      },
+    };
+    assert.deepEqual(
+      wpServiceOfferingQueryResultSchema.parse({ service: withFeatures }),
+      { service: withFeatures },
+    );
+  });
+
+  test("rejects a non-string features value", () => {
+    const result = wpServiceOfferingQueryResultSchema.safeParse({
+      service: {
+        ...validService,
+        serviceFields: { ...validService.serviceFields!, features: ["x"] },
       },
     });
     assert.equal(result.success, false);

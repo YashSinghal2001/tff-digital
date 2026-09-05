@@ -6,6 +6,8 @@ export interface WPServiceFields {
   shortDescription: string | null;
   description: string | null;
   displayOrder: number | null;
+  // ACF textarea: one feature per line (CRLF-separated from wp-admin).
+  features: string | null;
   icon: { node: WPMediaItem } | null;
 }
 

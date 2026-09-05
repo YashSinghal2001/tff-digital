@@ -12,5 +12,7 @@ export interface ServiceOffering {
   icon: Media | null;
   featuredImage: Media | null;
   order: number | null;
+  /** One entry per non-empty line of the ACF `features` textarea. */
+  features: string[];
   seo: Seo | null;
 }

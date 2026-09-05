@@ -7,6 +7,7 @@ import {
   findServiceOfferingPreview,
 } from "@/repositories/service-offering.repository";
 import { adaptServiceOffering } from "@/adapters/service-offering.adapter";
+import { sortByDisplayOrder } from "@/lib/content/service-order";
 import {
   getMockServiceOfferingBySlug,
   getMockServiceOfferings,
@@ -36,10 +37,14 @@ export async function getServiceOfferings(params?: {
 
   try {
     const { services } = await findAllServiceOfferings(params);
+    // WPGraphQL hands services back newest-first and cannot order by an ACF
+    // field; the editorial display_order is applied here so every list
+    // surface (homepage, /services, sitemap) agrees.
+    const items = sortByDisplayOrder(services.nodes.map(adaptServiceOffering));
     return {
-      items: services.nodes.map(adaptServiceOffering),
+      items,
       pageInfo: services.pageInfo,
-      totalCount: services.nodes.length,
+      totalCount: items.length,
     };
   } catch (error) {
     // A live WPGraphQL outage during a Vercel build would otherwise throw here
