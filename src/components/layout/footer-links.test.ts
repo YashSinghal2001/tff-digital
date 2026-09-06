@@ -3,8 +3,9 @@ import test, { describe } from "node:test";
 
 import { FOOTER_SERVICE_LINKS } from "./footer-links.ts";
 
-// The footer mirrors the seven WordPress services by CMS title and slug
-// (ARCH-1, CLIENT-6); it must never link a retired bespoke route.
+// The footer mirrors six of the seven WordPress services by CMS title and
+// slug (ARCH-1, CLIENT-6); ZOHO CRM is intentionally excluded from the public
+// footer listing. It must never link a retired bespoke route.
 const CANONICAL_SERVICES = [
   ["AEO & SEO", "/services/aeo-seo"],
   ["SMM", "/services/smm"],
@@ -12,11 +13,10 @@ const CANONICAL_SERVICES = [
   ["Web Development", "/services/web-development"],
   ["Video Editing", "/services/video-editing"],
   ["ZOHO One", "/services/zoho-one"],
-  ["ZOHO CRM", "/services/zoho-crm"],
 ];
 
 describe("FOOTER_SERVICE_LINKS", () => {
-  test("lists exactly the seven canonical services, in display order", () => {
+  test("lists exactly the six canonical services, in display order", () => {
     assert.deepEqual(
       FOOTER_SERVICE_LINKS.map((link) => [link.label, link.href]),
       CANONICAL_SERVICES,
@@ -27,5 +27,10 @@ describe("FOOTER_SERVICE_LINKS", () => {
     const hrefs = FOOTER_SERVICE_LINKS.map((link) => link.href);
     assert.equal(new Set(hrefs).size, hrefs.length);
     assert.ok(!hrefs.includes("/services/seo"));
+  });
+
+  test("does not publicly list ZOHO CRM", () => {
+    const labels = FOOTER_SERVICE_LINKS.map((link) => link.label);
+    assert.ok(!labels.includes("ZOHO CRM"));
   });
 });
