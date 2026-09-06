@@ -51,7 +51,7 @@ export function WhatWeDo({ services }: WhatWeDoProps) {
           ) : (
             <div
               aria-label="Our services"
-              className="flex snap-x snap-mandatory [scrollbar-width:none] gap-4 overflow-x-auto pb-4 sm:grid sm:grid-cols-2 sm:overflow-visible sm:pb-0 lg:grid-cols-3 xl:grid-cols-5 [&::-webkit-scrollbar]:hidden"
+              className="flex snap-x snap-mandatory [scrollbar-width:none] gap-4 overflow-x-auto pb-4 sm:grid sm:grid-cols-2 sm:overflow-visible sm:pb-0 lg:grid-cols-3 [&::-webkit-scrollbar]:hidden"
             >
               {services.map((service) => {
                 const Icon = getServiceCardIcon(service.slug);
