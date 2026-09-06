@@ -48,11 +48,47 @@ describe("ContactForm success behaviour (CLIENT-2)", () => {
     assert.match(SOURCE, /submitContactFormAction\(values\)/);
     assert.match(SOURCE, /result\.success/);
     assert.match(SOURCE, /role="alert"/);
+  });
+
+  test("submit control delegates to the animated SubmitButton (premium contact animation)", () => {
+    // Loading/success/error visuals and the disabled/aria-disabled contract
+    // now live in SubmitButton.tsx (see submit-button.test.ts) — this file
+    // only pins that ContactForm drives it via a phase state machine and
+    // that a real click can't double-fire while a submission is in flight.
     assert.match(
       SOURCE,
-      /\{isSubmitting \? "Sending\.\.\." : "Send a message"\}/,
+      /import \{ SubmitButton, type SubmitPhase \} from "@\/features\/contact\/SubmitButton";/,
     );
-    assert.match(SOURCE, /disabled=\{isSubmitting\}/);
+    assert.match(SOURCE, /<SubmitButton phase=\{phase\} \/>/);
+    assert.match(SOURCE, /setPhase\("submitting"\)/);
+    assert.doesNotMatch(SOURCE, /isSubmitting/);
+  });
+
+  test("the success animation is only entered after a real success response, and the redirect waits for its hold", () => {
+    const branchStart = SOURCE.indexOf("if (result.success)");
+    const successBranch = SOURCE.slice(
+      branchStart,
+      SOURCE.indexOf("setSubmitError(", branchStart),
+    );
+    assert.match(successBranch, /setPhase\("success"\)/);
+    assert.match(successBranch, /await wait\(SUCCESS_HOLD_MS\)/);
+    assert.match(successBranch, /router\.push\(ROUTES\.thankYou\)/);
+    // The redirect must come after the hold, not before it.
+    assert.ok(
+      successBranch.indexOf("await wait(SUCCESS_HOLD_MS)") <
+        successBranch.indexOf("router.push(ROUTES.thankYou)"),
+    );
+  });
+
+  test("a failed submission never redirects and returns the button to idle for retry", () => {
+    const errorBranch = SOURCE.slice(SOURCE.indexOf('setPhase("error")'));
+    assert.doesNotMatch(errorBranch, /router\.push/);
+    assert.match(errorBranch, /setPhase\("idle"\)/);
+  });
+
+  test("stale submissions can't clobber a newer one's phase (double-submit / race guard)", () => {
+    assert.match(SOURCE, /submitTokenRef/);
+    assert.match(SOURCE, /token !== submitTokenRef\.current/);
   });
 
   test("field labels, associations and the honeypot are unchanged", () => {

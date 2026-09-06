@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,20 +9,36 @@ import {
   type ContactFormValues,
 } from "@/schemas/forms/contact.schema";
 import { submitContactFormAction } from "@/features/contact/actions";
+import { SubmitButton, type SubmitPhase } from "@/features/contact/SubmitButton";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
-import { Button } from "@/components/ui/Button";
 import { serviceOptions, budgetOptions } from "@/constants/contact-form";
 import { ROUTES } from "@/constants/routes";
+
+// The success animation (spinner settles -> button contracts -> checkmark
+// draws) needs time to actually play before the redirect fires, so a
+// genuinely fast API response can't truncate it. The error hold is just
+// long enough to read "Try again" before the button relabels itself.
+const SUCCESS_HOLD_MS = 1200;
+const ERROR_HOLD_MS = 1600;
+
+function wait(ms: number) {
+  return new Promise<void>((resolve) => setTimeout(resolve, ms));
+}
 
 export function ContactForm() {
   const router = useRouter();
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [phase, setPhase] = useState<SubmitPhase>("idle");
+  // Guards the success/error holds below: if a retry fires and resolves
+  // before an earlier submission's hold timer finishes, the earlier timer's
+  // setPhase calls must not clobber the newer one's state.
+  const submitTokenRef = useRef(0);
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<ContactFormValues>({
     resolver: zodResolver(contactFormSchema),
     // Figma's form has no consent checkbox — agreement is implied by the
@@ -31,10 +47,16 @@ export function ContactForm() {
   });
 
   const onSubmit = async (values: ContactFormValues) => {
+    const token = ++submitTokenRef.current;
     setSubmitError(null);
+    setPhase("submitting");
     const result = await submitContactFormAction(values);
+    if (token !== submitTokenRef.current) return;
 
     if (result.success) {
+      setPhase("success");
+      await wait(SUCCESS_HOLD_MS);
+      if (token !== submitTokenRef.current) return;
       // A dedicated route (CLIENT-2), not an in-page panel: the client
       // requirement calls for a real Thank You page, and it gets the App
       // Router's built-in navigation announcer for free — no bespoke
@@ -43,15 +65,19 @@ export function ContactForm() {
       return;
     }
 
+    setPhase("error");
     setSubmitError(
       result.message ||
         "Something went wrong sending your message. Please try again.",
     );
+    await wait(ERROR_HOLD_MS);
+    if (token !== submitTokenRef.current) return;
+    setPhase("idle");
   };
 
   return (
     <form
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={(event) => handleSubmit(onSubmit)(event)}
       className="border-border-strong bg-glass flex flex-col gap-5 rounded-[25px] border p-6 sm:p-8"
     >
       <div className="grid gap-5 sm:grid-cols-2">
@@ -133,9 +159,7 @@ export function ContactForm() {
         </p>
       ) : null}
 
-      <Button type="submit" disabled={isSubmitting} className="w-full">
-        {isSubmitting ? "Sending..." : "Send a message"}
-      </Button>
+      <SubmitButton phase={phase} />
 
       <p className="font-body text-muted text-center text-xs">
         By submitting, you agree to our privacy policy.
