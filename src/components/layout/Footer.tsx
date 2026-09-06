@@ -1,11 +1,6 @@
-"use client";
-
 import Link from "next/link";
-import { useState, type FormEvent } from "react";
 import { Mail, Phone, MapPin } from "lucide-react";
 import { Container } from "@/components/ui/Container";
-import { Input } from "@/components/ui/Input";
-import { buttonVariants } from "@/components/ui/button-variants";
 import { Logo } from "@/components/layout/Logo";
 import {
   FOOTER_QUICK_LINKS,
@@ -34,21 +29,7 @@ const socialLinks = [
   { label: "Pinterest", href: SOCIAL_LINKS.pinterest, icon: PinterestIcon },
 ];
 
-// Unique on every page: the contact form's email field derives its id from
-// its `name` ("email") and the blog newsletter uses "newsletter-email".
-const NEWSLETTER_INPUT_ID = "footer-newsletter-email";
-
 export function Footer() {
-  const [email, setEmail] = useState("");
-  const [subscribed, setSubscribed] = useState(false);
-
-  const onSubscribe = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!email.trim()) return;
-    setSubscribed(true);
-    setEmail("");
-  };
-
   return (
     <footer className="border-t border-border-subtle">
       <Container size="full" className="max-w-[1280px] py-10 lg:py-12">
@@ -59,32 +40,6 @@ export function Footer() {
               Target Right. Find Strategy. Finish Strong. We build digital growth systems
               for brands that want measurable results.
             </p>
-
-            <p className="mt-5 font-heading text-sm font-semibold text-white">
-              Get growth insights, monthly.
-            </p>
-            {subscribed ? (
-              <p role="status" className="mt-3 font-body text-sm font-semibold text-primary">
-                You&apos;re subscribed — thanks for joining.
-              </p>
-            ) : (
-              <form onSubmit={onSubscribe} className="mt-3 flex max-w-xs gap-2">
-                <Input
-                  type="email"
-                  id={NEWSLETTER_INPUT_ID}
-                  label="Email address"
-                  hideLabel
-                  placeholder="you@company.com"
-                  required
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  className="h-11"
-                />
-                <button type="submit" className={buttonVariants({ size: "sm", className: "h-11 shrink-0" })}>
-                  Subscribe
-                </button>
-              </form>
-            )}
 
             <div className="mt-5 flex flex-wrap gap-3">
               {socialLinks.map(({ label, href, icon: Icon }) => (

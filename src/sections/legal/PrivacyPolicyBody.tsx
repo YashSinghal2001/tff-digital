@@ -28,10 +28,6 @@ export function PrivacyPolicyBody() {
                 Contact form submissions — name, work email address, phone number, company name,
                 service(s) of interest, budget range, and any message you include.
               </li>
-              <li>
-                Newsletter sign-up — your email address, if you choose to subscribe for updates
-                through our footer sign-up form.
-              </li>
               <li>Any other information you voluntarily send us, such as by email.</li>
             </ul>
 
@@ -48,7 +44,6 @@ export function PrivacyPolicyBody() {
             <ul>
               <li>Respond to inquiries submitted through our contact form;</li>
               <li>Provide information about our services;</li>
-              <li>Send occasional updates to newsletter subscribers, if you opt in;</li>
               <li>Operate, maintain, and improve the Website;</li>
               <li>Detect, prevent, and address technical issues or misuse; and</li>
               <li>Comply with applicable legal obligations.</li>

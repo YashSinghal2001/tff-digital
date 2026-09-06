@@ -8,7 +8,6 @@ import { getCategories, getTags } from "@/services/taxonomy.service";
 import { BlogHero } from "@/sections/blog/BlogHero";
 import { BlogResults } from "@/sections/blog/BlogResults";
 import { BlogSidebar } from "@/components/blog/BlogSidebar";
-import { NewsletterSection } from "@/components/blog/NewsletterSection";
 import { Container } from "@/components/ui/Container";
 import { JsonLd } from "@/components/common/JsonLd";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/json-ld";
@@ -85,7 +84,6 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           </div>
         </Container>
       </section>
-      <NewsletterSection />
     </>
   );
 }

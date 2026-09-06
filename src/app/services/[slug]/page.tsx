@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { draftMode } from "next/headers";
 import Image from "next/image";
+import { Check } from "lucide-react";
 import {
   getServiceOfferingBySlug,
   getServiceOfferingPreviewBySlug,
@@ -9,6 +10,7 @@ import {
 } from "@/services/service-offering.service";
 import type { ServiceOffering } from "@/types/domain/service-offering";
 import { Container } from "@/components/ui/Container";
+import { Heading } from "@/components/ui/Heading";
 import { IconCircle } from "@/components/ui/IconCircle";
 import { Breadcrumbs } from "@/components/blog/Breadcrumbs";
 import { ArticleContent } from "@/components/blog/ArticleContent";
@@ -129,6 +131,32 @@ export default async function ServiceDetailPage({ params }: ServiceDetailPagePro
           {service.content ? (
             <div className="mx-auto mt-10 max-w-3xl">
               <ArticleContent html={service.content} />
+            </div>
+          ) : null}
+
+          {/* CONTENT-2: the listing/homepage cards hide this checklist for
+              compactness (fe4ee9c, 78754b3) on the understanding that "the
+              full feature list stays intact on the service detail page" —
+              this was the only place that promise wasn't yet kept. */}
+          {service.features.length > 0 ? (
+            <div className="mx-auto mt-10 max-w-3xl">
+              <Heading as="h2" className="mb-4 text-2xl">
+                What&apos;s included
+              </Heading>
+              <ul className="grid gap-3 sm:grid-cols-2">
+                {service.features.map((feature) => (
+                  <li
+                    key={feature}
+                    className="font-body text-muted flex items-start gap-2 text-sm"
+                  >
+                    <Check
+                      className="text-primary mt-0.5 h-4 w-4 shrink-0"
+                      aria-hidden="true"
+                    />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
             </div>
           ) : null}
         </Container>

@@ -84,6 +84,7 @@ export function ContactForm() {
         <Input
           label="Name*"
           placeholder="Jane Doe"
+          autoComplete="name"
           {...register("name")}
           error={errors.name?.message}
         />
@@ -91,6 +92,7 @@ export function ContactForm() {
           label="Work email*"
           type="email"
           placeholder="jane@company.com"
+          autoComplete="email"
           {...register("email")}
           error={errors.email?.message}
         />
@@ -101,11 +103,13 @@ export function ContactForm() {
           label="Phone"
           type="tel"
           placeholder="(555) 000-0000"
+          autoComplete="tel"
           {...register("phone")}
         />
         <Input
           label="Company"
           placeholder="Company name"
+          autoComplete="organization"
           {...register("company")}
         />
       </div>
