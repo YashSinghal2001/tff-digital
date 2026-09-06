@@ -56,7 +56,7 @@ export function Footer() {
           <div>
             <Logo asLink={false} className="h-10" />
             <p className="mt-4 max-w-xs font-body text-sm text-muted">
-              Find Strategy. Target Right. Finish Strong. We build digital growth systems
+              Target Right. Find Strategy. Finish Strong. We build digital growth systems
               for brands that want measurable results.
             </p>
 
@@ -181,7 +181,7 @@ export function Footer() {
             </p>
 
             <p className="order-3 font-body text-xs text-muted lg:justify-self-end lg:text-right">
-              Find Strategy · Target Right · Finish Strong
+              Target Right · Find Strategy · Finish Strong
             </p>
           </div>
         </div>
