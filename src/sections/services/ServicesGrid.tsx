@@ -33,7 +33,11 @@ export function ServicesGrid({ services }: ServicesGridProps) {
         {/* Visually hidden: keeps the h1 -> h3 card titles in valid heading order without adding a visible section title the design doesn't call for. */}
         <h2 className="sr-only">Our services</h2>
         {items.length > 0 ? (
-          <FeatureGrid items={items} titleClassName="text-lg" />
+          <FeatureGrid
+            items={items}
+            titleClassName="text-lg"
+            clampDescription
+          />
         ) : (
           <ServicesEmptyState />
         )}

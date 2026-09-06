@@ -42,6 +42,8 @@ export interface FeatureGridProps {
   staggerColumns?: number;
   staggerStep?: number;
   variant?: "feature" | "compact";
+  /** Clamp the description to 4 visible lines instead of showing it in full. */
+  clampDescription?: boolean;
 }
 
 export function FeatureGrid({
@@ -54,6 +56,7 @@ export function FeatureGrid({
   staggerColumns = 3,
   staggerStep = 0.05,
   variant = "feature",
+  clampDescription = false,
 }: FeatureGridProps) {
   const entranceDelay = useEntranceDelay();
 
@@ -121,7 +124,12 @@ export function FeatureGrid({
                 {item.title}
               </h3>
               {item.description ? (
-                <p className="font-body text-muted text-sm">
+                <p
+                  className={cn(
+                    "font-body text-muted text-sm",
+                    clampDescription && "line-clamp-4",
+                  )}
+                >
                   {item.description}
                 </p>
               ) : null}
