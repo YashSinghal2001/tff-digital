@@ -59,7 +59,13 @@ export function buildBlogPostingJsonLd(
     author: post.author
       ? { "@type": "Person", name: post.author.name }
       : undefined,
-    publisher: buildOrganizationJsonLd(),
+    // A bare @id reference, not the full buildOrganizationJsonLd() body — the
+    // root layout already emits the complete Organization node on every page
+    // (see src/app/layout.tsx), and Google merges nodes sharing an @id.
+    // Repeating the full object here duplicated it (name/url/logo/sameAs) on
+    // every single blog post; buildWebsiteJsonLd already used this reference
+    // form, this just matches it.
+    publisher: { "@id": `${siteConfig.url}/#organization` },
   };
 }
 
@@ -95,7 +101,8 @@ export function buildCaseStudyJsonLd(
             value: result.value,
           }))
         : undefined,
-    publisher: buildOrganizationJsonLd(),
+    // Bare @id reference — see the matching comment in buildBlogPostingJsonLd.
+    publisher: { "@id": `${siteConfig.url}/#organization` },
   };
 }
 

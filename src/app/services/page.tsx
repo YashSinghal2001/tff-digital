@@ -4,6 +4,8 @@ import { buildPageOpenGraph } from "@/lib/seo/metadata";
 import { ROUTES } from "@/constants/routes";
 import { getServiceOfferings } from "@/services/service-offering.service";
 import { toServiceCardItems } from "@/lib/content/service-cards";
+import { JsonLd } from "@/components/common/JsonLd";
+import { buildBreadcrumbJsonLd } from "@/lib/seo/json-ld";
 import { ServicesHero } from "@/sections/services/ServicesHero";
 import { TrustedBrands } from "@/sections/home/TrustedBrands";
 import { ServicesGrid } from "@/sections/services/ServicesGrid";
@@ -69,6 +71,12 @@ export default async function ServicesPage() {
   const services = await getServiceOfferings({ first: 100 });
   return (
     <>
+      <JsonLd
+        data={buildBreadcrumbJsonLd([
+          { name: "Home", url: getCanonicalUrl(ROUTES.home) },
+          { name: "Services", url: getCanonicalUrl(ROUTES.services) },
+        ])}
+      />
       <ServicesHero />
       <TrustedBrands />
       <ServicesGrid services={toServiceCardItems(services.items)} />
