@@ -81,6 +81,10 @@ describe("adaptPost", () => {
     assert.deepEqual(post.seo?.robots, { index: true, follow: true });
   });
 
+  test("sets og:type to article (OG-2) — the one content type OG's article type describes", () => {
+    assert.equal(adaptPost(wpPostFixture).seo?.openGraph.type, "article");
+  });
+
   test("survives taxonomy connections returned without .nodes, or with empty nodes (PARTIAL-1)", () => {
     // A connection object that exists but carries no `nodes` is valid
     // GraphQL and distinct from `null`; before the fix `.nodes.map` threw

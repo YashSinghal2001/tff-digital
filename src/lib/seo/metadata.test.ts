@@ -88,3 +88,98 @@ describe("buildMetadata og:url", () => {
     assert.equal(metadata.openGraph?.url, CANONICAL);
   });
 });
+
+describe("buildMetadata OG-2 site identity + locale", () => {
+  test("re-supplies og:site_name and og:locale on every WP-backed item, not just the no-SEO fallback", () => {
+    // The page-level openGraph object replaces the root layout's wholesale,
+    // so a WP post/case-study/service/page (the `if (seo)` branch) must
+    // carry these itself — they were silently missing live before OG-2.
+    const metadata = buildMetadata(seoFixture, CANONICAL);
+    assert.equal(metadata.openGraph?.siteName, SITE_OPEN_GRAPH_DEFAULTS.siteName);
+    assert.equal(metadata.openGraph?.locale, SITE_OPEN_GRAPH_DEFAULTS.locale);
+  });
+});
+
+describe("buildMetadata OG-2 image + type consistency", () => {
+  test("carries a WP-sourced image's width/height/alt into og:image, not just its url", () => {
+    const metadata = buildMetadata(
+      {
+        ...seoFixture,
+        openGraph: {
+          ...seoFixture.openGraph,
+          image: {
+            id: "1",
+            url: "https://cms.example.test/photo.jpg",
+            altText: "A photo",
+            width: 800,
+            height: 600,
+          },
+        },
+      },
+      CANONICAL,
+    );
+    assert.deepEqual(metadata.openGraph?.images, [
+      { url: "https://cms.example.test/photo.jpg", alt: "A photo", width: 800, height: 600 },
+    ]);
+  });
+
+  test("falls back og:image alt to the og:title when the media has none", () => {
+    const metadata = buildMetadata(
+      {
+        ...seoFixture,
+        openGraph: {
+          ...seoFixture.openGraph,
+          image: {
+            id: "1",
+            url: "https://cms.example.test/photo.jpg",
+            altText: "",
+            width: null,
+            height: null,
+          },
+        },
+      },
+      CANONICAL,
+    );
+    assert.deepEqual(metadata.openGraph?.images, [
+      { url: "https://cms.example.test/photo.jpg", alt: seoFixture.openGraph.title },
+    ]);
+  });
+
+  test("passes og:type through from the adapted SEO data (article for blog posts)", () => {
+    const metadata = buildMetadata(
+      { ...seoFixture, openGraph: { ...seoFixture.openGraph, type: "article" } },
+      CANONICAL,
+    );
+    // Metadata["openGraph"] is a discriminated union keyed on `type`; only
+    // some members declare it, so a type-narrowed read needs the cast.
+    assert.equal((metadata.openGraph as { type?: string } | undefined)?.type, "article");
+  });
+});
+
+// IDX-1: buildMetadata is the only place a WP item's adapted robots
+// directive (from adaptSeo, see seo.adapter.test.ts) reaches Next's
+// <meta name="robots"> output, so the pass-through itself needs its own
+// regression coverage independent of the caller-supplied `overrides` path
+// already covered above.
+describe("buildMetadata robots (IDX-1)", () => {
+  test("carries a noindex directive from the adapted SEO data through to metadata.robots", () => {
+    const metadata = buildMetadata(
+      { ...seoFixture, robots: { index: false, follow: true } },
+      CANONICAL,
+    );
+    assert.deepEqual(metadata.robots, { index: false, follow: true });
+  });
+
+  test("carries an indexable directive from the adapted SEO data through to metadata.robots", () => {
+    const metadata = buildMetadata(
+      { ...seoFixture, robots: { index: true, follow: true } },
+      CANONICAL,
+    );
+    assert.deepEqual(metadata.robots, { index: true, follow: true });
+  });
+
+  test("sets no robots field at all when the item has no SEO data, so the indexable root-layout default is inherited rather than overridden", () => {
+    const metadata = buildMetadata(null, CANONICAL, { title: "Untitled" });
+    assert.equal("robots" in metadata, false);
+  });
+});

@@ -1,7 +1,22 @@
 import type { Metadata } from "next";
 import type { Seo } from "@/types/domain/seo";
+import type { Media } from "@/types/domain/media";
 import { seoConfig } from "@/config/seo.config";
 import { siteConfig } from "@/config/site.config";
+
+/** Resolves a WordPress media item into an OG/Twitter image descriptor
+ *  (OG-2) — width/height/alt are only known for WP-sourced images, so a
+ *  bare `{ url }` (as before) silently dropped data crawlers use to render
+ *  the share card without a layout flash. */
+function toShareImage(media: Media, altFallback: string) {
+  return {
+    url: media.url,
+    alt: media.altText || altFallback,
+    ...(media.width && media.height
+      ? { width: media.width, height: media.height }
+      : {}),
+  };
+}
 
 /** Sitewide OpenGraph defaults — single source for the root layout and
  *  buildPageOpenGraph, so the share card can't drift between them. */
@@ -75,14 +90,19 @@ export function buildMetadata(
       follow: seo.robots.follow,
     };
     metadata.openGraph = {
+      // A page-level openGraph replaces the root layout's wholesale, so a
+      // WP-backed page must re-supply site identity/locale itself (OG-2) —
+      // Yoast has no equivalent fields, and without this every post/case
+      // study/service/page shipped og:image with no og:site_name or
+      // og:locale at all, live-confirmed on /services and /case-studies.
+      siteName: SITE_OPEN_GRAPH_DEFAULTS.siteName,
+      locale: SITE_OPEN_GRAPH_DEFAULTS.locale,
       title: seo.openGraph.title,
       description: seo.openGraph.description,
       type: seo.openGraph.type,
       url: resolvedCanonical,
-      // A page-level openGraph replaces the root layout's wholesale, so
-      // pages without a Yoast OG image must re-supply the sitewide card.
       images: seo.openGraph.image
-        ? [{ url: seo.openGraph.image.url }]
+        ? [toShareImage(seo.openGraph.image, seo.openGraph.title)]
         : seoConfig.defaultOgImage
           ? [{ url: seoConfig.defaultOgImage }]
           : undefined,
@@ -91,7 +111,9 @@ export function buildMetadata(
       card: seo.twitter.card,
       title: seo.twitter.title,
       description: seo.twitter.description,
-      images: seo.twitter.image ? [seo.twitter.image.url] : undefined,
+      images: seo.twitter.image
+        ? [toShareImage(seo.twitter.image, seo.twitter.title)]
+        : undefined,
     };
   } else if (resolvedCanonical) {
     // og:url is the one OpenGraph field the root layout can never supply

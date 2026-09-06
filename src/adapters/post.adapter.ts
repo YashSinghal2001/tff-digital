@@ -35,6 +35,9 @@ export function adaptPost(wpPost: WPPost): Post {
     seo: adaptSeo(wpPost.seo, {
       title: wpPost.title,
       description: excerpt,
+      // Blog posts are the one content type OG's article type describes
+      // (OG-2) — case studies/services/pages stay "website".
+      type: "article",
     }),
   };
 }

@@ -26,6 +26,10 @@ export interface SeoFallback {
   title: string;
   description: string;
   canonicalUrl?: string | null;
+  // Yoast's WPGraphQL bridge doesn't expose an og:type field, so callers
+  // supply it directly — blog posts pass "article" (OG-2); everything else
+  // defaults to "website".
+  type?: "website" | "article";
 }
 
 export function adaptSeo(wpSeo: WPSeo | null, fallback: SeoFallback): Seo {
@@ -45,12 +49,18 @@ export function adaptSeo(wpSeo: WPSeo | null, fallback: SeoFallback): Seo {
   return {
     title,
     description,
-    canonicalUrl: wpSeo?.canonical ?? fallback.canonicalUrl ?? null,
+    // wpSeo.canonical is Yoast's own canonical, resolved against the CMS
+    // host (https://cms.tffdigital.com/...) — never the public frontend
+    // domain (CANON-1), so it must never be used here even as a fallback.
+    // Every route builds its own frontend canonical and passes it to
+    // buildMetadata directly; `fallback.canonicalUrl` exists only for a
+    // caller that wants to pre-resolve one through this adapter instead.
+    canonicalUrl: fallback.canonicalUrl ?? null,
     openGraph: {
       title: wpSeo?.opengraphTitle || title,
       description: wpSeo?.opengraphDescription || description,
       image: ogImage,
-      type: "website",
+      type: fallback.type ?? "website",
     },
     twitter: {
       card: "summary_large_image",

@@ -13,6 +13,10 @@ import type { WPCaseStudyFields } from "@/types/api/wp-case-study";
 // dangerouslySetInnerHTML (ARCH-5), and the nested related services.
 
 describe("adaptCaseStudy", () => {
+  test("stays og:type website (OG-2 pins article to blog posts only)", () => {
+    assert.equal(adaptCaseStudy(wpCaseStudyFixture).seo?.openGraph.type, "website");
+  });
+
   test("keeps only result pairs that have both a label and a value, in order", () => {
     assert.deepEqual(adaptCaseStudy(wpCaseStudyFixture).results, [
       { label: "Traffic", value: "+120%" },

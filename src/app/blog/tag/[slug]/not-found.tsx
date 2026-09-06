@@ -1,5 +1,12 @@
+import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { BlogNotFound } from "@/components/blog/BlogNotFound";
+
+// See src/app/blog/[slug]/not-found.tsx for why this segment needs its own
+// title (META-1) instead of falling through to the bare site-name default.
+export const metadata: Metadata = {
+  title: "Tag not found",
+};
 
 export default function NotFound() {
   return (
