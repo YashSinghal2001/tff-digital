@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Card } from "@/components/ui/Card";
 import { Heading } from "@/components/ui/Heading";
@@ -66,23 +66,9 @@ export function WhatWeDo({ services }: WhatWeDoProps) {
                         <h3 className="font-heading text-lg font-bold text-white xl:text-base">
                           {service.title}
                         </h3>
-                        <p className="font-body text-muted text-sm">
+                        <p className="font-body text-muted line-clamp-4 text-sm">
                           {service.summary}
                         </p>
-                        <ul className="flex flex-col gap-2">
-                          {service.features.map((feature) => (
-                            <li
-                              key={feature}
-                              className="font-body text-muted flex items-start gap-2 text-sm"
-                            >
-                              <Check
-                                className="text-primary mt-0.5 h-4 w-4 shrink-0"
-                                aria-hidden="true"
-                              />
-                              {feature}
-                            </li>
-                          ))}
-                        </ul>
                         <Link
                           href={service.href}
                           className="font-body text-primary relative mt-auto flex items-center gap-1 pt-2 text-sm font-semibold transition-colors hover:text-white"
