@@ -44,6 +44,8 @@ export interface FeatureGridProps {
   variant?: "feature" | "compact";
   /** Clamp the description to 4 visible lines instead of showing it in full. */
   clampDescription?: boolean;
+  /** Omit the feature/checkmark list entirely, e.g. for a compact listing card. */
+  hideFeatures?: boolean;
 }
 
 export function FeatureGrid({
@@ -57,6 +59,7 @@ export function FeatureGrid({
   staggerStep = 0.05,
   variant = "feature",
   clampDescription = false,
+  hideFeatures = false,
 }: FeatureGridProps) {
   const entranceDelay = useEntranceDelay();
 
@@ -133,7 +136,7 @@ export function FeatureGrid({
                   {item.description}
                 </p>
               ) : null}
-              {item.features && item.features.length > 0 ? (
+              {!hideFeatures && item.features && item.features.length > 0 ? (
                 <ul className="flex flex-col gap-2">
                   {item.features.map((feature) => (
                     <li

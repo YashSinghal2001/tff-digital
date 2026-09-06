@@ -37,6 +37,7 @@ export function ServicesGrid({ services }: ServicesGridProps) {
             items={items}
             titleClassName="text-lg"
             clampDescription
+            hideFeatures
           />
         ) : (
           <ServicesEmptyState />
