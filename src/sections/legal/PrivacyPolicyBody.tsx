@@ -59,8 +59,10 @@ export function PrivacyPolicyBody() {
 
             <h2>5. Website Analytics / Tracking</h2>
             <p>
-              We do not currently use third-party analytics or advertising tools (such as Google
-              Analytics or Meta Pixel) on the Website.
+              We use Google Tag Manager (GTM), a tag management tool provided by Google, to load
+              and manage scripts on the Website. We do not currently use analytics or advertising
+              tools (such as Google Analytics or Meta Pixel) through GTM on the Website. If that
+              changes, this Privacy Policy will be updated to name the specific tools in use.
             </p>
 
             <h2>6. How We Share Information</h2>

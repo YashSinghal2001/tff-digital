@@ -33,10 +33,11 @@ export function CookiePolicyBody() {
             <h2>3. How TFF Digital Uses Cookies</h2>
             <p>
               The Website does not use cookies or browser storage for analytics,
-              advertising, or profiling. The only technologies described below
-              exist to run core site functionality: remembering your
-              cookie-notice decision and, for our internal editorial team only,
-              previewing unpublished content.
+              advertising, or profiling. The technologies described below exist
+              to run core site functionality: remembering your cookie-notice
+              decision, previewing unpublished content for our internal
+              editorial team only, and loading Google Tag Manager, which does
+              not itself set cookies (see Section 4).
             </p>
 
             <h2>4. Types of Cookies We Use</h2>
@@ -59,6 +60,17 @@ export function CookiePolicyBody() {
               again on later visits. This is the only browser storage the
               Website sets for visitors, and it is used solely to remember your
               decision.
+            </p>
+
+            <h3>Tag Management</h3>
+            <p>
+              The Website uses Google Tag Manager (GTM), a tag management tool
+              provided by Google, to load and manage scripts on the Website.
+              GTM does not itself set cookies or collect analytics data — it is
+              a container that can load other tools. We are not currently using
+              GTM to load any analytics, advertising, or profiling tags. If
+              that changes, this section will be updated to name the specific
+              tools in use.
             </p>
 
             <h3>Analytics Cookies</h3>

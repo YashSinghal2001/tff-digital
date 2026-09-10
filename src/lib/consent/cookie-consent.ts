@@ -3,9 +3,11 @@
  * localStorage read/write, no React, so it's unit-testable under
  * `node --test` with jsdom the same way src/lib/a11y/focus-trap.ts is.
  *
- * The site loads no analytics/advertising scripts, so "accepted" and
- * "rejected" are not gates for anything — both simply record that the
- * visitor has seen and dismissed the notice, matching the Cookie Policy.
+ * The site loads Google Tag Manager (src/app/layout.tsx) but no analytics or
+ * advertising tags, and GTM's bare container sets no cookies of its own — so
+ * "accepted" and "rejected" are not gates for anything — both simply record
+ * that the visitor has seen and dismissed the notice, matching the Cookie
+ * Policy.
  */
 
 export const COOKIE_CONSENT_STORAGE_KEY = "tff-cookie-consent";

@@ -71,8 +71,15 @@ describe("cookie consent banner content and controls (CLIENT-5)", () => {
     assert.match(BANNER, /aria-label="Cookie notice"/);
   });
 
-  test("does not claim or introduce any tracking/analytics script", () => {
-    assert.doesNotMatch(BANNER, /gtag|GoogleAnalytics|GTM|fbq|hotjar|clarity/i);
+  test("mentions the real Google Tag Manager install, not any other tracking/analytics script", () => {
+    // GTM (GTM-KTSN4NHB) is the client-requested tag management container —
+    // see src/app/layout.tsx and src/constants/analytics.ts. It sets no
+    // cookies on its own, so this banner still truthfully says no
+    // analytics/advertising cookies are set; it must never grow a mention of
+    // an actual analytics/advertising tool that isn't configured anywhere in
+    // this repo.
+    assert.match(BANNER, /Google Tag Manager/);
+    assert.doesNotMatch(BANNER, /gtag|GoogleAnalytics|fbq|hotjar|clarity/i);
   });
 
   test("does not build a fake multi-category consent manager for cookies that don't exist", () => {

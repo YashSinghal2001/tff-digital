@@ -17,9 +17,22 @@ if (process.env.NODE_ENV !== "production") {
   scriptSrc.push("'unsafe-eval'");
 }
 
+// Client-provided Google Tag Manager container (GTM-KTSN4NHB, see
+// src/constants/analytics.ts). GTM's bootstrap script is injected by the
+// inline snippet in src/app/layout.tsx, so it needs an explicit host here —
+// script-src's 'unsafe-inline' only covers inline script *content*, not
+// scripts fetched from a remote src. The noscript fallback's <iframe> points
+// at googletagmanager.com/ns.html, which needs the same host in frame-src.
+// Deliberately NOT adding img-src/connect-src here: the bare container with
+// no tags configured makes neither kind of request. If tags are later added
+// inside the GTM console (e.g. GA4, Google Ads), those tags' own origins
+// (e.g. www.google-analytics.com) will need their own CSP entries at that
+// time — CSP can't anticipate tags configured outside this codebase.
+const gtmOrigin = "https://www.googletagmanager.com";
+
 const cspDirectives = [
   `default-src 'self'`,
-  `script-src ${scriptSrc.join(" ")}`,
+  `script-src ${scriptSrc.join(" ")} ${gtmOrigin}`,
   `style-src 'self' 'unsafe-inline'`,
   // next/font self-hosts Google Fonts at build time (no fonts.gstatic.com request at runtime).
   `font-src 'self'`,
@@ -27,8 +40,9 @@ const cspDirectives = [
   // s.wordpress.com serves the Selected Work website-preview screenshots (src/lib/content/website-preview.ts).
   `img-src 'self' data:${wordpressMediaHostname ? ` https://${wordpressMediaHostname}` : ""} https://placehold.co https://s.wordpress.com`,
   // WP oEmbed YouTube embeds rendered inside ArticleContent (see src/components/blog/ArticleContent.tsx),
-  // plus the Google Maps embed on the contact page (src/sections/contact/ContactFormSection.tsx).
-  `frame-src 'self' https://www.youtube.com https://youtube.com https://www.youtube-nocookie.com https://www.google.com`,
+  // the Google Maps embed on the contact page (src/sections/contact/ContactFormSection.tsx),
+  // and the GTM noscript fallback iframe (src/app/layout.tsx) — see gtmOrigin comment above.
+  `frame-src 'self' https://www.youtube.com https://youtube.com https://www.youtube-nocookie.com https://www.google.com ${gtmOrigin}`,
   `frame-ancestors 'self'`,
   `connect-src 'self'`,
   `object-src 'none'`,

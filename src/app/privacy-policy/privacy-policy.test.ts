@@ -80,14 +80,17 @@ describe("privacy policy content (CLIENT-3)", () => {
     }
   });
 
-  test("only describes data collection the site actually performs (no analytics/cookie claims)", () => {
-    // The site ships no analytics/tracking script (see grep in the CLIENT-3
-    // audit) and no cookie-consent mechanism, so the copy must say so rather
-    // than asserting tooling that doesn't exist.
+  test("only claims the analytics/advertising tooling the site actually has (none, beyond GTM)", () => {
+    // The site loads Google Tag Manager (GTM-KTSN4NHB, see
+    // src/app/layout.tsx) but has no analytics or advertising tags
+    // configured through it, so the copy must disclose GTM while still
+    // saying it doesn't use analytics/advertising tools, rather than
+    // claiming no tracking infrastructure exists at all.
     assert.match(
       BODY,
       /do not (currently )?use (third-party )?(cookies|analytics)/i,
     );
+    assert.match(BODY, /Google Tag Manager/);
   });
 });
 

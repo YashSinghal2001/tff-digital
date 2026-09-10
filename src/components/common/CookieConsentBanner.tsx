@@ -11,10 +11,12 @@ import {
 } from "@/lib/consent/cookie-consent";
 
 /**
- * Sitewide cookie notice (CLIENT-5). The site loads no analytics or
- * advertising scripts, so there is nothing to gate behind this decision —
- * "Accept" and "Reject" both just record that the visitor dismissed the
- * notice (see src/lib/consent/cookie-consent.ts and /cookie-policy).
+ * Sitewide cookie notice (CLIENT-5). The site loads Google Tag Manager (see
+ * src/app/layout.tsx) but no analytics or advertising scripts, and GTM's
+ * bare container sets no cookies of its own — so there is nothing to gate
+ * behind this decision. "Accept" and "Reject" both just record that the
+ * visitor dismissed the notice (see src/lib/consent/cookie-consent.ts and
+ * /cookie-policy).
  *
  * Renders nothing until the stored decision has been checked client-side,
  * so it never flashes for a returning visitor and never renders twice.
@@ -46,8 +48,9 @@ export function CookieConsentBanner() {
     >
       <div className="mx-auto flex max-w-[1280px] flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
         <p className="font-body text-muted text-sm leading-relaxed">
-          We use only strictly necessary technology to run this site — no
-          analytics or advertising cookies. See our{" "}
+          We use cookies and similar technologies to run this site, including
+          Google Tag Manager — no analytics or advertising cookies are set.
+          See our{" "}
           <Link
             href={ROUTES.cookiePolicy}
             className="text-primary underline underline-offset-2"
