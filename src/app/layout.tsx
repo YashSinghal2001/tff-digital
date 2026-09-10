@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import { Poppins, Open_Sans } from "next/font/google";
 import "./globals.css";
 import { siteConfig } from "@/config/site.config";
@@ -51,18 +50,30 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${poppins.variable} ${openSans.variable} antialiased`}>
+      <head>
         {/*
           Client-provided Google Tag Manager container (GTM-KTSN4NHB).
-          `beforeInteractive` is hoisted into <head> by Next regardless of
-          where the <Script> sits in the tree — see
-          https://nextjs.org/docs/app/api-reference/components/script.
-          The noscript fallback is placed as the very first element inside
-          <body>, matching Google's own installation instructions.
+          A raw <head> element here is App Router's documented escape hatch
+          for content the Metadata API can't express — see
+          https://nextjs.org/docs/app/api-reference/file-conventions/layout#the-head-element.
+          This is a plain <script>, deliberately not next/script: that
+          component's earliest-loading option only guarantees the script
+          *executes* before hydration — in App Router it does this by
+          injecting via Next's own side-channel immediately after <body>
+          opens, ignoring wherever its own component sits in the tree. A
+          literal <script> placed here renders exactly where authored (in
+          <head>) and, being synchronous and unmodified by async/defer,
+          still runs before the rest of the document parses — matching
+          Google's own install instructions and this client's requirement.
+          @next/third-parties/google's GoogleTagManager component (which
+          next/next/next-script-for-ga suggests below) is not installed in
+          this project and would be a new dependency — out of scope for a
+          placement-only fix, and it wouldn't change where the script lands
+          relative to this hand-authored <head> anyway.
         */}
-        <Script
+        {/* eslint-disable-next-line @next/next/next-script-for-ga */}
+        <script
           id="gtm-bootstrap"
-          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -71,6 +82,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+i:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','${GTM_CONTAINER_ID}');`,
           }}
         />
+      </head>
+      <body className={`${poppins.variable} ${openSans.variable} antialiased`}>
+        {/*
+          GTM noscript fallback, placed as the very first element inside
+          <body>, matching Google's own installation instructions.
+        */}
         <noscript>
           <iframe
             src={`https://www.googletagmanager.com/ns.html?id=${GTM_CONTAINER_ID}`}

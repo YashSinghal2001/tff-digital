@@ -28,9 +28,38 @@ describe("GTM container ID", () => {
 });
 
 describe("GTM wiring in the root layout (src/app/layout.tsx)", () => {
-  test("loads the bootstrap script via next/script with strategy beforeInteractive", () => {
-    assert.match(LAYOUT, /import Script from "next\/script";/);
-    assert.match(LAYOUT, /<Script[\s\S]*?strategy="beforeInteractive"/);
+  // next/script's strategy="beforeInteractive" only guarantees the script
+  // *executes* before hydration — in App Router it injects via Next's own
+  // side-channel immediately after <body> opens, regardless of where the
+  // <Script> component sits in the tree (verified against actual rendered
+  // HTML from `next build` + `next start`, not just this source file). A
+  // plain <script> authored directly inside a literal <head> element is
+  // what actually lands in <head>, so this must NOT use next/script.
+  test("does not use next/script (its beforeInteractive strategy renders in body, not head)", () => {
+    assert.doesNotMatch(LAYOUT, /from "next\/script"/);
+    assert.doesNotMatch(LAYOUT, /strategy="beforeInteractive"/);
+  });
+
+  test("the root layout renders a literal <head> element ahead of <body>", () => {
+    const headIdx = LAYOUT.indexOf("<head>");
+    const headCloseIdx = LAYOUT.indexOf("</head>");
+    const bodyTagIdx = LAYOUT.indexOf("<body", headCloseIdx);
+    assert.notEqual(headIdx, -1);
+    assert.notEqual(headCloseIdx, -1);
+    assert.notEqual(bodyTagIdx, -1);
+    assert.ok(headIdx < headCloseIdx, "<head> must open before it closes");
+    assert.ok(headCloseIdx < bodyTagIdx, "</head> must close before <body> opens");
+  });
+
+  test("the GTM bootstrap <script> is inside <head>...</head>, not <body>", () => {
+    const headIdx = LAYOUT.indexOf("<head>");
+    const headCloseIdx = LAYOUT.indexOf("</head>");
+    const bootstrapIdx = LAYOUT.indexOf('id="gtm-bootstrap"');
+    assert.notEqual(bootstrapIdx, -1);
+    assert.ok(
+      headIdx < bootstrapIdx && bootstrapIdx < headCloseIdx,
+      "gtm-bootstrap script must sit between <head> and </head>",
+    );
   });
 
   test("the bootstrap script resolves to the real gtm.js request for this container", () => {
@@ -45,6 +74,20 @@ describe("GTM wiring in the root layout (src/app/layout.tsx)", () => {
     assert.match(
       LAYOUT,
       /<noscript>\s*<iframe\s+src=\{`https:\/\/www\.googletagmanager\.com\/ns\.html\?id=\$\{GTM_CONTAINER_ID\}`\}/,
+    );
+  });
+
+  test("the noscript iframe is the first thing rendered inside <body>", () => {
+    const headCloseIdx = LAYOUT.indexOf("</head>");
+    const bodyTagIdx = LAYOUT.indexOf("<body", headCloseIdx);
+    const bodyOpenEnd = LAYOUT.indexOf(">", bodyTagIdx) + 1;
+    const afterBody = LAYOUT.slice(bodyOpenEnd).trimStart();
+    // The only thing allowed between <body ...> and <noscript> is JSX
+    // whitespace/comments — no other element may render before it.
+    const strippedComments = afterBody.replace(/\{\/\*[\s\S]*?\*\/\}/g, "").trimStart();
+    assert.ok(
+      strippedComments.startsWith("<noscript>"),
+      "noscript must be the first rendered element inside <body>",
     );
   });
 
