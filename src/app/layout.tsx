@@ -52,6 +52,24 @@ export default function RootLayout({
     <html lang="en">
       <head>
         {/*
+          Google Consent Mode v2 default state. Must render — and therefore
+          execute — before #gtm-bootstrap below, so GTM/GA4 see it as soon as
+          they parse the dataLayer, per Google's own consent guide
+          (https://developers.google.com/tag-platform/security/guides/consent).
+          Denies analytics/ad storage by default; the actual grant/deny comes
+          from the visitor's cookie-notice decision via
+          src/lib/consent/cookie-consent.ts (see CookieConsentBanner.tsx),
+          which pushes a 'consent update' once known (immediately, on mount,
+          for a returning visitor with a stored decision). This site runs no
+          ad tags, so the ad_* signals are only ever set here, to 'denied'.
+        */}
+        <script
+          id="consent-default"
+          dangerouslySetInnerHTML={{
+            __html: `window.dataLayer=window.dataLayer||[];function gtag(){window.dataLayer.push(arguments);}gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied'});`,
+          }}
+        />
+        {/*
           Client-provided Google Tag Manager container (GTM-KTSN4NHB).
           A raw <head> element here is App Router's documented escape hatch
           for content the Metadata API can't express — see

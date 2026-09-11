@@ -80,17 +80,15 @@ describe("privacy policy content (CLIENT-3)", () => {
     }
   });
 
-  test("only claims the analytics/advertising tooling the site actually has (none, beyond GTM)", () => {
+  test("discloses GA4 analytics via GTM, gated by cookie consent, and no advertising tools", () => {
     // The site loads Google Tag Manager (GTM-KTSN4NHB, see
-    // src/app/layout.tsx) but has no analytics or advertising tags
-    // configured through it, so the copy must disclose GTM while still
-    // saying it doesn't use analytics/advertising tools, rather than
-    // claiming no tracking infrastructure exists at all.
-    assert.match(
-      BODY,
-      /do not (currently )?use (third-party )?(cookies|analytics)/i,
-    );
+    // src/app/layout.tsx), which loads Google Analytics 4 — gated behind
+    // the cookie notice via Consent Mode (src/lib/consent/cookie-consent.ts).
+    // No advertising tools are configured through GTM, so that claim stays.
+    assert.match(BODY, /Google Analytics 4/);
     assert.match(BODY, /Google Tag Manager/);
+    assert.match(BODY, /accept the cookie notice/i);
+    assert.match(BODY, /do not currently use any\s+advertising tools/i);
   });
 });
 

@@ -51,18 +51,20 @@ export function PrivacyPolicyBody() {
 
             <h2>4. Cookies and Similar Technologies</h2>
             <p>
-              At this time, the Website does not use cookies or similar tracking technologies for
-              analytics, advertising, or profiling purposes. If this changes in the future, this
-              Privacy Policy will be updated to describe the technologies used and any choices
-              available to you.
+              The Website uses Google Analytics 4, loaded through Google Tag Manager, for
+              analytics — see Section 5. This only operates if you accept the cookie notice on the
+              Website. The Website does not use cookies or similar technologies for advertising or
+              profiling purposes.
             </p>
 
             <h2>5. Website Analytics / Tracking</h2>
             <p>
               We use Google Tag Manager (GTM), a tag management tool provided by Google, to load
-              and manage scripts on the Website. We do not currently use analytics or advertising
-              tools (such as Google Analytics or Meta Pixel) through GTM on the Website. If that
-              changes, this Privacy Policy will be updated to name the specific tools in use.
+              Google Analytics 4 (GA4) on the Website for analytics. GA4 only collects data about
+              your visit if you accept the cookie notice described in our Cookie Policy; if you
+              reject it, GA4 does not collect analytics data. We do not currently use any
+              advertising tools (such as Meta Pixel or Google Ads) through GTM. If that changes,
+              this Privacy Policy will be updated to name the specific tools in use.
             </p>
 
             <h2>6. How We Share Information</h2>

@@ -5,9 +5,10 @@ import { readFileSync } from "node:fs";
 // CLIENT-5: pins that the Cookie Policy page keeps real TFF Digital content,
 // is wired into SEO the same way every other public legal page is, stays
 // linked from the footer, and only describes cookie/storage technologies
-// this repository actually ships. The site now loads Google Tag Manager
-// (GTM-KTSN4NHB, see src/app/layout.tsx) sitewide, disclosed in the "Tag
-// Management" subsection below — but still no analytics or advertising
+// this repository actually ships. The site loads Google Tag Manager
+// (GTM-KTSN4NHB, see src/app/layout.tsx) sitewide, which loads Google
+// Analytics 4 — gated behind this page's cookie notice via Consent Mode
+// (see src/lib/consent/cookie-consent.ts). Still no advertising/profiling
 // tags/cookies, so those claims stay. Source-level, matching the existing
 // convention for static-copy legal pages (privacy-policy.test.ts,
 // terms-and-conditions.test.ts).
@@ -96,8 +97,9 @@ describe("cookie policy content (CLIENT-5)", () => {
     }
   });
 
-  test("does not claim analytics or advertising cookies that don't exist", () => {
-    assert.match(BODY, /do not currently use analytics cookies/i);
+  test("discloses real GA4 analytics, gated by consent, and does not claim advertising cookies that don't exist", () => {
+    assert.match(BODY, /Google Analytics 4/);
+    assert.match(BODY, /click Accept/i);
     assert.match(BODY, /do not currently use marketing, advertising/i);
   });
 

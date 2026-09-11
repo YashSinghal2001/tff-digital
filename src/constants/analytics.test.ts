@@ -62,6 +62,34 @@ describe("GTM wiring in the root layout (src/app/layout.tsx)", () => {
     );
   });
 
+  test("the Consent Mode default is a separate <script> inside <head>, before gtm-bootstrap", () => {
+    const headIdx = LAYOUT.indexOf("<head>");
+    const headCloseIdx = LAYOUT.indexOf("</head>");
+    const consentDefaultIdx = LAYOUT.indexOf('id="consent-default"');
+    const bootstrapIdx = LAYOUT.indexOf('id="gtm-bootstrap"');
+    assert.notEqual(consentDefaultIdx, -1);
+    assert.ok(
+      headIdx < consentDefaultIdx && consentDefaultIdx < headCloseIdx,
+      "consent-default script must sit between <head> and </head>",
+    );
+    assert.ok(
+      consentDefaultIdx < bootstrapIdx,
+      "Consent Mode default must be pushed to dataLayer before the GTM bootstrap script runs",
+    );
+  });
+
+  test("the Consent Mode default denies analytics_storage and every ad_* signal", () => {
+    const consentScript = LAYOUT.match(
+      /id="consent-default"[\s\S]*?__html:\s*`([^`]*)`/,
+    )?.[1];
+    assert.ok(consentScript, "consent-default script content not found");
+    assert.match(consentScript!, /gtag\('consent','default',/);
+    assert.match(consentScript!, /ad_storage:'denied'/);
+    assert.match(consentScript!, /ad_user_data:'denied'/);
+    assert.match(consentScript!, /ad_personalization:'denied'/);
+    assert.match(consentScript!, /analytics_storage:'denied'/);
+  });
+
   test("the bootstrap script resolves to the real gtm.js request for this container", () => {
     assert.match(
       LAYOUT,

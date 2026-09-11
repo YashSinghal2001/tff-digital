@@ -6,17 +6,17 @@ import { ROUTES } from "@/constants/routes";
 import { buttonVariants } from "@/components/ui/button-variants";
 import {
   getCookieConsent,
+  restoreConsentMode,
   setCookieConsent,
   type CookieConsentDecision,
 } from "@/lib/consent/cookie-consent";
 
 /**
  * Sitewide cookie notice (CLIENT-5). The site loads Google Tag Manager (see
- * src/app/layout.tsx) but no analytics or advertising scripts, and GTM's
- * bare container sets no cookies of its own — so there is nothing to gate
- * behind this decision. "Accept" and "Reject" both just record that the
- * visitor dismissed the notice (see src/lib/consent/cookie-consent.ts and
- * /cookie-policy).
+ * src/app/layout.tsx), which loads Google Analytics 4 — gated behind this
+ * decision via Google Consent Mode (src/lib/consent/cookie-consent.ts):
+ * "Accept" grants analytics_storage, "Reject" keeps it denied. GTM's default
+ * (before any decision) is also denied, set in src/app/layout.tsx.
  *
  * Renders nothing until the stored decision has been checked client-side,
  * so it never flashes for a returning visitor and never renders twice.
@@ -31,6 +31,9 @@ export function CookieConsentBanner() {
     // (not derivable during render/SSR) is the sync this rule allows for.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setDecision(getCookieConsent());
+    // Re-applies a returning visitor's stored decision to Consent Mode —
+    // layout.tsx's default (denied) otherwise stands until this runs.
+    restoreConsentMode();
   }, []);
 
   if (decision === undefined || decision !== null) return null;
@@ -49,8 +52,8 @@ export function CookieConsentBanner() {
       <div className="mx-auto flex max-w-[1280px] flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
         <p className="font-body text-muted text-sm leading-relaxed">
           We use cookies and similar technologies to run this site, including
-          Google Tag Manager — no analytics or advertising cookies are set.
-          See our{" "}
+          Google Tag Manager and Google Analytics. Analytics only runs if you
+          click Accept — no advertising cookies are set. See our{" "}
           <Link
             href={ROUTES.cookiePolicy}
             className="text-primary underline underline-offset-2"
