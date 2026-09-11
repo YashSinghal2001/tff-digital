@@ -23,12 +23,18 @@ if (process.env.NODE_ENV !== "production") {
 // script-src's 'unsafe-inline' only covers inline script *content*, not
 // scripts fetched from a remote src. The noscript fallback's <iframe> points
 // at googletagmanager.com/ns.html, which needs the same host in frame-src.
-// Deliberately NOT adding img-src/connect-src here: the bare container with
-// no tags configured makes neither kind of request. If tags are later added
-// inside the GTM console (e.g. GA4, Google Ads), those tags' own origins
-// (e.g. www.google-analytics.com) will need their own CSP entries at that
-// time — CSP can't anticipate tags configured outside this codebase.
+// GTM also loads its own resources (e.g. gtm.js's service-worker registration
+// asset) as images, which img-src must allow.
 const gtmOrigin = "https://www.googletagmanager.com";
+
+// The GTM container above is now configured (in the GTM console, outside
+// this repo) to load a GA4 tag (measurement ID G-JFL5GJ6W9S). Verified live
+// via the container's compiled gtm.js/gtag.js: the GA4 collect beacon is
+// sent with fetch/sendBeacon to https://www.google-analytics.com/g/collect,
+// which connect-src must allow. No other Google Analytics domain (e.g.
+// region1.google-analytics.com, analytics.google.com) is used by this
+// container's current configuration — do not add those speculatively.
+const gaOrigin = "https://www.google-analytics.com";
 
 const cspDirectives = [
   `default-src 'self'`,
@@ -38,13 +44,15 @@ const cspDirectives = [
   `font-src 'self'`,
   // WordPress media host + the placehold.co mock fallback (see images.remotePatterns below), plus data: for any inline/blur placeholders.
   // s.wordpress.com serves the Selected Work website-preview screenshots (src/lib/content/website-preview.ts).
-  `img-src 'self' data:${wordpressMediaHostname ? ` https://${wordpressMediaHostname}` : ""} https://placehold.co https://s.wordpress.com`,
+  // gtmOrigin: GTM's own image-loaded resources (see gtmOrigin comment above).
+  `img-src 'self' data:${wordpressMediaHostname ? ` https://${wordpressMediaHostname}` : ""} https://placehold.co https://s.wordpress.com ${gtmOrigin}`,
   // WP oEmbed YouTube embeds rendered inside ArticleContent (see src/components/blog/ArticleContent.tsx),
   // the Google Maps embed on the contact page (src/sections/contact/ContactFormSection.tsx),
   // and the GTM noscript fallback iframe (src/app/layout.tsx) — see gtmOrigin comment above.
   `frame-src 'self' https://www.youtube.com https://youtube.com https://www.youtube-nocookie.com https://www.google.com ${gtmOrigin}`,
   `frame-ancestors 'self'`,
-  `connect-src 'self'`,
+  // gaOrigin: GA4 collect beacon fired by the GTM-managed GA4 tag (see gaOrigin comment above).
+  `connect-src 'self' ${gaOrigin}`,
   `object-src 'none'`,
   `base-uri 'self'`,
 ].join("; ");
