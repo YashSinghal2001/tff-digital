@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { ChevronDown, Menu, X } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { Logo } from "@/components/layout/Logo";
@@ -10,15 +10,135 @@ import { ROUTES } from "@/constants/routes";
 import { createFocusTrap } from "@/lib/a11y/focus-trap";
 import { cn } from "@/lib/utils";
 
-const navLinks = [
-  { label: "About", href: ROUTES.about },
-  { label: "Services", href: ROUTES.services },
-  { label: "Process", href: `${ROUTES.home}#process` },
-  { label: "Work", href: `${ROUTES.home}#work` },
-  { label: "Testimonials", href: `${ROUTES.home}#testimonials` },
-  { label: "Blog", href: ROUTES.blog },
-  { label: "Contact", href: ROUTES.contact },
+interface ServiceLink {
+  label: string;
+  href: string;
+}
+
+const servicesLinks: ServiceLink[] = [
+  { label: "AEO & SEO", href: ROUTES.service("aeo-seo") },
+  { label: "SMM", href: ROUTES.service("smm") },
+  { label: "Meta Ads", href: ROUTES.service("meta-ads") },
+  { label: "Web Development", href: ROUTES.service("web-development") },
+  { label: "Video Editing", href: ROUTES.service("video-editing") },
+  { label: "ZOHO One", href: ROUTES.service("zoho-one") },
 ];
+
+type NavLink =
+  | { type: "link"; label: string; href: string }
+  | { type: "dropdown"; label: string; items: ServiceLink[] };
+
+const navLinks: NavLink[] = [
+  { type: "link", label: "About", href: ROUTES.about },
+  { type: "dropdown", label: "Services", items: servicesLinks },
+  { type: "link", label: "Process", href: `${ROUTES.home}#process` },
+  { type: "link", label: "Work", href: `${ROUTES.home}#work` },
+  { type: "link", label: "Testimonials", href: `${ROUTES.home}#testimonials` },
+  { type: "link", label: "Blog", href: ROUTES.blog },
+  { type: "link", label: "Contact", href: ROUTES.contact },
+];
+
+// Desktop dropdown: a disclosure button (FAQ.tsx's aria-expanded/aria-controls
+// idiom) rather than an ARIA menu widget — six plain links, no arrow-key menu
+// navigation needed. Closes on outside click, Escape, or picking a link.
+function DesktopServicesMenu({ label, items }: { label: string; items: ServiceLink[] }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (event: MouseEvent) => {
+      if (!ref.current?.contains(event.target as Node)) setOpen(false);
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("mousedown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        aria-haspopup="true"
+        aria-expanded={open}
+        aria-controls="desktop-services-menu"
+        onClick={() => setOpen((prev) => !prev)}
+        className="font-body flex items-center gap-1 text-sm text-white/90 transition-colors hover:text-white"
+      >
+        {label}
+        <ChevronDown
+          className={cn("h-3.5 w-3.5 transition-transform", open && "rotate-180")}
+          aria-hidden="true"
+        />
+      </button>
+      <div
+        id="desktop-services-menu"
+        hidden={!open}
+        className="border-border-strong bg-glass absolute left-0 top-full mt-2 flex w-56 flex-col gap-1 rounded-2xl border p-2 backdrop-blur-md"
+      >
+        {items.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            onClick={() => setOpen(false)}
+            className="font-body rounded-lg px-3 py-2 text-sm text-white/90 hover:bg-white/5"
+          >
+            {item.label}
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Mobile: same accordion mechanics as FAQ.tsx, with its own independent
+// open state so it doesn't fight the outer panel's open/close.
+function MobileServicesMenu({
+  label,
+  items,
+  onNavigate,
+}: {
+  label: string;
+  items: ServiceLink[];
+  onNavigate: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div>
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls="mobile-services-menu"
+        onClick={() => setOpen((prev) => !prev)}
+        className="font-body flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm text-white/90 hover:bg-white/5"
+      >
+        {label}
+        <ChevronDown
+          className={cn("h-4 w-4 shrink-0 transition-transform", open && "rotate-180")}
+          aria-hidden="true"
+        />
+      </button>
+      <div id="mobile-services-menu" hidden={!open} className="flex flex-col gap-1 pl-4">
+        {items.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            onClick={onNavigate}
+            className="font-body rounded-lg px-3 py-2 text-sm text-white/90 hover:bg-white/5"
+          >
+            {item.label}
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 // This project moves Tailwind's `xl` breakpoint to 75rem (see
 // --breakpoint-xl in src/app/globals.css); the mobile toggle and panel are
@@ -99,15 +219,19 @@ export function Navbar() {
           <Logo priority className="h-8 sm:h-9" />
 
           <nav className="hidden items-center gap-8 xl:flex">
-            {navLinks.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className="font-body text-sm text-white/90 transition-colors hover:text-white"
-              >
-                {link.label}
-              </Link>
-            ))}
+            {navLinks.map((link) =>
+              link.type === "dropdown" ? (
+                <DesktopServicesMenu key={link.label} label={link.label} items={link.items} />
+              ) : (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  className="font-body text-sm text-white/90 transition-colors hover:text-white"
+                >
+                  {link.label}
+                </Link>
+              ),
+            )}
           </nav>
 
           <Link
@@ -141,16 +265,25 @@ export function Navbar() {
             open ? "flex" : "hidden",
           )}
         >
-          {navLinks.map((link) => (
-            <Link
-              key={link.label}
-              href={link.href}
-              onClick={close}
-              className="font-body rounded-lg px-3 py-2 text-sm text-white/90 hover:bg-white/5"
-            >
-              {link.label}
-            </Link>
-          ))}
+          {navLinks.map((link) =>
+            link.type === "dropdown" ? (
+              <MobileServicesMenu
+                key={link.label}
+                label={link.label}
+                items={link.items}
+                onNavigate={close}
+              />
+            ) : (
+              <Link
+                key={link.label}
+                href={link.href}
+                onClick={close}
+                className="font-body rounded-lg px-3 py-2 text-sm text-white/90 hover:bg-white/5"
+              >
+                {link.label}
+              </Link>
+            ),
+          )}
           <Link
             href={ROUTES.contact}
             onClick={close}
