@@ -80,14 +80,14 @@ function DesktopServicesMenu({ label, items }: { label: string; items: ServiceLi
       <div
         id="desktop-services-menu"
         hidden={!open}
-        className="border-border-strong bg-glass absolute left-0 top-full mt-2 flex w-56 flex-col gap-1 rounded-2xl border p-2 backdrop-blur-md"
+        className="border-border-strong bg-glass absolute left-0 top-full mt-2 flex w-48 flex-col gap-0.5 rounded-xl border p-1.5 backdrop-blur-md"
       >
         {items.map((item) => (
           <Link
             key={item.href}
             href={item.href}
             onClick={() => setOpen(false)}
-            className="font-body rounded-lg px-3 py-2 text-sm text-white/90 hover:bg-white/5"
+            className="font-body rounded-lg px-3 py-1.5 text-sm text-white/90 hover:bg-white/5"
           >
             {item.label}
           </Link>
