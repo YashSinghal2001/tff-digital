@@ -21,6 +21,7 @@ import { JsonLd } from "@/components/common/JsonLd";
 import { buildBreadcrumbJsonLd, buildFaqJsonLd, buildServiceJsonLd } from "@/lib/seo/json-ld";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { getCanonicalUrl } from "@/lib/seo/canonical";
+import { SERVICE_META_OVERRIDES } from "@/config/seo.config";
 import { htmlToPlainText } from "@/lib/content/post-content";
 import { getServiceIcon } from "@/lib/content/service-icons";
 import { ROUTES } from "@/constants/routes";
@@ -61,10 +62,21 @@ export async function generateMetadata({ params }: ServiceDetailPageProps): Prom
 
   // Content-derived fallback so a service without Yoast data still gets its
   // own title/description instead of the site defaults.
-  const metadata = buildMetadata(service.seo, getCanonicalUrl(ROUTES.service(slug)), {
-    title: service.title,
-    description: service.summary ? htmlToPlainText(service.summary) : undefined,
-  });
+  const clientOverride = SERVICE_META_OVERRIDES[slug];
+  const metadata = buildMetadata(
+    service.seo,
+    getCanonicalUrl(ROUTES.service(slug)),
+    {
+      title: service.title,
+      description: service.summary ? htmlToPlainText(service.summary) : undefined,
+    },
+    // Client-provided title/description win over CMS/Yoast data for these
+    // six pages; `{ absolute }` bypasses the root layout's "%s | TFF
+    // Digital" template since the client copy already ends in "| TFF Digital".
+    clientOverride
+      ? { title: { absolute: clientOverride.title }, description: clientOverride.description }
+      : undefined,
+  );
 
   // Draft/unpublished content must never be indexed, regardless of what the
   // service's own SEO fields say.
