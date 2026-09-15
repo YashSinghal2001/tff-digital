@@ -5,7 +5,7 @@ import { ROUTES } from "@/constants/routes";
 import { getServiceOfferings } from "@/services/service-offering.service";
 import { toServiceCardItems } from "@/lib/content/service-cards";
 import { JsonLd } from "@/components/common/JsonLd";
-import { buildBreadcrumbJsonLd } from "@/lib/seo/json-ld";
+import { buildBreadcrumbJsonLd, buildFaqJsonLd, buildServiceListJsonLd } from "@/lib/seo/json-ld";
 import { ServicesHero } from "@/sections/services/ServicesHero";
 import { TrustedBrands } from "@/sections/home/TrustedBrands";
 import { ServicesGrid } from "@/sections/services/ServicesGrid";
@@ -72,10 +72,22 @@ export default async function ServicesPage() {
   return (
     <>
       <JsonLd
-        data={buildBreadcrumbJsonLd([
-          { name: "Home", url: getCanonicalUrl(ROUTES.home) },
-          { name: "Services", url: getCanonicalUrl(ROUTES.services) },
-        ])}
+        data={[
+          buildBreadcrumbJsonLd([
+            { name: "Home", url: getCanonicalUrl(ROUTES.home) },
+            { name: "Services", url: getCanonicalUrl(ROUTES.services) },
+          ]),
+          buildServiceListJsonLd(
+            services.items.map((service) => ({
+              name: service.title,
+              url: getCanonicalUrl(ROUTES.service(service.slug)),
+              description: service.summary,
+            })),
+          ),
+          // Same single question the visible FAQ accordion opens with by
+          // default (`servicesFaqs[0]` above) — not a second, drifting copy.
+          buildFaqJsonLd([servicesFaqs[0]]),
+        ]}
       />
       <ServicesHero />
       <TrustedBrands />

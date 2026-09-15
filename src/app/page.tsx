@@ -21,7 +21,10 @@ import { StatementBand } from "@/sections/shared/StatementBand";
 import { GradientText } from "@/components/ui/GradientText";
 import { Industries } from "@/sections/home/Industries";
 import { FAQ } from "@/sections/shared/FAQ";
+import { faqs } from "@/sections/shared/faq-data";
 import { CTABookForm } from "@/sections/shared/CTABookForm";
+import { JsonLd } from "@/components/common/JsonLd";
+import { buildBreadcrumbJsonLd, buildFaqJsonLd } from "@/lib/seo/json-ld";
 
 // The compact five-column What We Do card only has room for a short list;
 // /services renders every feature. Applied before the client boundary.
@@ -63,6 +66,15 @@ export default async function Home() {
 
   return (
     <>
+      <JsonLd
+        data={[
+          buildBreadcrumbJsonLd([{ name: "Home", url: getCanonicalUrl(ROUTES.home) }]),
+          // Same single question the visible FAQ accordion opens with by
+          // default (FAQ.tsx's `faqs[0]`) — not a second, drifting copy.
+          buildFaqJsonLd([faqs[0]]),
+        ]}
+      />
+
       {/* Hero + Upwork trust bar form one first-screen composition: the
           wrapper fills the viewport below the fixed navbar (main pt-24 = 6rem)
           and the hero flexes to absorb the remaining height. */}

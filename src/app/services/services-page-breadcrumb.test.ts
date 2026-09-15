@@ -23,3 +23,20 @@ describe("/services BreadcrumbList (JSONLD-1)", () => {
     assert.match(SERVICES_PAGE, /<JsonLd\s/);
   });
 });
+
+// Client-provided Services schema: an ItemList of bare Service summaries +
+// one FAQPage question — never the full per-service Service/OfferCatalog
+// node, which stays scoped to the detail route.
+describe("/services ItemList + FAQPage (client schema)", () => {
+  test("emits exactly one ItemList via the shared builder", () => {
+    assert.equal(SERVICES_PAGE.match(/buildServiceListJsonLd\(/g)?.length, 1);
+  });
+
+  test("emits exactly one FAQPage sourced from servicesFaqs[0]", () => {
+    assert.equal(SERVICES_PAGE.match(/buildFaqJsonLd\(\[servicesFaqs\[0\]\]\)/g)?.length, 1);
+  });
+
+  test("does not leak a full per-service Service/OfferCatalog node onto the listing", () => {
+    assert.doesNotMatch(SERVICES_PAGE, /buildServiceJsonLd\(/);
+  });
+});

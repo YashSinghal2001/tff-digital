@@ -4,4 +4,5 @@ export const SOCIAL_LINKS = {
   linkedin: "https://www.linkedin.com/company/tff-digital/",
   facebook: "https://www.facebook.com/profile.php?id=61592027200334",
   pinterest: "https://www.pinterest.com/tffdigital/",
+  upwork: "https://www.upwork.com/freelancers/upworkseoexpert",
 } as const;

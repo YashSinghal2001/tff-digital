@@ -11,38 +11,10 @@ import { SectionEyebrow } from "@/components/common/SectionEyebrow";
 import { fadeInUp } from "@/styles/animations";
 import { useEntranceDelay } from "@/lib/a11y/use-entrance-delay";
 import { cn } from "@/lib/utils";
+import { faqs, type FAQItem } from "@/sections/shared/faq-data";
 
-export interface FAQItem {
-  question: string;
-  answer: string;
-}
-
-const faqs: FAQItem[] = [
-  {
-    question: "How is TFF different from other agencies?",
-    answer:
-      "We integrate strategy, brand, and performance marketing into one accountable team instead of handing you off between disconnected vendors.",
-  },
-  {
-    question: "How quickly will I see results?",
-    answer:
-      "Most clients see early signal within the first 30-60 days, with compounding results building over the first two quarters.",
-  },
-  {
-    question: "Do you work with businesses of my size?",
-    answer:
-      "We work with ambitious teams from early-stage startups to established mid-market companies ready to invest in growth.",
-  },
-  {
-    question: "What does a typical engagement look like?",
-    answer:
-      "We start with a discovery and research sprint, build a prioritized roadmap, then move into design, launch, and ongoing optimization.",
-  },
-  {
-    question: "How quickly will I hear back?",
-    answer: "We reply to every inquiry within 24 hours, Monday through Friday.",
-  },
-];
+export type { FAQItem };
+export { faqs };
 
 export interface FAQProps {
   /** Page-specific questions; falls back to the shared defaults. */

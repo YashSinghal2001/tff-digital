@@ -8,7 +8,7 @@ import { JsonLd } from "@/components/common/JsonLd";
 import { HashScrollHandler } from "@/components/common/HashScrollHandler";
 import { MotionProvider } from "@/components/common/MotionProvider";
 import { CookieConsentBanner } from "@/components/common/CookieConsentBanner";
-import { buildOrganizationJsonLd, buildWebsiteJsonLd } from "@/lib/seo/json-ld";
+import { buildProfessionalServiceJsonLd, buildWebsiteJsonLd } from "@/lib/seo/json-ld";
 import { SITE_OPEN_GRAPH_DEFAULTS } from "@/lib/seo/metadata";
 import { GTM_CONTAINER_ID } from "@/constants/analytics";
 
@@ -121,7 +121,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+i:'';j.async=true;j.src=
         >
           Skip to main content
         </a>
-        <JsonLd data={[buildOrganizationJsonLd(), buildWebsiteJsonLd()]} />
+        <JsonLd data={[buildProfessionalServiceJsonLd(), buildWebsiteJsonLd()]} />
         <HashScrollHandler />
         <MotionProvider>
           <Navbar />

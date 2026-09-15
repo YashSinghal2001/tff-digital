@@ -15,9 +15,10 @@ import { IconCircle } from "@/components/ui/IconCircle";
 import { Breadcrumbs } from "@/components/blog/Breadcrumbs";
 import { ArticleContent } from "@/components/blog/ArticleContent";
 import { FAQ } from "@/sections/shared/FAQ";
+import { faqs } from "@/sections/shared/faq-data";
 import { CTABookForm } from "@/sections/shared/CTABookForm";
 import { JsonLd } from "@/components/common/JsonLd";
-import { buildBreadcrumbJsonLd, buildServiceJsonLd } from "@/lib/seo/json-ld";
+import { buildBreadcrumbJsonLd, buildFaqJsonLd, buildServiceJsonLd } from "@/lib/seo/json-ld";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { getCanonicalUrl } from "@/lib/seo/canonical";
 import { htmlToPlainText } from "@/lib/content/post-content";
@@ -96,6 +97,9 @@ export default async function ServiceDetailPage({ params }: ServiceDetailPagePro
             { name: service.title, url: canonicalUrl },
           ]),
           buildServiceJsonLd(service, canonicalUrl),
+          // Same single question the visible FAQ accordion opens with by
+          // default (FAQ.tsx's `faqs[0]`) — not a second, drifting copy.
+          buildFaqJsonLd([faqs[0]]),
         ]}
       />
 
