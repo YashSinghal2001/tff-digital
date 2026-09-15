@@ -4,10 +4,12 @@ import {
   buildOrganizationJsonLd,
   buildBlogPostingJsonLd,
   buildCaseStudyJsonLd,
+  buildServiceJsonLd,
 } from "@/lib/seo/json-ld";
 import { siteConfig } from "@/config/site.config";
 import type { Post } from "@/types/domain/post";
 import type { CaseStudy } from "@/types/domain/case-study";
+import type { ServiceOffering } from "@/types/domain/service-offering";
 
 // JSONLD-1: buildBlogPostingJsonLd/buildCaseStudyJsonLd used to embed a full
 // second copy of the Organization object (name/url/logo/sameAs) as their
@@ -55,11 +57,58 @@ const caseStudy: CaseStudy = {
   seo: null,
 };
 
+const service: ServiceOffering = {
+  id: "1",
+  slug: "aeo-seo",
+  title: "AEO & SEO",
+  summary: "  <p>Rank higher &amp; get cited.</p>  ",
+  content: "<p>Body</p>",
+  publishedAt: "2026-01-01T00:00:00Z",
+  updatedAt: "2026-01-02T00:00:00Z",
+  icon: null,
+  featuredImage: null,
+  order: 1,
+  features: ["On-page SEO", "Technical audits"],
+  seo: null,
+};
+
 describe("buildOrganizationJsonLd", () => {
   test("carries a stable @id other nodes can reference", () => {
     const org = buildOrganizationJsonLd();
     assert.equal(org["@id"], ORG_ID);
     assert.equal(org["@type"], "Organization");
+  });
+
+  test("includes both founders", () => {
+    const org = buildOrganizationJsonLd();
+    assert.deepEqual(org.founder, [
+      {
+        "@type": "Person",
+        name: "Raju Gorai",
+        jobTitle: "Founder & Performance Marketing Specialist",
+      },
+      {
+        "@type": "Person",
+        name: "Kanchan Rana",
+        jobTitle: "Founder & SEO Strategist",
+      },
+    ]);
+  });
+});
+
+describe("buildServiceJsonLd", () => {
+  test("builds a Service node keyed off the canonical URL, referencing the Organization by @id", () => {
+    const canonicalUrl = `${siteConfig.url}/services/aeo-seo`;
+    const result = buildServiceJsonLd(service, canonicalUrl);
+
+    assert.equal(result["@type"], "Service");
+    assert.equal(result["@id"], `${canonicalUrl}#service`);
+    assert.equal(result.name, "AEO & SEO");
+    assert.equal(result.url, canonicalUrl);
+    assert.equal(result.description, "Rank higher & get cited.");
+    assert.equal(result.serviceType, "AEO & SEO");
+    assert.deepEqual(result.provider, { "@id": ORG_ID });
+    assert.equal(result.areaServed, "Worldwide");
   });
 });
 

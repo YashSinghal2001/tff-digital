@@ -3,6 +3,7 @@ import { SOCIAL_LINKS } from "@/constants/social";
 import { stripHtml } from "@/lib/content/post-content";
 import type { Post } from "@/types/domain/post";
 import type { CaseStudy } from "@/types/domain/case-study";
+import type { ServiceOffering } from "@/types/domain/service-offering";
 
 // Same treatment as the <meta description> fallback in src/adapters/seo.adapter.ts:
 // structured-data text fields must be plain text, and stripping HTML tags alone
@@ -24,6 +25,21 @@ export function buildOrganizationJsonLd(): Record<string, unknown> {
     // crawlable image of at least 112x112px — this one is 512x512.
     logo: `${siteConfig.url}/icon-512.png`,
     sameAs: Object.values(SOCIAL_LINKS),
+    // Full legal names + roles per the team spotlight source of truth
+    // (src/data/team.ts, id: "raju" / "kanchan" — same names/titles used in
+    // each member's image alt text).
+    founder: [
+      {
+        "@type": "Person",
+        name: "Raju Gorai",
+        jobTitle: "Founder & Performance Marketing Specialist",
+      },
+      {
+        "@type": "Person",
+        name: "Kanchan Rana",
+        jobTitle: "Founder & SEO Strategist",
+      },
+    ],
   };
 }
 
@@ -103,6 +119,27 @@ export function buildCaseStudyJsonLd(
         : undefined,
     // Bare @id reference — see the matching comment in buildBlogPostingJsonLd.
     publisher: { "@id": `${siteConfig.url}/#organization` },
+  };
+}
+
+export function buildServiceJsonLd(
+  service: ServiceOffering,
+  canonicalUrl: string,
+): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": `${canonicalUrl}#service`,
+    name: service.title,
+    url: canonicalUrl,
+    description: cleanText(service.summary),
+    // No dedicated serviceType field on ServiceOffering — the title itself
+    // (e.g. "AEO & SEO", "Meta Ads") is the only deterministic, non-invented
+    // category available per service.
+    serviceType: service.title,
+    // Bare @id reference — see the matching comment on buildBlogPostingJsonLd.
+    provider: { "@id": `${siteConfig.url}/#organization` },
+    areaServed: "Worldwide",
   };
 }
 

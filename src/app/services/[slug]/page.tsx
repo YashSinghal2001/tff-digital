@@ -17,7 +17,7 @@ import { ArticleContent } from "@/components/blog/ArticleContent";
 import { FAQ } from "@/sections/shared/FAQ";
 import { CTABookForm } from "@/sections/shared/CTABookForm";
 import { JsonLd } from "@/components/common/JsonLd";
-import { buildBreadcrumbJsonLd } from "@/lib/seo/json-ld";
+import { buildBreadcrumbJsonLd, buildServiceJsonLd } from "@/lib/seo/json-ld";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { getCanonicalUrl } from "@/lib/seo/canonical";
 import { htmlToPlainText } from "@/lib/content/post-content";
@@ -89,11 +89,14 @@ export default async function ServiceDetailPage({ params }: ServiceDetailPagePro
   return (
     <>
       <JsonLd
-        data={buildBreadcrumbJsonLd([
-          { name: "Home", url: getCanonicalUrl(ROUTES.home) },
-          { name: "Services", url: getCanonicalUrl(ROUTES.services) },
-          { name: service.title, url: canonicalUrl },
-        ])}
+        data={[
+          buildBreadcrumbJsonLd([
+            { name: "Home", url: getCanonicalUrl(ROUTES.home) },
+            { name: "Services", url: getCanonicalUrl(ROUTES.services) },
+            { name: service.title, url: canonicalUrl },
+          ]),
+          buildServiceJsonLd(service, canonicalUrl),
+        ]}
       />
 
       <article className="py-10 lg:py-16">
