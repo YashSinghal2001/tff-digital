@@ -62,7 +62,7 @@ function DesktopServicesMenu({ label, items }: { label: string; items: ServiceLi
   }, [open]);
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className="relative flex h-full items-center">
       <button
         type="button"
         aria-haspopup="true"
@@ -218,7 +218,7 @@ export function Navbar() {
         <div className="border-border-strong bg-glass flex h-[69px] items-center justify-between rounded-[25px] border px-6 backdrop-blur-md">
           <Logo priority className="h-8 sm:h-9" />
 
-          <nav className="hidden items-center gap-8 xl:flex">
+          <nav className="hidden h-full items-center gap-8 xl:flex">
             {navLinks.map((link) =>
               link.type === "dropdown" ? (
                 <DesktopServicesMenu key={link.label} label={link.label} items={link.items} />
