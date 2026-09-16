@@ -40,7 +40,8 @@ const navLinks: NavLink[] = [
 
 // Desktop dropdown: a disclosure button (FAQ.tsx's aria-expanded/aria-controls
 // idiom) rather than an ARIA menu widget — six plain links, no arrow-key menu
-// navigation needed. Closes on outside click, Escape, or picking a link.
+// navigation needed. Opens on hover or focus, closes on outside click, Escape,
+// blur past the menu, mouseleave, or picking a link.
 function DesktopServicesMenu({ label, items }: { label: string; items: ServiceLink[] }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -62,25 +63,33 @@ function DesktopServicesMenu({ label, items }: { label: string; items: ServiceLi
   }, [open]);
 
   return (
-    <div ref={ref} className="relative flex h-full items-center">
+    <div
+      ref={ref}
+      className="relative flex h-full items-center"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+      onFocus={() => setOpen(true)}
+      onBlur={(event) => {
+        if (!ref.current?.contains(event.relatedTarget as Node)) setOpen(false);
+      }}
+    >
       <button
         type="button"
         aria-haspopup="true"
         aria-expanded={open}
         aria-controls="desktop-services-menu"
-        onClick={() => setOpen((prev) => !prev)}
         className="font-body flex items-center gap-1 text-sm text-white/90 transition-colors hover:text-white"
       >
         {label}
         <ChevronDown
-          className={cn("h-3.5 w-3.5 transition-transform", open && "rotate-180")}
+          className={cn("h-3.5 w-3.5 transition-transform duration-200", open && "rotate-180")}
           aria-hidden="true"
         />
       </button>
       <div
         id="desktop-services-menu"
         hidden={!open}
-        className="border-border-strong bg-glass absolute left-0 top-full mt-2 flex w-48 flex-col gap-0.5 rounded-xl border p-1.5 backdrop-blur-md"
+        className="border-border-strong bg-glass absolute left-0 top-full flex w-48 flex-col gap-0.5 rounded-xl border p-1.5 backdrop-blur-lg"
       >
         {items.map((item) => (
           <Link
