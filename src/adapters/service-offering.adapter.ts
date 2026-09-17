@@ -1,4 +1,7 @@
-import type { WPServiceOffering } from "@/types/api/wp-service-offering";
+import type {
+  WPServiceFields,
+  WPServiceOffering,
+} from "@/types/api/wp-service-offering";
 import type { ServiceOffering } from "@/types/domain/service-offering";
 import { adaptMedia } from "@/adapters/media.adapter";
 import { adaptSeo } from "@/adapters/seo.adapter";
@@ -12,6 +15,21 @@ export function parseServiceFeatures(raw: string | null | undefined): string[] {
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter((line) => line.length > 0);
+}
+
+// ACF repeater rows arrive with possibly-null question/answer (an
+// in-progress or malformed row) — trim both and drop the row unless both
+// are non-empty, same tolerance-of-CMS-mess policy as parseServiceFeatures.
+export function parseServiceFaqs(
+  raw: WPServiceFields["faqs"],
+): { question: string; answer: string }[] {
+  if (!raw) return [];
+  return raw
+    .map((row) => ({
+      question: (row.question ?? "").trim(),
+      answer: (row.answer ?? "").trim(),
+    }))
+    .filter((row) => row.question.length > 0 && row.answer.length > 0);
 }
 
 export function adaptServiceOffering(
@@ -40,6 +58,7 @@ export function adaptServiceOffering(
       : null,
     order: wpService.serviceFields?.displayOrder ?? null,
     features: parseServiceFeatures(wpService.serviceFields?.features),
+    faqs: parseServiceFaqs(wpService.serviceFields?.faqs),
     seo: adaptSeo(wpService.seo, {
       title: wpService.title,
       description: summary,

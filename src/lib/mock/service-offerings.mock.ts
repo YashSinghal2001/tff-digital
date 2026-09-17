@@ -16,6 +16,7 @@ export const mockServiceOfferings: ServiceOffering[] = [
     featuredImage: mockMedia,
     order: 1,
     features: ["Positioning", "Messaging", "Visual identity"],
+    faqs: [],
     seo: buildMockSeo(
       "Brand Strategy",
       "Placeholder summary for brand strategy.",
@@ -34,6 +35,7 @@ export const mockServiceOfferings: ServiceOffering[] = [
     featuredImage: mockMedia,
     order: 2,
     features: ["Responsive build", "Performance", "CMS integration"],
+    faqs: [],
     seo: buildMockSeo(
       "Web Development",
       "Placeholder summary for web development.",

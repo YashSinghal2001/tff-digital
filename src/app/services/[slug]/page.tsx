@@ -98,6 +98,11 @@ export default async function ServiceDetailPage({ params }: ServiceDetailPagePro
 
   const canonicalUrl = getCanonicalUrl(ROUTES.service(slug));
   const Icon = getServiceIcon(service.slug);
+  // Service-specific FAQs (CMS-editable ACF repeater) win when present; the
+  // shared generic FAQ list is the fallback otherwise. The visible accordion
+  // and the FAQPage JSON-LD below both read this same variable so they can
+  // never drift apart.
+  const faqItems = service.faqs.length > 0 ? service.faqs : faqs;
 
   return (
     <>
@@ -109,9 +114,7 @@ export default async function ServiceDetailPage({ params }: ServiceDetailPagePro
             { name: service.title, url: canonicalUrl },
           ]),
           buildServiceJsonLd(service, canonicalUrl),
-          // Same single question the visible FAQ accordion opens with by
-          // default (FAQ.tsx's `faqs[0]`) — not a second, drifting copy.
-          buildFaqJsonLd([faqs[0]]),
+          buildFaqJsonLd(faqItems),
         ]}
       />
 
@@ -188,7 +191,7 @@ export default async function ServiceDetailPage({ params }: ServiceDetailPagePro
         </Container>
       </article>
 
-      <FAQ />
+      <FAQ items={faqItems} />
       <CTABookForm />
     </>
   );

@@ -12,6 +12,14 @@ export interface WPServiceFields {
   // ACF textarea: raw HTML, rendered as-is (sanitized in the adapter) in
   // place of `description`/`content` when present.
   customHtmlContent: string | null;
+  // ACF repeater (question/answer sub-fields). Optional, not just nullable:
+  // the live WPGraphQL schema doesn't expose this field yet (verified —
+  // querying it errors the whole request), so SERVICE_FIELDS doesn't select
+  // it and it's simply absent from today's response. See wp-case-study.ts's
+  // result1Label precedent: if ACF Repeater turns out to be unavailable
+  // here too, this becomes fixed faq1Question/faq1Answer-style fields
+  // instead.
+  faqs?: { question: string | null; answer: string | null }[] | null;
 }
 
 export interface WPServiceOffering {

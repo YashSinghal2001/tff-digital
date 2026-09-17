@@ -39,6 +39,7 @@ const validService: WPServiceOffering = {
       },
     },
     customHtmlContent: null,
+    faqs: null,
   },
   seo: null,
 };
@@ -151,6 +152,58 @@ describe("wpServiceOfferingSchema — customHtmlContent", () => {
       service: {
         ...validService,
         serviceFields: { ...validService.serviceFields!, customHtmlContent: 5 },
+      },
+    });
+    assert.equal(result.success, false);
+  });
+});
+
+describe("wpServiceOfferingSchema — faqs repeater", () => {
+  test("accepts a populated faqs array", () => {
+    const withFaqs = {
+      ...validService,
+      serviceFields: {
+        ...validService.serviceFields!,
+        faqs: [{ question: "How long?", answer: "6-12 months." }],
+      },
+    };
+    assert.deepEqual(
+      wpServiceOfferingQueryResultSchema.parse({ service: withFaqs }),
+      { service: withFaqs },
+    );
+  });
+
+  test("accepts a null faqs field (no repeater rows yet)", () => {
+    const result = wpServiceOfferingQueryResultSchema.safeParse({
+      service: {
+        ...validService,
+        serviceFields: { ...validService.serviceFields!, faqs: null },
+      },
+    });
+    assert.equal(result.success, true);
+  });
+
+  test("accepts a malformed row with null question/answer (adapter filters it)", () => {
+    const result = wpServiceOfferingQueryResultSchema.safeParse({
+      service: {
+        ...validService,
+        serviceFields: {
+          ...validService.serviceFields!,
+          faqs: [{ question: null, answer: null }],
+        },
+      },
+    });
+    assert.equal(result.success, true);
+  });
+
+  test("rejects a faqs row missing the question/answer shape entirely", () => {
+    const result = wpServiceOfferingQueryResultSchema.safeParse({
+      service: {
+        ...validService,
+        serviceFields: {
+          ...validService.serviceFields!,
+          faqs: ["not an object"],
+        },
       },
     });
     assert.equal(result.success, false);

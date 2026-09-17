@@ -24,6 +24,7 @@ export const wpServiceOfferingFixture: WPServiceOffering = {
     features: "Technical SEO\r\nOn-Page SEO\r\nLocal SEO",
     icon: null,
     customHtmlContent: null,
+    faqs: null,
   },
   seo: null,
 };

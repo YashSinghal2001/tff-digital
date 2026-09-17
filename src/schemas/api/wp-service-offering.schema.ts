@@ -29,6 +29,17 @@ export const wpServiceOfferingSchema = z.object({
       features: z.string().nullable(),
       icon: z.object({ node: wpMediaItemSchema }).nullable(),
       customHtmlContent: z.string().nullable(),
+      // .optional(): not yet selected by SERVICE_FIELDS (see the query file's
+      // comment) — absent from today's response, not merely null.
+      faqs: z
+        .array(
+          z.object({
+            question: z.string().nullable(),
+            answer: z.string().nullable(),
+          }),
+        )
+        .nullable()
+        .optional(),
     })
     .nullable(),
   seo: wpSeoSchema.nullable(),

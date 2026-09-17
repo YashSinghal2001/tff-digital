@@ -26,6 +26,13 @@ export const SERVICE_FIELDS = gql`
         }
       }
       customHtmlContent
+      # faqs { question answer } — pending: WPGraphQL rejects this field today
+      # ("Cannot query field \"faqs\" on type \"ServiceFields\"", verified live
+      # against cms.tffdigital.com), which fails this ENTIRE query, not just
+      # the FAQ data. Add it back once the ACF repeater is added to the
+      # Service field group in wp-admin and exposed to GraphQL — the
+      # type/schema/adapter/page support for it already exists and needs no
+      # other change.
     }
     seo {
       ...SeoFields

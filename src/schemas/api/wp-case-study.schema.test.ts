@@ -26,6 +26,7 @@ const relatedService: WPServiceOffering = {
     features: null,
     icon: null,
     customHtmlContent: null,
+    faqs: null,
   },
   seo: null,
 };

@@ -16,5 +16,7 @@ export interface ServiceOffering {
   order: number | null;
   /** One entry per non-empty line of the ACF `features` textarea. */
   features: string[];
+  /** Rows from the ACF `faqs` repeater with a non-empty question and answer. */
+  faqs: { question: string; answer: string }[];
   seo: Seo | null;
 }

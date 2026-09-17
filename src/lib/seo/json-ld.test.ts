@@ -73,6 +73,7 @@ const overriddenService: ServiceOffering = {
   featuredImage: null,
   order: 1,
   features: ["On-page SEO", "Technical audits"],
+  faqs: [],
   seo: null,
 };
 

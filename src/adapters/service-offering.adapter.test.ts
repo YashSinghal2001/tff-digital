@@ -4,6 +4,7 @@ import test, { describe } from "node:test";
 import { wpServiceOfferingFixture } from "../../test/fixtures/wp-content.ts";
 import {
   adaptServiceOffering,
+  parseServiceFaqs,
   parseServiceFeatures,
 } from "./service-offering.adapter.ts";
 
@@ -29,6 +30,33 @@ describe("parseServiceFeatures", () => {
   });
 });
 
+describe("parseServiceFaqs", () => {
+  test("trims each row's question and answer", () => {
+    assert.deepEqual(
+      parseServiceFaqs([{ question: "  Q1?  ", answer: "  A1.  " }]),
+      [{ question: "Q1?", answer: "A1." }],
+    );
+  });
+
+  test("drops rows missing a question or an answer", () => {
+    assert.deepEqual(
+      parseServiceFaqs([
+        { question: "Q1?", answer: "A1." },
+        { question: null, answer: "A2." },
+        { question: "Q3?", answer: null },
+        { question: "  ", answer: "A4." },
+        { question: "Q5?", answer: "  " },
+      ]),
+      [{ question: "Q1?", answer: "A1." }],
+    );
+  });
+
+  test("yields an empty list for null or undefined input", () => {
+    assert.deepEqual(parseServiceFaqs(null), []);
+    assert.deepEqual(parseServiceFaqs(undefined), []);
+  });
+});
+
 describe("adaptServiceOffering", () => {
   test("maps the ACF field group, including features and display order", () => {
     const service = adaptServiceOffering(wpServiceOfferingFixture);
@@ -50,6 +78,20 @@ describe("adaptServiceOffering", () => {
     assert.deepEqual(service.features, []);
     assert.equal(service.order, null);
     assert.equal(service.summary, "");
+    assert.deepEqual(service.faqs, []);
+  });
+
+  test("maps the faqs repeater", () => {
+    const service = adaptServiceOffering({
+      ...wpServiceOfferingFixture,
+      serviceFields: {
+        ...wpServiceOfferingFixture.serviceFields!,
+        faqs: [{ question: "How long?", answer: "6-12 months." }],
+      },
+    });
+    assert.deepEqual(service.faqs, [
+      { question: "How long?", answer: "6-12 months." },
+    ]);
   });
 
   test("keeps entities browser-decodable on both rich-text sources (CONTENT-1)", () => {

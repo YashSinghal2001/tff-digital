@@ -6,8 +6,9 @@ import { readFileSync } from "node:fs";
 // alongside its existing BreadcrumbList, generically through the [slug]
 // route — not as six hardcoded per-page blocks — and must not introduce a
 // second ProfessionalService/Organization or BreadcrumbList builder call.
-// FAQPage was added later, sourced from the same faqs[0] the visible
-// accordion opens with — not a second, hardcoded copy of the question.
+// FAQPage is sourced from the same `faqItems` variable the visible
+// accordion renders (service-specific FAQs, falling back to the shared
+// generic list) — not a second, drifting copy.
 
 const SERVICE_DETAIL_PAGE = readFileSync(new URL("./page.tsx", import.meta.url), "utf8");
 
@@ -20,8 +21,16 @@ describe("service detail page JSON-LD wiring", () => {
     assert.equal(SERVICE_DETAIL_PAGE.match(/buildBreadcrumbJsonLd\(\[/g)?.length, 1);
   });
 
-  test("renders exactly one FAQPage sourced from FAQ.tsx's faqs[0]", () => {
-    assert.equal(SERVICE_DETAIL_PAGE.match(/buildFaqJsonLd\(\[faqs\[0\]\]\)/g)?.length, 1);
+  test("renders exactly one FAQPage sourced from the same faqItems the accordion renders", () => {
+    assert.equal(SERVICE_DETAIL_PAGE.match(/buildFaqJsonLd\(faqItems\)/g)?.length, 1);
+    assert.equal(SERVICE_DETAIL_PAGE.match(/<FAQ items=\{faqItems\}/g)?.length, 1);
+  });
+
+  test("faqItems prefers service-specific FAQs, falling back to the generic list", () => {
+    assert.match(
+      SERVICE_DETAIL_PAGE,
+      /const faqItems = service\.faqs\.length > 0 \? service\.faqs : faqs;/,
+    );
   });
 
   test("does not introduce a second ProfessionalService/Organization builder call", () => {
