@@ -304,13 +304,14 @@ describe("sanitizeWpHtml — legitimate WordPress formatting survives", () => {
     assert.equal(out.includes("data-start"), false);
   });
 
-  test("CSS-anticipated tags survive: code/pre with language class, table, blockquote, ol", () => {
+  test("CSS-anticipated tags survive: code/pre with language class, table, blockquote, ol, section", () => {
     const wp =
       '<pre class="wp-block-code"><code class="language-ts">const x = 1;</code></pre>' +
       "<blockquote><p>quote</p></blockquote>" +
       '<table><caption>c</caption><thead><tr><th scope="col">h</th></tr></thead>' +
       "<tbody><tr><td>d</td></tr></tbody><tfoot><tr><td>f</td></tr></tfoot></table>" +
-      "<ol><li>one</li></ol><hr /><br />";
+      "<ol><li>one</li></ol><hr /><br />" +
+      '<section class="wp-block-group">grouped</section>';
     const out = sanitizeWpHtml(wp);
     for (const marker of [
       'class="language-ts"',
@@ -324,6 +325,7 @@ describe("sanitizeWpHtml — legitimate WordPress formatting survives", () => {
       "<ol>",
       "<hr",
       "<br",
+      '<section class="wp-block-group">grouped</section>',
     ]) {
       assert.equal(out.includes(marker), true, `expected ${marker}`);
     }

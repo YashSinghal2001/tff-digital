@@ -117,4 +117,45 @@ describe("adaptServiceOffering", () => {
     });
     assert.equal(empty.content, "");
   });
+
+  test("normalizes a missing/null customHtmlContent to an empty string", () => {
+    assert.equal(adaptServiceOffering(wpServiceOfferingFixture).customHtmlContent, "");
+    const noFieldGroup = adaptServiceOffering({
+      ...wpServiceOfferingFixture,
+      serviceFields: null,
+    });
+    assert.equal(noFieldGroup.customHtmlContent, "");
+  });
+
+  test("maps customHtmlContent, preserving legitimate markup exactly (section, table, details)", () => {
+    const html =
+      '<section class="promo"><h2>Plan</h2><p>Keep <strong>this</strong>.</p>' +
+      "<details><summary>FAQ</summary><p>Answer</p></details>" +
+      "<table><tr><td>cell</td></tr></table></section>";
+    const service = adaptServiceOffering({
+      ...wpServiceOfferingFixture,
+      serviceFields: {
+        ...wpServiceOfferingFixture.serviceFields!,
+        customHtmlContent: html,
+      },
+    });
+    assert.equal(service.customHtmlContent, html);
+  });
+
+  test("sanitizes customHtmlContent — it is CMS content, not developer-trusted markup (ARCH-5)", () => {
+    const hostile =
+      '<section><script>alert(1)</script><img src="x" onerror="alert(1)">' +
+      '<a href="javascript:alert(1)">x</a></section>';
+    const service = adaptServiceOffering({
+      ...wpServiceOfferingFixture,
+      serviceFields: {
+        ...wpServiceOfferingFixture.serviceFields!,
+        customHtmlContent: hostile,
+      },
+    });
+    assert.doesNotMatch(
+      service.customHtmlContent,
+      /<script|onerror|javascript:/,
+    );
+  });
 });

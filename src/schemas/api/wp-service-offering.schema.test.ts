@@ -38,6 +38,7 @@ const validService: WPServiceOffering = {
         mediaDetails: null,
       },
     },
+    customHtmlContent: null,
   },
   seo: null,
 };
@@ -114,6 +115,42 @@ describe("wpServiceOfferingSchema — features textarea (ARCH-1)", () => {
       service: {
         ...validService,
         serviceFields: { ...validService.serviceFields!, features: ["x"] },
+      },
+    });
+    assert.equal(result.success, false);
+  });
+});
+
+describe("wpServiceOfferingSchema — customHtmlContent", () => {
+  test("accepts a populated customHtmlContent string", () => {
+    const withHtml = {
+      ...validService,
+      serviceFields: {
+        ...validService.serviceFields!,
+        customHtmlContent: "<section><h2>Custom</h2></section>",
+      },
+    };
+    assert.deepEqual(
+      wpServiceOfferingQueryResultSchema.parse({ service: withHtml }),
+      { service: withHtml },
+    );
+  });
+
+  test("accepts a null customHtmlContent (field unset in wp-admin)", () => {
+    const result = wpServiceOfferingQueryResultSchema.safeParse({
+      service: {
+        ...validService,
+        serviceFields: { ...validService.serviceFields!, customHtmlContent: null },
+      },
+    });
+    assert.equal(result.success, true);
+  });
+
+  test("rejects a non-string customHtmlContent value", () => {
+    const result = wpServiceOfferingQueryResultSchema.safeParse({
+      service: {
+        ...validService,
+        serviceFields: { ...validService.serviceFields!, customHtmlContent: 5 },
       },
     });
     assert.equal(result.success, false);

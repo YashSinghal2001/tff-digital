@@ -101,6 +101,7 @@ const WP_HTML_POLICY: sanitizeHtml.IOptions = {
     "blockquote",
     "details",
     "summary",
+    "section",
     "table",
     "caption",
     "thead",

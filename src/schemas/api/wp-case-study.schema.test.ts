@@ -25,6 +25,7 @@ const relatedService: WPServiceOffering = {
     displayOrder: 1,
     features: null,
     icon: null,
+    customHtmlContent: null,
   },
   seo: null,
 };

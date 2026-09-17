@@ -29,6 +29,7 @@ export function adaptServiceOffering(
     content: sanitizeWpHtml(
       wpService.content || wpService.serviceFields?.description || "",
     ),
+    customHtmlContent: sanitizeWpHtml(wpService.serviceFields?.customHtmlContent || ""),
     publishedAt: wpService.date,
     updatedAt: wpService.modified,
     icon: wpService.serviceFields?.icon

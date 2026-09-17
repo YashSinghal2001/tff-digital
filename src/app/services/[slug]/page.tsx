@@ -147,7 +147,14 @@ export default async function ServiceDetailPage({ params }: ServiceDetailPagePro
             </div>
           ) : null}
 
-          {service.content ? (
+          {/* Service-specific custom HTML (ACF `custom_html_content`) wins
+              when present; the existing description/content rendering is
+              the fallback otherwise — never both at once. */}
+          {service.customHtmlContent ? (
+            <div className="mx-auto mt-10 max-w-3xl">
+              <ArticleContent html={service.customHtmlContent} />
+            </div>
+          ) : service.content ? (
             <div className="mx-auto mt-10 max-w-3xl">
               <ArticleContent html={service.content} />
             </div>

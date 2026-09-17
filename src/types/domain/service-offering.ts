@@ -7,6 +7,8 @@ export interface ServiceOffering {
   title: string;
   summary: string;
   content: string;
+  /** Sanitized ACF `custom_html_content`; empty string when unset. Takes over the content slot on the service detail page when non-empty. */
+  customHtmlContent: string;
   publishedAt: string;
   updatedAt: string;
   icon: Media | null;

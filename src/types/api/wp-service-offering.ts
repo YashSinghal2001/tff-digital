@@ -9,6 +9,9 @@ export interface WPServiceFields {
   // ACF textarea: one feature per line (CRLF-separated from wp-admin).
   features: string | null;
   icon: { node: WPMediaItem } | null;
+  // ACF textarea: raw HTML, rendered as-is (sanitized in the adapter) in
+  // place of `description`/`content` when present.
+  customHtmlContent: string | null;
 }
 
 export interface WPServiceOffering {

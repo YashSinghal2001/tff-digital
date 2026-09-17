@@ -25,6 +25,7 @@ export const SERVICE_FIELDS = gql`
           ...MediaFields
         }
       }
+      customHtmlContent
     }
     seo {
       ...SeoFields
