@@ -7,8 +7,10 @@ export interface ServiceOffering {
   title: string;
   summary: string;
   content: string;
-  /** Sanitized ACF `custom_html_content`; empty string when unset. Takes over the content slot on the service detail page when non-empty. */
+  /** Sanitized ACF `custom_html_content`, with any `data-content-section="faq"` block already lifted into `customHtmlFaqs` and removed; empty string when unset. Takes over the content slot on the service detail page when non-empty. */
   customHtmlContent: string;
+  /** FAQ items parsed out of customHtmlContent's `data-content-section="faq"` block, if any; empty when the field has no such block or it parsed to zero valid items. */
+  customHtmlFaqs: { question: string; answer: string }[];
   publishedAt: string;
   updatedAt: string;
   icon: Media | null;

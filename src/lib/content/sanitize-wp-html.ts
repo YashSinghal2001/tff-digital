@@ -50,6 +50,22 @@ const dropUnsafeId: sanitizeHtml.Transformer = (tagName, attribs) => {
   return { tagName, attribs };
 };
 
+// CONTENT-FAQ: a service's customHtmlContent can mark one <section> as the
+// CMS-authored FAQ block (data-content-section="faq") so the service-offering
+// adapter can lift it out into the same { question, answer } shape the ACF
+// faqs repeater already produces (src/lib/content/extract-faq-section.ts).
+// Any other value — or an editor guessing at the attribute for styling — is
+// stripped, so this one exact marker is the only thing that can trigger
+// extraction; "faq" carries no script/URL semantics, so allowing it doesn't
+// widen the sanitizer's script-execution surface.
+const FAQ_SECTION_MARKER = "faq";
+const restrictFaqSectionMarker: sanitizeHtml.Transformer = (tagName, attribs) => {
+  if (attribs["data-content-section"] !== FAQ_SECTION_MARKER) {
+    delete attribs["data-content-section"];
+  }
+  return { tagName, attribs };
+};
+
 // A target="_blank" link must not re-enable window.opener via rel="opener".
 const normalizeLink: sanitizeHtml.Transformer = (tagName, attribs) => {
   const rel = new Set(
@@ -126,6 +142,7 @@ const WP_HTML_POLICY: sanitizeHtml.IOptions = {
     h6: ["id"],
     a: ["id", "href", "title", "target", "rel"],
     li: ["id"],
+    section: ["data-content-section"],
     ol: ["start", "reversed", "type"],
     abbr: ["title"],
     details: ["open"],
@@ -199,6 +216,7 @@ const WP_HTML_POLICY: sanitizeHtml.IOptions = {
     h6: dropUnsafeId,
     li: dropUnsafeId,
     a: normalizeLink,
+    section: restrictFaqSectionMarker,
   },
   // Void elements in this allowlist (sanitize-html's default list also
   // carries tags this policy never allows, e.g. <base>/<link>/<meta>).

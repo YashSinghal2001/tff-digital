@@ -7,8 +7,8 @@ import { readFileSync } from "node:fs";
 // route — not as six hardcoded per-page blocks — and must not introduce a
 // second ProfessionalService/Organization or BreadcrumbList builder call.
 // FAQPage is sourced from the same `faqItems` variable the visible
-// accordion renders (service-specific FAQs, falling back to the shared
-// generic list) — not a second, drifting copy.
+// accordion renders (customHtmlContent's FAQ section, then the ACF repeater,
+// then the shared generic list) — not a second, drifting copy.
 
 const SERVICE_DETAIL_PAGE = readFileSync(new URL("./page.tsx", import.meta.url), "utf8");
 
@@ -26,10 +26,10 @@ describe("service detail page JSON-LD wiring", () => {
     assert.equal(SERVICE_DETAIL_PAGE.match(/<FAQ items=\{faqItems\}/g)?.length, 1);
   });
 
-  test("faqItems prefers service-specific FAQs, falling back to the generic list", () => {
+  test("faqItems prefers customHtmlContent's FAQ section, then the ACF repeater, then the generic list", () => {
     assert.match(
       SERVICE_DETAIL_PAGE,
-      /const faqItems = service\.faqs\.length > 0 \? service\.faqs : faqs;/,
+      /const faqItems =\s*\[service\.customHtmlFaqs, service\.faqs, faqs\]\.find\(\(list\) => list\.length > 0\) \?\? faqs;/,
     );
   });
 

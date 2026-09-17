@@ -98,11 +98,13 @@ export default async function ServiceDetailPage({ params }: ServiceDetailPagePro
 
   const canonicalUrl = getCanonicalUrl(ROUTES.service(slug));
   const Icon = getServiceIcon(service.slug);
-  // Service-specific FAQs (CMS-editable ACF repeater) win when present; the
-  // shared generic FAQ list is the fallback otherwise. The visible accordion
-  // and the FAQPage JSON-LD below both read this same variable so they can
-  // never drift apart.
-  const faqItems = service.faqs.length > 0 ? service.faqs : faqs;
+  // Three-tier FAQ fallback, most CMS-specific first: FAQs authored inside
+  // customHtmlContent's data-content-section="faq" block, then the ACF faqs
+  // repeater, then the shared generic list. The visible accordion and the
+  // FAQPage JSON-LD below both read this same variable so they can never
+  // drift apart.
+  const faqItems =
+    [service.customHtmlFaqs, service.faqs, faqs].find((list) => list.length > 0) ?? faqs;
 
   return (
     <>

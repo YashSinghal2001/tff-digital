@@ -200,4 +200,101 @@ describe("adaptServiceOffering", () => {
       /<script|onerror|javascript:/,
     );
   });
+
+  describe("CONTENT-FAQ: FAQ section embedded in customHtmlContent", () => {
+    test("lifts a data-content-section=\"faq\" block into customHtmlFaqs and strips it from customHtmlContent", () => {
+      const html =
+        "<section><h2>How the project moves</h2><p>Step one.</p></section>" +
+        '<section data-content-section="faq"><h2>Frequently asked questions</h2>' +
+        "<details><summary>How much does a website cost?</summary>" +
+        "<p>It depends on the work involved.</p></details></section>";
+      const service = adaptServiceOffering({
+        ...wpServiceOfferingFixture,
+        serviceFields: {
+          ...wpServiceOfferingFixture.serviceFields!,
+          customHtmlContent: html,
+        },
+      });
+
+      assert.deepEqual(service.customHtmlFaqs, [
+        {
+          question: "How much does a website cost?",
+          answer: "It depends on the work involved.",
+        },
+      ]);
+      // No duplicate rendering: the marked section — and any trace of the
+      // marker attribute — is gone from what ArticleContent will render.
+      assert.equal(
+        service.customHtmlContent,
+        "<section><h2>How the project moves</h2><p>Step one.</p></section>",
+      );
+      assert.doesNotMatch(service.customHtmlContent, /data-content-section/);
+      assert.doesNotMatch(service.customHtmlContent, /Frequently asked questions/);
+    });
+
+    test("yields an empty customHtmlFaqs list when there is no marked section", () => {
+      const html = "<section><h2>Plan</h2><p>Body.</p></section>";
+      const service = adaptServiceOffering({
+        ...wpServiceOfferingFixture,
+        serviceFields: {
+          ...wpServiceOfferingFixture.serviceFields!,
+          customHtmlContent: html,
+        },
+      });
+      assert.deepEqual(service.customHtmlFaqs, []);
+      assert.equal(service.customHtmlContent, html);
+    });
+
+    test("yields an empty customHtmlFaqs list, and still strips the section, when it has no valid items", () => {
+      const html =
+        "<section><p>Keep me.</p></section>" +
+        '<section data-content-section="faq"><h2>Frequently asked questions</h2></section>';
+      const service = adaptServiceOffering({
+        ...wpServiceOfferingFixture,
+        serviceFields: {
+          ...wpServiceOfferingFixture.serviceFields!,
+          customHtmlContent: html,
+        },
+      });
+      assert.deepEqual(service.customHtmlFaqs, []);
+      assert.equal(service.customHtmlContent, "<section><p>Keep me.</p></section>");
+    });
+
+    test("does not treat an unmarked <details> elsewhere on the page as a FAQ", () => {
+      // Same fixture the "preserving legitimate markup exactly" test above
+      // uses — an ordinary <details> with no data-content-section marker
+      // must keep rendering as content, not get harvested into customHtmlFaqs.
+      const html =
+        '<section class="promo"><h2>Plan</h2><p>Keep <strong>this</strong>.</p>' +
+        "<details><summary>FAQ</summary><p>Answer</p></details>" +
+        "<table><tr><td>cell</td></tr></table></section>";
+      const service = adaptServiceOffering({
+        ...wpServiceOfferingFixture,
+        serviceFields: {
+          ...wpServiceOfferingFixture.serviceFields!,
+          customHtmlContent: html,
+        },
+      });
+      assert.equal(service.customHtmlContent, html);
+      assert.deepEqual(service.customHtmlFaqs, []);
+    });
+
+    test("extraction runs on already-sanitized content — a scripted FAQ block can't smuggle markup into customHtmlFaqs", () => {
+      const hostile =
+        '<section data-content-section="faq">' +
+        '<details><summary>Q<script>alert(1)</script>?</summary>' +
+        '<p>A<img src="x" onerror="alert(1)">.</p></details></section>';
+      const service = adaptServiceOffering({
+        ...wpServiceOfferingFixture,
+        serviceFields: {
+          ...wpServiceOfferingFixture.serviceFields!,
+          customHtmlContent: hostile,
+        },
+      });
+      // <script> and onerror never survive sanitizeWpHtml, which runs before
+      // extraction — the plain-text result carries no trace of either.
+      assert.deepEqual(service.customHtmlFaqs, [{ question: "Q?", answer: "A ." }]);
+      assert.doesNotMatch(JSON.stringify(service.customHtmlFaqs), /script|onerror|alert/);
+    });
+  });
 });

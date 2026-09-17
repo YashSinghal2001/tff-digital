@@ -6,6 +6,7 @@ import type { ServiceOffering } from "@/types/domain/service-offering";
 import { adaptMedia } from "@/adapters/media.adapter";
 import { adaptSeo } from "@/adapters/seo.adapter";
 import { sanitizeWpHtml } from "@/lib/content/sanitize-wp-html";
+import { extractFaqSection } from "@/lib/content/extract-faq-section";
 
 // The ACF `features` textarea arrives as one string with CRLF (wp-admin) or
 // LF line endings; each non-empty trimmed line is one feature bullet.
@@ -37,6 +38,17 @@ export function adaptServiceOffering(
 ): ServiceOffering {
   const summary = wpService.serviceFields?.shortDescription ?? "";
 
+  // CONTENT-FAQ: pull the CMS-authored FAQ section (data-content-section=
+  // "faq") out of customHtmlContent AFTER sanitizing it, so extraction only
+  // ever sees the same well-formed, script-free tree ArticleContent will
+  // render — never the raw wp-admin field. The marked section is removed
+  // from customHtmlContent either way (found-but-empty still counts as
+  // "handled"), so it can never render twice: once as raw HTML and once
+  // through the FAQ component.
+  const { html: customHtmlContent, faqs: customHtmlFaqs } = extractFaqSection(
+    sanitizeWpHtml(wpService.serviceFields?.customHtmlContent || ""),
+  );
+
   return {
     id: wpService.id,
     slug: wpService.slug,
@@ -47,7 +59,8 @@ export function adaptServiceOffering(
     content: sanitizeWpHtml(
       wpService.content || wpService.serviceFields?.description || "",
     ),
-    customHtmlContent: sanitizeWpHtml(wpService.serviceFields?.customHtmlContent || ""),
+    customHtmlContent,
+    customHtmlFaqs,
     publishedAt: wpService.date,
     updatedAt: wpService.modified,
     icon: wpService.serviceFields?.icon
