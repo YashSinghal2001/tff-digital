@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test, { afterEach, describe, mock } from "node:test";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 
 import {
   homePreviewFaq,
@@ -10,7 +10,6 @@ import {
   richTextToPlain,
 } from "../../data/home-preview-content.ts";
 import { testimonials } from "../../data/testimonials.ts";
-import { checkHomePreviewAccess } from "../../lib/preview/home-preview-auth.ts";
 import { isReservedPageSlug } from "../../lib/content/reserved-page-slugs.ts";
 
 // /home-preview: staging copy of the homepage carrying the client's homepage
@@ -199,94 +198,33 @@ describe("PDF copy", () => {
   });
 });
 
-describe("preview access protection", () => {
-  const creds = { username: "client", password: "s3cret:pass" };
-  const basic = (value: string) => `Basic ${btoa(value)}`;
+describe("public access (no authentication)", () => {
+  const exists = (path: string) => existsSync(new URL(path, import.meta.url));
 
-  test("is disabled (fail closed) when either credential is unset", () => {
-    assert.equal(
-      checkHomePreviewAccess(basic("client:s3cret:pass"), {}),
-      "disabled",
-    );
-    assert.equal(
-      checkHomePreviewAccess(null, { username: "client" }),
-      "disabled",
-    );
-    assert.equal(checkHomePreviewAccess(null, { password: "x" }), "disabled");
-  });
-
-  test("denies missing, malformed or wrong credentials", () => {
-    for (const header of [
-      null,
-      "",
-      "Bearer abc",
-      "Basic !!!",
-      basic("nocolon"),
-      basic("client:wrong"),
-      basic("other:s3cret:pass"),
+  test("no proxy/middleware can intercept the route with an auth prompt or redirect", () => {
+    for (const file of [
+      "../../proxy.ts",
+      "../../middleware.ts",
+      "../../../proxy.ts",
+      "../../../middleware.ts",
     ]) {
-      assert.equal(
-        checkHomePreviewAccess(header, creds),
-        "denied",
-        String(header),
-      );
+      assert.ok(!exists(file), `${file} must not exist`);
     }
   });
 
-  test("grants the configured credentials (password may contain ':')", () => {
-    assert.equal(
-      checkHomePreviewAccess(basic("client:s3cret:pass"), creds),
-      "granted",
+  test("the page reads no request credentials, env gate or redirect", () => {
+    assert.doesNotMatch(
+      PREVIEW,
+      /headers\(|cookies\(|process\.env|redirect\(|notFound\(|HOME_PREVIEW/,
     );
   });
 
-  describe("proxy", () => {
-    const env = { ...process.env };
-    afterEach(() => {
-      process.env = { ...env };
-    });
-    const load = () => import("../../proxy.ts");
-    const request = async (authorization?: string) => {
-      const { NextRequest } = await import("next/server");
-      return new NextRequest("https://www.tffdigital.com/home-preview", {
-        headers: authorization ? { authorization } : {},
-      });
-    };
-
-    test("only matches /home-preview", async () => {
-      const { config } = await load();
-      assert.deepEqual(config.matcher, [
-        "/home-preview",
-        "/home-preview/:path*",
-      ]);
-    });
-
-    test("404s when no credentials are configured", async () => {
-      delete process.env.HOME_PREVIEW_USERNAME;
-      delete process.env.HOME_PREVIEW_PASSWORD;
-      const { proxy } = await load();
-      const response = proxy(await request(basic("client:s3cret:pass")));
-      assert.equal(response.status, 404);
-      assert.equal(response.headers.get("x-robots-tag"), "noindex, nofollow");
-    });
-
-    test("challenges with 401 Basic, then passes through with noindex", async () => {
-      process.env.HOME_PREVIEW_USERNAME = creds.username;
-      process.env.HOME_PREVIEW_PASSWORD = creds.password;
-      const { proxy } = await load();
-
-      const denied = proxy(await request());
-      assert.equal(denied.status, 401);
-      assert.match(
-        denied.headers.get("www-authenticate") ?? "",
-        /^Basic realm=/,
-      );
-
-      const granted = proxy(await request(basic("client:s3cret:pass")));
-      assert.equal(granted.status, 200);
-      assert.equal(granted.headers.get("x-middleware-next"), "1");
-      assert.equal(granted.headers.get("x-robots-tag"), "noindex, nofollow");
-    });
+  test(".env.example no longer documents preview credentials", () => {
+    const env = readFileSync(
+      new URL("../../../.env.example", import.meta.url),
+      "utf8",
+    );
+    assert.doesNotMatch(env, /HOME_PREVIEW/);
   });
 });
 

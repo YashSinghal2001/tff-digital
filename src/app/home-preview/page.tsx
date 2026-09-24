@@ -33,8 +33,8 @@ import {
 } from "@/data/home-preview-content";
 
 // Staging copy of the homepage (src/app/page.tsx) carrying the client's
-// approved homepage PDF copy. Gated by src/proxy.ts (HTTP Basic auth from
-// env), noindex/nofollow, absent from the sitemap and navigation, and emits
+// approved homepage PDF copy. Public (no auth) but noindex/nofollow,
+// absent from the sitemap and navigation, and emits
 // no page-level JSON-LD so it can't compete with the real homepage's
 // Breadcrumb/FAQPage nodes. Same sections, same order, same styling as `/`;
 // only copy props differ — plus the ThreePartJourney cards are dropped
