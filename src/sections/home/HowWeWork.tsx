@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -152,7 +153,12 @@ function TimelineRow({
   );
 }
 
-export function HowWeWork() {
+export interface HowWeWorkProps {
+  heading?: ReactNode;
+  intro?: ReactNode;
+}
+
+export function HowWeWork({ heading, intro }: HowWeWorkProps = {}) {
   const entranceDelay = useEntranceDelay();
 
   return (
@@ -176,11 +182,19 @@ export function HowWeWork() {
         <motion.div {...fadeInUp} className="mb-8 lg:mb-10">
           <SectionEyebrow>HOW WE WORK</SectionEyebrow>
           <Heading as="h2">
-            A proven <GradientText>six-step</GradientText> growth engine.
+            {heading ?? (
+              <>
+                A proven <GradientText>six-step</GradientText> growth engine.
+              </>
+            )}
           </Heading>
           <p className="font-body text-muted mt-4 max-w-md text-sm leading-relaxed">
-            From insight to execution, every step has a purpose and every action
-            drives measurable results.
+            {intro ?? (
+              <>
+                From insight to execution, every step has a purpose and every
+                action drives measurable results.
+              </>
+            )}
           </p>
         </motion.div>
 

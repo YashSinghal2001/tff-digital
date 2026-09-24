@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import { Heading } from "@/components/ui/Heading";
@@ -10,7 +11,18 @@ import { TestimonialSlider } from "@/components/testimonials/TestimonialSlider";
 import { testimonials } from "@/data/testimonials";
 import { fadeInUp } from "@/styles/animations";
 
-export function Testimonials() {
+export interface TestimonialsProps {
+  heading?: ReactNode;
+  intro?: ReactNode;
+  /** Extra header content (e.g. pull-quote excerpts), below the intro. */
+  excerpts?: ReactNode;
+}
+
+export function Testimonials({
+  heading,
+  intro,
+  excerpts,
+}: TestimonialsProps = {}) {
   return (
     <section id="testimonials" className="py-12 lg:py-16">
       <Container size="full" className="max-w-[1280px]">
@@ -20,12 +32,21 @@ export function Testimonials() {
         >
           <SectionEyebrow>CLIENT FEEDBACK</SectionEyebrow>
           <Heading as="h2">
-            What our <GradientText>clients say.</GradientText>
+            {heading ?? (
+              <>
+                What our <GradientText>clients say.</GradientText>
+              </>
+            )}
           </Heading>
           <p className="font-body text-muted mx-auto mt-4 max-w-md text-sm">
-            Real feedback from businesses we&apos;ve helped grow through
-            strategy, SEO, marketing, and digital execution.
+            {intro ?? (
+              <>
+                Real feedback from businesses we&apos;ve helped grow through
+                strategy, SEO, marketing, and digital execution.
+              </>
+            )}
           </p>
+          {excerpts}
         </motion.div>
 
         <motion.div {...fadeInUp} className="mb-8 flex justify-center">

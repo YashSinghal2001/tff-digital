@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { motion } from "framer-motion";
 import { CircleX, CircleCheck } from "lucide-react";
 import { Container } from "@/components/ui/Container";
@@ -26,7 +27,12 @@ const tff = [
   "One integrated, accountable team",
 ];
 
-export function WhyTFF() {
+export interface WhyTFFProps {
+  heading?: ReactNode;
+  intro?: ReactNode;
+}
+
+export function WhyTFF({ heading, intro }: WhyTFFProps = {}) {
   const entranceDelay = useEntranceDelay();
 
   return (
@@ -35,8 +41,17 @@ export function WhyTFF() {
         <motion.div {...fadeInUp} className="mb-8 text-center">
           <SectionEyebrow>WHY TFF</SectionEyebrow>
           <Heading as="h2">
-            The difference is <GradientText>strategy.</GradientText>
+            {heading ?? (
+              <>
+                The difference is <GradientText>strategy.</GradientText>
+              </>
+            )}
           </Heading>
+          {intro ? (
+            <p className="font-body text-muted mx-auto mt-4 max-w-md text-sm">
+              {intro}
+            </p>
+          ) : null}
         </motion.div>
 
         <div className="grid gap-6 md:grid-cols-2">

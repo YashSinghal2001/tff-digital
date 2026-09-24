@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
@@ -13,7 +14,12 @@ const stats = [
   { value: "12+", label: "Year Experience" },
 ];
 
-export function HeroSection() {
+export interface HeroSectionProps {
+  heading?: ReactNode;
+  intro?: ReactNode;
+}
+
+export function HeroSection({ heading, intro }: HeroSectionProps = {}) {
   return (
     <section className="relative flex flex-col justify-center overflow-hidden lg:flex-1">
       <Glow className="left-1/2 top-0 h-[420px] w-[420px] -translate-x-1/2 opacity-20" />
@@ -26,14 +32,22 @@ export function HeroSection() {
             </Badge>
 
             <h1 className="font-heading text-[38px] font-bold leading-[1.15] text-white sm:text-[48px] lg:text-[clamp(44px,4vw,56px)] lg:leading-[1.1]">
-              Target Right. <br />
-              <GradientText>Find Strategy.</GradientText> <br />
-              Finish Strong.
+              {heading ?? (
+                <>
+                  Target Right. <br />
+                  <GradientText>Find Strategy.</GradientText> <br />
+                  Finish Strong.
+                </>
+              )}
             </h1>
 
             <p className="max-w-md font-body text-sm leading-relaxed text-muted">
-              We don&apos;t sell services — we build digital growth systems that blend
-              strategy, creative branding, and measurable performance.
+              {intro ?? (
+                <>
+                  We don&apos;t sell services — we build digital growth systems that blend
+                  strategy, creative branding, and measurable performance.
+                </>
+              )}
             </p>
 
             <div className="flex flex-wrap gap-4">

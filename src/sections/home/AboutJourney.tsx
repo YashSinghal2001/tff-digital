@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Briefcase, Search, Target, TrendingUp } from "lucide-react";
@@ -69,23 +70,42 @@ const founders: Array<{
   },
 ];
 
-export function AboutJourney() {
+export interface AboutJourneyProps {
+  heading?: ReactNode;
+  intro?: ReactNode;
+  /** The three-part journey cards repeat HowWeWork's six steps in brief. */
+  showJourney?: boolean;
+}
+
+export function AboutJourney({
+  heading,
+  intro,
+  showJourney = true,
+}: AboutJourneyProps = {}) {
   return (
     <section id="about" className="py-12 lg:py-16">
       <Container size="full" className="max-w-[1280px]">
         <motion.div {...fadeInUp} className="mx-auto mb-8 max-w-2xl text-center">
           <SectionEyebrow>ABOUT US</SectionEyebrow>
           <Heading as="h2">
-            Built by <GradientText>growth leaders,</GradientText> for{" "}
-            <GradientText>growth leaders.</GradientText>
+            {heading ?? (
+              <>
+                Built by <GradientText>growth leaders,</GradientText> for{" "}
+                <GradientText>growth leaders.</GradientText>
+              </>
+            )}
           </Heading>
           <p className="mx-auto mt-4 max-w-md font-body text-sm text-muted">
-            Experienced. Focused. Results-driven. We lead with strategy and execute with
-            precision to deliver measurable growth.
+            {intro ?? (
+              <>
+                Experienced. Focused. Results-driven. We lead with strategy and execute with
+                precision to deliver measurable growth.
+              </>
+            )}
           </p>
         </motion.div>
 
-        <div className="mb-10 grid gap-6 lg:grid-cols-2 lg:gap-8">
+        <div className={`${showJourney ? "mb-10 " : ""}grid gap-6 lg:grid-cols-2 lg:gap-8`}>
           {founders.map((founder) => (
             <motion.div key={founder.name} {...fadeInUp} className="h-full">
               <div className="group h-full rounded-[25px] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--color-primary)_35%,transparent),color-mix(in_srgb,var(--color-secondary)_35%,transparent))] p-px transition-transform duration-200 hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:translate-y-0">
@@ -149,11 +169,15 @@ export function AboutJourney() {
           ))}
         </div>
 
-        <motion.p {...fadeInUp} className="mb-8 font-heading text-lg font-bold text-white">
-          A three-part journey from insight to impact.
-        </motion.p>
+        {showJourney ? (
+          <>
+            <motion.p {...fadeInUp} className="mb-8 font-heading text-lg font-bold text-white">
+              A three-part journey from insight to impact.
+            </motion.p>
 
-        <ThreePartJourney />
+            <ThreePartJourney />
+          </>
+        ) : null}
       </Container>
     </section>
   );

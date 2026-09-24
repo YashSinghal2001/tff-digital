@@ -28,6 +28,7 @@ export const RESERVED_PAGE_SLUGS = new Set([
   "terms-and-conditions",
   "thank-you",
   "cookie-policy",
+  "home-preview",
   "api",
   "portfolio",
   "projects",

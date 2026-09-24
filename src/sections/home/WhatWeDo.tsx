@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/Container";
@@ -23,9 +24,19 @@ interface WhatWeDoProps {
    * data stays out of the client payload (SEO-2).
    */
   services: ServiceCardItem[];
+  heading?: ReactNode;
+  /**
+   * Off only where approved copy must never be truncated (/home-preview);
+   * the production grid keeps the 4-line clamp.
+   */
+  clampSummary?: boolean;
 }
 
-export function WhatWeDo({ services }: WhatWeDoProps) {
+export function WhatWeDo({
+  services,
+  heading,
+  clampSummary = true,
+}: WhatWeDoProps) {
   return (
     <section id="services" className="py-12 lg:py-16">
       <Container size="full" className="max-w-[1280px]">
@@ -35,9 +46,13 @@ export function WhatWeDo({ services }: WhatWeDoProps) {
         >
           <SectionEyebrow>WHAT WE DO</SectionEyebrow>
           <Heading as="h2">
-            A full growth stack,
-            <br />
-            <GradientText>under one roof.</GradientText>
+            {heading ?? (
+              <>
+                A full growth stack,
+                <br />
+                <GradientText>under one roof.</GradientText>
+              </>
+            )}
           </Heading>
           <p className="font-body text-muted mx-auto mt-4 max-w-md text-sm">
             Six disciplines, one integrated system — engineered to move a single
@@ -66,7 +81,13 @@ export function WhatWeDo({ services }: WhatWeDoProps) {
                         <h3 className="font-heading text-lg font-bold text-white xl:text-base">
                           {service.title}
                         </h3>
-                        <p className="font-body text-muted line-clamp-4 text-sm">
+                        <p
+                          className={
+                            clampSummary
+                              ? "font-body text-muted line-clamp-4 text-sm"
+                              : "font-body text-muted text-sm"
+                          }
+                        >
                           {service.summary}
                         </p>
                         <Link

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { ChevronDown } from "lucide-react";
@@ -17,11 +17,15 @@ export type { FAQItem };
 export { faqs };
 
 export interface FAQProps {
-  /** Page-specific questions; falls back to the shared defaults. */
-  items?: FAQItem[];
+  /**
+   * Page-specific questions; falls back to the shared defaults. Answers may
+   * carry inline links (ReactNode) — JSON-LD callers keep using FAQItem.
+   */
+  items?: Array<{ question: string; answer: ReactNode }>;
+  heading?: ReactNode;
 }
 
-export function FAQ({ items = faqs }: FAQProps) {
+export function FAQ({ items = faqs, heading }: FAQProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   const entranceDelay = useEntranceDelay();
@@ -32,7 +36,11 @@ export function FAQ({ items = faqs }: FAQProps) {
         <motion.div {...fadeInUp} className="mb-8 text-center">
           <SectionEyebrow>FAQ</SectionEyebrow>
           <Heading as="h2">
-            Questions, <GradientText>answered.</GradientText>
+            {heading ?? (
+              <>
+                Questions, <GradientText>answered.</GradientText>
+              </>
+            )}
           </Heading>
         </motion.div>
 
