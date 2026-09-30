@@ -48,9 +48,22 @@ const POST_FIELDS = gql`
   ${SEO_FRAGMENT}
 `;
 
+// TEMPORARY CONTAINMENT (2026-09-30) — REVERT after the WordPress spam
+// cleanup by deleting the `where` argument (back to the default DATE DESC).
+// ~3,000 injected posts dated 2026-09-11 with a null `modified` sort ahead
+// of every real post by date, so a DATE-ordered page is all spam and the
+// repository's per-record validation leaves it empty. MODIFIED DESC sinks
+// null-modified records below real ones. Affects every GET_POSTS consumer:
+// the /blog listing, the recent/popular sidebars on /blog, post, category
+// and tag pages, /blog/[slug] generateStaticParams, and the sitemap. Category,
+// tag and search queries are deliberately left on their default order.
 export const GET_POSTS = gql`
   query GetPosts($first: Int = 10, $after: String) {
-    posts(first: $first, after: $after) {
+    posts(
+      first: $first
+      after: $after
+      where: { orderby: { field: MODIFIED, order: DESC } }
+    ) {
       nodes {
         ...PostFields
       }

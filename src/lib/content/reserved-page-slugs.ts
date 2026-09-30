@@ -17,6 +17,9 @@
  *    the (currently dormant) Projects content type. Mirrors that decision
  *    rather than reopening it — see src/constants/routes.test.ts's
  *    DORMANT_PATH pattern, which this list is kept in sync with.
+ * 3. `home` — the real homepage is `/`; a WordPress Page named "home"
+ *    (the Elementor migration/staging Home page) must not be publicly
+ *    served as a second, indexable homepage at `/home`.
  */
 export const RESERVED_PAGE_SLUGS = new Set([
   "about",
@@ -28,6 +31,7 @@ export const RESERVED_PAGE_SLUGS = new Set([
   "terms-and-conditions",
   "thank-you",
   "cookie-policy",
+  "home",
   "home-preview",
   "api",
   "portfolio",

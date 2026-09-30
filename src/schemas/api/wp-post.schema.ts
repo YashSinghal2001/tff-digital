@@ -50,3 +50,16 @@ export const wpPostsQueryResultSchema = z.object({
 export const wpPostQueryResultSchema = z.object({
   post: wpPostSchema.nullable(),
 }) satisfies z.ZodType<WPPostQueryResult>;
+
+// Envelopes the repository actually parses with (2026-09 spam incident):
+// the connection shell stays strict, but each post is validated on its own
+// against wpPostSchema (see keepValidWordPressNodes), so one malformed
+// record is dropped instead of failing the whole response. wpPostSchema
+// itself is unchanged — `modified: null` stays invalid.
+export const wpPostsEnvelopeSchema = z.object({
+  posts: wpConnectionSchema(z.unknown()),
+});
+
+export const wpPostEnvelopeSchema = z.object({
+  post: z.unknown(),
+});

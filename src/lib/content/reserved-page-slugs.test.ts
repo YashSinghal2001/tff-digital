@@ -25,10 +25,19 @@ const APP = path.resolve(
 // deliberately keeps the Projects content type unclaimed at these URLs.
 const ARCH2_RESERVED = new Set(["portfolio", "projects", "work"]);
 const API_RESERVED = new Set(["api"]);
+// Not a route directory either: the homepage lives at src/app/page.tsx (`/`),
+// and `home` is reserved so the WordPress staging Home page can't be served
+// at /home through the generic [slug] route.
+const HOMEPAGE_ALIAS = new Set(["home"]);
 
 describe("RESERVED_PAGE_SLUGS matches the real route list", () => {
   for (const slug of RESERVED_PAGE_SLUGS) {
-    if (ARCH2_RESERVED.has(slug) || API_RESERVED.has(slug)) continue;
+    if (
+      ARCH2_RESERVED.has(slug) ||
+      API_RESERVED.has(slug) ||
+      HOMEPAGE_ALIAS.has(slug)
+    )
+      continue;
     test(`${slug} has a real src/app/${slug}/page.tsx`, () => {
       assert.ok(
         existsSync(path.join(APP, slug, "page.tsx")),
@@ -87,13 +96,14 @@ describe("isReservedPageSlug / filterReservedPageSlugs", () => {
       "portfolio",
       "projects",
       "work",
+      "home",
     ]) {
       assert.equal(isReservedPageSlug(slug), true, slug);
     }
   });
 
   test("does not flag a legitimate new Page slug", () => {
-    for (const slug of ["our-story", "faq", "careers", "home"]) {
+    for (const slug of ["our-story", "faq", "careers", "homepage"]) {
       assert.equal(isReservedPageSlug(slug), false, slug);
     }
   });

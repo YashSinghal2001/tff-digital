@@ -37,3 +37,34 @@ export function parseWordPressResponse<TSchema extends z.ZodType>(
     "parse",
   );
 }
+
+/**
+ * Per-record counterpart of parseWordPressResponse for collection nodes
+ * (2026-09 spam incident): each node is validated on its own against the
+ * strict schema, invalid ones are dropped, and only an aggregate count plus
+ * the distinct issue paths/codes are logged — never node content. One
+ * malformed CMS record (e.g. an injected post with `modified: null`) can no
+ * longer take down a whole listing, and it can never be rendered either.
+ */
+export function keepValidWordPressNodes<TSchema extends z.ZodType>(
+  schema: TSchema,
+  nodes: unknown[],
+  queryLabel: string,
+): z.output<TSchema>[] {
+  const valid: z.output<TSchema>[] = [];
+  const issues = new Set<string>();
+  for (const node of nodes) {
+    const result = schema.safeParse(node);
+    if (result.success) valid.push(result.data);
+    else
+      for (const issue of result.error.issues)
+        issues.add(`${issue.path.join(".") || "<root>"}: ${issue.code}`);
+  }
+  const rejected = nodes.length - valid.length;
+  if (rejected > 0) {
+    console.warn(
+      `[${queryLabel}] Rejected ${rejected} of ${nodes.length} invalid WordPress records (${[...issues].slice(0, 5).join("; ")})`,
+    );
+  }
+  return valid;
+}
