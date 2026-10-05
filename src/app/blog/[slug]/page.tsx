@@ -22,6 +22,7 @@ import {
   stripDuplicateFeaturedImage,
   htmlToPlainText,
 } from "@/lib/content/post-content";
+import { withFaqAccordion } from "@/lib/content/blog-faq";
 import { formatPostDate } from "@/lib/content/format-date";
 import { ROUTES } from "@/constants/routes";
 import type { Post } from "@/types/domain/post";
@@ -68,7 +69,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   if (!post) notFound();
 
   const dedupedContent = stripDuplicateFeaturedImage(post.content, post.featuredImage?.url);
-  const { html, headings } = withHeadingIds(dedupedContent);
+  const { html: headedHtml, headings } = withHeadingIds(dedupedContent);
+  // After withHeadingIds so the question headings keep their ToC anchors.
+  const html = withFaqAccordion(headedHtml);
   const canonicalUrl = getCanonicalUrl(ROUTES.blogPost(slug));
 
   const primaryCategory = post.categories[0];

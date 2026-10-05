@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
+import { bindFaqAccordion } from "@/lib/content/blog-faq-accordion";
 import "highlight.js/styles/github-dark-dimmed.css";
 
 export interface ArticleContentProps {
@@ -19,6 +20,14 @@ export interface ArticleContentProps {
  */
 export function ArticleContent({ html, className }: ArticleContentProps) {
   const contentRef = useRef<HTMLDivElement>(null);
+
+  // FAQ accordion (see src/lib/content/blog-faq.ts): the markup is server
+  // HTML, so its toggling is one delegated listener rather than React state.
+  useEffect(() => {
+    const container = contentRef.current;
+    if (!container?.querySelector("[data-faq-accordion]")) return;
+    return bindFaqAccordion(container);
+  }, [html]);
 
   useEffect(() => {
     const container = contentRef.current;
@@ -45,6 +54,10 @@ export function ArticleContent({ html, className }: ArticleContentProps) {
         "font-body text-sm leading-relaxed text-muted [&>*+*]:mt-5",
         "[&_h2]:mt-10 [&_h2]:font-heading [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-white",
         "[&_h3]:mt-8 [&_h3]:font-heading [&_h3]:text-xl [&_h3]:font-bold [&_h3]:text-white",
+        // FAQ accordion question headings (blog-faq.ts) sit inside a card,
+        // so they drop the section-heading margin/size the rules above give
+        // every h3; the attribute selector outranks the bare tag selector.
+        "[&_[data-faq-question]]:mt-0 [&_[data-faq-question]]:text-base [&_[data-faq-question]]:font-semibold",
         "[&_p]:text-sm [&_p]:text-muted",
         "[&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2",
         "[&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5",
